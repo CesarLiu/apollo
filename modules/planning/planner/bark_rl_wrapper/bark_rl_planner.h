@@ -69,6 +69,10 @@ class BarkRlPlanner : public LatticePlanner {
   std::vector<BarkObstacle> ConvertToBarkObstacles(
       const std::vector<const Obstacle*>& obstacles, double timestep) const;
 
+  void SaveDiscretizedTrajectoryToFile(
+      const apollo::planning::DiscretizedTrajectory& traj,
+      const std::string& path_to_file, const std::string& file_name);
+
  private:
   std::shared_ptr<cyber::Writer<ApolloToBarkMsg>> apollo_to_bark_msg_writer_;
   BarkResponse* bark_response_;  // TODO: initialize and handle nullptr
