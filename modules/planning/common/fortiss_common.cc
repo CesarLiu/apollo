@@ -317,6 +317,22 @@ void FillTimeDerivativesInApolloTrajectory(DiscretizedTrajectory& traj) {
   traj[traj.size() - 1].mutable_path_point()->set_dkappa(0.0);
 }
 
+std::string GetTimeString() {
+  // from cyber/logger/log_file_object.cc
+  struct ::tm tm_time;
+  const time_t timestamp =
+      static_cast<time_t>(apollo::common::time::Clock::NowInSeconds());
+  localtime_r(&timestamp, &tm_time);
+  std::ostringstream time_pid_stream;
+  time_pid_stream.fill('0');
+  time_pid_stream << 1900 + tm_time.tm_year << std::setw(2)
+                  << 1 + tm_time.tm_mon << std::setw(2) << tm_time.tm_mday
+                  << '-' << std::setw(2) << tm_time.tm_hour << std::setw(2)
+                  << tm_time.tm_min << std::setw(2) << tm_time.tm_sec << '.'
+                  << apollo::cyber::logger::GetMainThreadPid();
+  return time_pid_stream.str();
+}
+
 }  // namespace fortiss
 }  // namespace planning
 }  // namespace apollo

@@ -213,7 +213,7 @@ Status BarkRlPlanner::PlanOnReferenceLine(
     // Log full trajectories
     if (config_.bark_rl_planner_config().log_trajectories()) {
       if(smoothed_apollo_trajectory.first) {
-        const std::string& time_pid_string = GetTimeString();
+        const std::string& time_pid_string = fortiss::GetTimeString();
         const std::string& file_name = "smoothed_traj_" + time_pid_string + ".pb.txt";
         SaveDiscretizedTrajectoryToFile(smoothed_apollo_trajectory.second, logdir_.c_str(), file_name);
       }
@@ -227,7 +227,7 @@ Status BarkRlPlanner::PlanOnReferenceLine(
 
   // Log full trajectories
   if (config_.bark_rl_planner_config().log_trajectories()) {
-    const std::string& time_pid_string = GetTimeString();
+    const std::string& time_pid_string = fortiss::GetTimeString();
     const std::string& file_name = "bark_ml_traj_" + time_pid_string + ".pb.txt";
     SaveDiscretizedTrajectoryToFile(apollo_traj, logdir_.c_str(), file_name);
   }
@@ -273,7 +273,7 @@ std::vector<BarkObstacle> BarkRlPlanner::ConvertToBarkObstacles(
   return bark_obstacles;
 }
 
-void SaveDiscretizedTrajectoryToFile(
+void BarkRlPlanner::SaveDiscretizedTrajectoryToFile(
     const apollo::planning::DiscretizedTrajectory& traj,
     const std::string& path_to_file, const std::string& file_name) {
   apollo::planning::PublishableTrajectory publishable_trajectory(0.0, traj);

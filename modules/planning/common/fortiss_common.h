@@ -17,8 +17,13 @@
 
 #pragma once
 
+#include <iomanip>
+#include <iostream>
+
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/reference_line_info.h"
+#include "cyber/logger/logger_util.h"
+#include "modules/common/time/time.h"
 
 namespace apollo {
 namespace planning {
@@ -78,6 +83,8 @@ PlannerState DeterminePlannerState(const double planning_init_v,
                                    const bool brake_for_inline_while_driving = false);
 
 void FillTimeDerivativesInApolloTrajectory(DiscretizedTrajectory& traj);
+
+std::string GetTimeString();
 
 }  // namespace fortiss
 }  // namespace planning
