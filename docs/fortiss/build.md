@@ -23,7 +23,7 @@ Don't forget the [post-installation steps for Linux](https://docs.docker.com/ins
 
 As we our own docker file definition, we have to create that manually.
 
-`cd docker/buid`
+`cd docker/build`
 
 `./build_dev.sh ./dev_fortiss.dockerfile`
 
