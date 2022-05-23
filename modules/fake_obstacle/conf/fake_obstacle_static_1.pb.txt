@@ -1,10 +1,10 @@
 fake_obstacle_conf {
     id: 1
     velocity: 0.0
-    delta_s_in_front: 50
+    delta_s_in_front: 30
     heading_offset: 0.0
-    lateral_offset: 1.7
-    width: 2.0
+    lateral_offset: -2.7
+    width: 2.5
     height: 2.0
     length: 4.0
     type: VEHICLE
