@@ -67,9 +67,12 @@ docker/build/archive/
 # Data bag
 docs/demo_guide/*.bag
 docs/demo_guide/*.record
-
+docs/demo_guide/*.record*
 # Bash Environment
 .dev_bash_hist
 
 # bazel cache and others
 .cache/
+
+## Planning models only with force add 
+modules/planning/data
