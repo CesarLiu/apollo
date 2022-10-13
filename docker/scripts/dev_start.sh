@@ -48,15 +48,11 @@ MAP_VOLUMES_CONF=
 OTHER_VOLUMES_CONF=
 
 DEFAULT_MAPS=(
-    sunnyvale_big_loop
     sunnyvale_loop
-    sunnyvale_with_two_offices
-    san_mateo
     apollo_virutal_map
 )
 
 DEFAULT_TEST_MAPS=(
-    sunnyvale_big_loop
     sunnyvale_loop
 )
 

@@ -63,6 +63,7 @@ modules/calibration/data
 # Data bag
 docs/demo_guide/*.bag
 docs/demo_guide/*.record
+docs/*
 
 # Bash Environment
 .dev_bash_hist
