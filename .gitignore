@@ -80,3 +80,4 @@ tools/FlameGraph
 
 # jetbrain profiler
 .DS_Store
+doxygen/*
