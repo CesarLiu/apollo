@@ -8,14 +8,14 @@
 1. Record a bag including a localization, eg. 20190710115340.record.00000
 2. python modules/tools/map_gen/extract_path.py test.txt path_of_your_record_file/20190819152635.record.00000
    In case the record is split in several files: Pass all of them, eg. python modules/tools/map_gen/extract_path.py test.txt 20190911151106.record.00000 20190911151106.record.00001 20190911151106.record.00002 20190911151106.record.00003 20190911151106.record.00004
-3. Alternativly operation: 3a or 3b (atm I only use 3b)
+3. Alternativly operation: 3a or 3b (atm I only use 3b) --- 
 3a. python modules/tools/map_gen/map_gen.py test.txt and rename output to rename to base_map.txt
 3b. python modules/tools/map_gen/map_gen_single_lane.py test.txt base_map.txt 0
 4. new folder in modules/map/data/my_first_map, copy base_map.txt here via command: mv base_map.txt modules/map/data/my_first_map/base_map.txt
-5. scripts/generate_routing_topo_graph.sh --map_dir modules/map/data/guerickestrasse/
-6. bazel-bin/modules/map/tools/sim_map_generator --map_dir=modules/map/data/guerickestrasse/ --output_dir=modules/map/data/guerickestrasse/
+5. scripts/generate_routing_topo_graph.sh --map_dir modules/map/data/my_first_map/
+6. bazel-bin/modules/map/tools/sim_map_generator --map_dir=modules/map/data/my_first_map/ --output_dir=modules/map/data/my_first_map/
 
-7. View map: python modules/tools/mapshow/mapshow.py -m modules/map/data/guerickestrasse/base_map.txt
+7. View map: python modules/tools/mapshow/mapshow.py -m modules/map/data/my_first_map/base_map.txt
 8.  Stop and Start Dreamview: new map my_first_map available
 
 ## Pitfalls
