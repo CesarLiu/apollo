@@ -11,7 +11,7 @@
 3. Alternativly: a or b (atm I only use 3b)
 3a. python modules/tools/map_gen/map_gen.py test.txt and rename output to rename to base_map.txt
 3b. python modules/tools/map_gen/map_gen_single_lane.py test.txt base_map.txt 0
-4. new folder in modules/map/data/my_first_map, copy base_map.txt here via mv base_map.txt modules/map/data/parkplatz/base_map.txt
+4. new folder in modules/map/data/my_first_map, copy base_map.txt here via mv modules/map/data/parkplatz/base_map.txt ./
 5. scripts/generate_routing_topo_graph.sh --map_dir modules/map/data/guerickestrasse/
 6. bazel-bin/modules/map/tools/sim_map_generator --map_dir=modules/map/data/guerickestrasse/ --output_dir=modules/map/data/guerickestrasse/
 
