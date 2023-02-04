@@ -1,9 +1,9 @@
 # Running Bark-ML in Apollo
 
 ## Installation (everytime you start the docker container)
-`bash docker/scripts/dev_start.sh`
-`bash docker/scripts/dev_into.sh`
-`bash scripts/fortiss/install_bark_ml.sh`
+- `bash docker/scripts/dev_start.sh`
+- `bash docker/scripts/dev_into.sh`
+- `bash scripts/fortiss/install_bark_ml.sh`
 
 ## Starting BARK-ML Wrapper Node
 `python3.7 modules/planning/planner/bark_rl_wrapper/bark_rl_wrapper.py`
