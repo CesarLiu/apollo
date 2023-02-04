@@ -38,6 +38,7 @@ Then go back to the top directory and continue with
 Now, inside the docker container, build Apollo using:
 
  `bash apollo.sh build`
+（if you want to use MIQP planer, you have to build Apollo at the first time by using "bash apollo.sh build_use_planner_miqp" ! See unter session)
 
 **Note: ** calling `bash apollo.sh build_cpu` instead of `bash apollo.sh build`causes some erros, as opencv cannot be found. Don't do it and stick to the plan build call.
 **Note: ** If you experience experience some weird stuff when building, clean all bazel directories using `bazel clean --expunge`
