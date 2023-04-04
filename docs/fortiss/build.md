@@ -29,7 +29,7 @@ As we our own docker file definition, we have to create that manually.
 
 ## Use docker to build apollo
 
-Then go back to the top directory and continue with 
+Then go back to the top directory (change the setting in  https://github.com/fortiss/apollo/blob/0d6cb31708f13363f441d475469a6d5cb1955f44/docker/scripts/dev_start.sh#L27 as "no" if you use Apollo for the first time!) and continue with 
 
 `bash docker/scripts/dev_start.sh`
 
@@ -38,7 +38,6 @@ Then go back to the top directory and continue with
 Now, inside the docker container, build Apollo using:
 
  `bash apollo.sh build`
-（if you want to use MIQP planer, you have to build Apollo at the first time by using "bash apollo.sh build_use_planner_miqp" ! See unter session)
 
 **Note: ** calling `bash apollo.sh build_cpu` instead of `bash apollo.sh build`causes some erros, as opencv cannot be found. Don't do it and stick to the plan build call.
 **Note: ** If you experience experience some weird stuff when building, clean all bazel directories using `bazel clean --expunge`
