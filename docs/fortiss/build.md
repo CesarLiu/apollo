@@ -49,6 +49,15 @@ In order to use the MIQP Planner (described in the publications [1](https://ieee
 
 Also, as it requires the CPLEX solver, you need to place the CPLEX libraries at `apollo/cplex`. For more info, see cplex/README.md
 
+## Reset speed limit for using the planers in high-speed scenarios (Attention: all speed values in Apollo's code are using the unit 'm/s')
+
+1. First of all, check the speed limit of the Apollo maps, for example:
+https://github.com/fortiss/apollo/blob/fc62d694f5b44e1a9a72cb47487ab85b51b5a6b7/modules/map/data/guerickestrasse_assymetric_47/base_map.txt#L1239
+
+Actually, when you create the Apollo maps with the map generation tools (like https://github.com/fortiss/apollo/blob/dev_fortiss/modules/tools/map_gen/map_gen_single_lane.py), you should rewrite the speed limit according to your need: https://github.com/fortiss/apollo/blob/fc62d694f5b44e1a9a72cb47487ab85b51b5a6b7/modules/tools/map_gen/map_gen_single_lane.py#L74
+
+
+
 ## Prerequisites
 
 * If you want to run the Perception module and the Viszalization Components you need to install cuda and the nvidia docker toolchain:
