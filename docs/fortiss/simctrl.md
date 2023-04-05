@@ -4,7 +4,7 @@
 
 1. Load map in the upper right corner of dreamview
 2. Launch Simctl
-3. Launch Control, Planning, Routing in Module Controller Tab
+3. Launch "Routing", "Planning" and "Control" in Module Controller Tab
 4. Send a routing request in the Route Editing Tab
 => Vehicle is moving in the simulation
 
@@ -15,7 +15,7 @@
    1. There are parameters for that in sim control: fortiss_simcontrol_set_start_pose, fortiss_simcontrol_start_x, fortiss_simcontrol_start_y
    2. Set these in the flagfile:  /apollo/modules/common/data/global_flagfile.txt
 3. Launch Simcontrol (vehicle will jump to the specified start pose)
-4. Launch Control, Planning, Routing in Module Controller Tab
+4. Launch "Routing", "Planning" and "Control" in Module Controller Tab
 5. Send a routing request in the Route Editing Tab or select default route in the lower left corner of the Tasks tab
 => Vehicle is moving in the simulation
 
