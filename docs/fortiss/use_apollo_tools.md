@@ -16,6 +16,8 @@ Reference: https://github.com/fortiss/apollo/blob/dev_fortiss/modules/tools/READ
 
 Then replay a .record file:
 `cyber_recorder play -f path_of_your_record_file` or `cyber_recorder play -f path_of_your_record_file --loop` (for cycle replay)
-
+![](Realtime_plot.png)
 
 Optional: save the plot in your prefer direction.
+
+2. Use Rtk_recorder to 
