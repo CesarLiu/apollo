@@ -9,7 +9,10 @@ Use Apollo Tools in docker container.
 Reference: https://github.com/fortiss/apollo/blob/dev_fortiss/modules/tools/README.md
 
 1. Use Realtime_plot to plot real-time trajectory, curvature, speed, acceleration for .record files --> Data analysis
-```bash scripts/realtime_plot.sh```
+
+    ```
+    bash scripts/realtime_plot.sh
+    ```
 
 Then replay a .record file:
 `cyber_recorder play -f path_of_your_record_file` or `cyber_recorder play -f path_of_your_record_file --loop` (for cycle replay)
