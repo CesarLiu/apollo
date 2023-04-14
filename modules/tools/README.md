@@ -39,12 +39,13 @@ source scripts/apollo_base.sh
 
   * Rtk_recorder
 
-    `shortcuts: scripts/run_rtk_recorder.sh`
+    `shortcuts: scripts/rtk_recorder.sh`
 
   Record vehicle trajectory and save it into a file.
 
   * Rtk_player
 
-    `shortcuts: scripts/run_rtk_player.sh`
+    `shortcuts: scripts/rtk_player.sh`
 
   Read recorded trajectory and publish it as a planning trajectory.
+  --> Try to use SimCtrl in Dreamview to simulate letting the ego car drive by following the above trajectory.
