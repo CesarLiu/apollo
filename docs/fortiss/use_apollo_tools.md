@@ -23,7 +23,7 @@ Optional: save the plot in your prefer direction.
 
 2. Use Rtk_recorder to record status information from a .record file:
 
-2.1 Rtk_recorder
+* Rtk_recorder
 
     ```
     bash scripts/rtk_recorder.sh
@@ -33,7 +33,7 @@ Then replay a .record file in Dreamviewer and the status information will be sav
 ![](rtk_record.png)
 
 
-2.2 Rtk_player
+* Rtk_player
 
 Use SimCtrl in Dreamview to simulate letting the ego car drive by following the trajectory based on the data in above .csv file:
 
