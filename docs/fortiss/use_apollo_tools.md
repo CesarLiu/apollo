@@ -36,7 +36,6 @@ Then replay a .record file in Dreamviewer and the status information will be sav
 * Rtk_player
 
 Use SimCtrl in Dreamview to simulate letting the ego car drive by following the trajectory based on the data in above .csv file:
-
     ```
     bash scripts/rtk_player.sh
     ```
