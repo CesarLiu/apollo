@@ -36,7 +36,7 @@ source dev_into.sh
 
 ```
 # input and output path need to be absolute (except the maps in test_maps)
-bazel run //modules:converter -- -m modules/test_maps/Osterwaldstrasse_v1.xodr -o ~/Desktop/osterwald.txt -d 0.1
+bazel run //modules:converter -- -m /apollo/modules/test_maps/Osterwaldstrasse_v1.xodr -o ~/Desktop/osterwald.txt -d 0.1
 ```
 
 #### Arguments of opendrive2apollo converter
