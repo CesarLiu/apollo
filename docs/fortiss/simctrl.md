@@ -4,7 +4,7 @@
 
 1. Load map in the upper right corner of dreamview
 2. Launch Simctl
-3. Launch "Routing", "Planning" and "Control" in Module Controller Tab
+3. Launch "Routing", "Planning" and "Control" in Module Controller Tab (You can also launch the above modules via entering commands in Apollo docker container, here is a reference: https://github.com/fortiss/apollo/blob/dev_fortiss/docs/fortiss/planning_miqp.md)
 4. Send a routing request in the Route Editing Tab
 => Vehicle is moving in the simulation
 
