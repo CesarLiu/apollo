@@ -29,7 +29,7 @@ As we our own docker file definition, we have to create that manually.
 
 ## Use docker to build apollo
 
-Then go back to the top directory (change the setting in  https://github.com/fortiss/apollo/blob/0d6cb31708f13363f441d475469a6d5cb1955f44/docker/scripts/dev_start.sh#L27 as "no" if you use Apollo for the first time!) and continue with 
+Then go back to the top directory (change the setting in  https://github.com/fortiss/apollo/blob/0d6cb31708f13363f441d475469a6d5cb1955f44/docker/scripts/dev_start.sh#L27 as "no" if you use Apollo for the first time!), navigate to the 2. upper path (i.e. ~/apollo) and continue with 
 
 `bash docker/scripts/dev_start.sh`
 
