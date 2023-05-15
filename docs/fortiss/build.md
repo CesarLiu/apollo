@@ -49,6 +49,8 @@ In order to use the MIQP Planner (described in the publications [1](https://ieee
 
 Also, as it requires the CPLEX solver, you need to place the CPLEX libraries at `apollo/cplex`. For more info, see cplex/README.md
 
+For getting the above specific files, you have to ask for our maintainer JfortissJ!
+
 ## Reset speed limit for using the planers in high-speed scenarios (Attention: all speed values in Apollo's code are using the unit 'm/s')
 
 1. First of all, check the speed limit of the Apollo maps, for example:
