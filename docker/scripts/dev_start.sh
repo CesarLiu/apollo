@@ -21,7 +21,7 @@ source "${CURR_DIR}/docker_base.sh"
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 DOCKER_REPO="apolloauto/apollo"
-DEV_CONTAINER="apollo_dev_${USER}"
+DEV_CONTAINER="apollo_latest_${USER}"
 DEV_INSIDE="in-dev-docker"
 
 SUPPORTED_ARCHS=(x86_64 aarch64)
@@ -41,7 +41,7 @@ FAST_MODE="no"
 
 GEOLOC=
 
-USE_LOCAL_IMAGE=0
+USE_LOCAL_IMAGE=1
 CUSTOM_DIST=
 USER_AGREED="no"
 
