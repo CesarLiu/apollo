@@ -58,4 +58,14 @@ Setup steps:
     ![](images/dv_trajectory.png)
    The car in Dreamview is happy to move around!
 
+8. For replaying the records collected from fortiss test drives, you may need to additionally use
+   ```
+    cyber_launch start modules/transform/launch/static_transform_fortiss.launch
+    ```
+   and
+   ```
+    cyber_launch start modules/perception/production/launch/perception_fortiss_LIDAR.launch
+    ```
+   to transform the perception results of fortiss_Lidar to the world of Dreamview.
+   
 Congratulations!
