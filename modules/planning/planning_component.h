@@ -27,6 +27,7 @@
 #include "modules/planning/common/message_process.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/planning_base.h"
+#include "modules/planning/proto/bark_interface.pb.h"
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/common_msgs/planning_msgs/pad_msg.pb.h"
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
@@ -65,10 +66,12 @@ class PlanningComponent final
   std::shared_ptr<cyber::Reader<routing::RoutingResponse>> routing_reader_;
   std::shared_ptr<cyber::Reader<planning::PadMessage>> pad_msg_reader_;
   std::shared_ptr<cyber::Reader<relative_map::MapMsg>> relative_map_reader_;
+  std::shared_ptr<cyber::Reader<BarkResponse>> bark_response_reader_;
   std::shared_ptr<cyber::Reader<storytelling::Stories>> story_telling_reader_;
 
   std::shared_ptr<cyber::Writer<ADCTrajectory>> planning_writer_;
   std::shared_ptr<cyber::Writer<routing::RoutingRequest>> rerouting_writer_;
+  std::shared_ptr<cyber::Writer<ApolloToBarkMsg>> apollo_to_bark_msg_writer_;
   std::shared_ptr<cyber::Writer<PlanningLearningData>>
       planning_learning_data_writer_;
 
@@ -78,6 +81,7 @@ class PlanningComponent final
   planning::PadMessage pad_msg_;
   relative_map::MapMsg relative_map_;
   storytelling::Stories stories_;
+  BarkResponse bark_response_;
 
   LocalView local_view_;
 

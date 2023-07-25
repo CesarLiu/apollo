@@ -18,6 +18,8 @@
 
 DOCKER_USER="${USER}"
 CYBER_CONTAINER="apollo_cyber_${USER}"
+DOCKER_USER="${USER}"
+CYBER_CONTAINER="apollo_cyber_${USER}"
 
 APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 source "${APOLLO_ROOT_DIR}/scripts/apollo.bashrc"
@@ -41,6 +43,8 @@ fi
 
 if [[ "${TARGET_ARCH}" == "x86_64" || "${TARGET_ARCH}" == "aarch64" ]]; then
     docker exec \
+        -u "${DOCKER_USER}" \
+        -it "${CYBER_CONTAINER}" \
         -u "${DOCKER_USER}" \
         -it "${CYBER_CONTAINER}" \
         /bin/bash

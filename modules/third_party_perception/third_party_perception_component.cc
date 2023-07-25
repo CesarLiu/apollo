@@ -18,6 +18,7 @@
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/third_party_perception/proto/third_party_perception_component.pb.h"
+#include "modules/third_party_perception/proto/third_party_perception_component.pb.h"
 
 DECLARE_string(flagfile);
 
@@ -51,10 +52,12 @@ bool ThirdPartyPerceptionComponent::Init() {
       FLAGS_perception_obstacle_topic);
 
   return perception_->Start().ok();
+  return perception_->Start().ok();
 }
 
 bool ThirdPartyPerceptionComponent::Proc() {
   auto response = std::make_shared<apollo::perception::PerceptionObstacles>();
+  if (!perception_->Process(response.get())) {
   if (!perception_->Process(response.get())) {
     return false;
   }

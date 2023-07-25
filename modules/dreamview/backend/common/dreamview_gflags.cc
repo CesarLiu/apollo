@@ -54,7 +54,7 @@ DEFINE_string(ssl_certificate, "",
               "be in PEM format, and it must have both, private key and "
               "certificate");
 
-DEFINE_double(sim_map_radius, 200.0,
+DEFINE_double(sim_map_radius, 500.0,
               "The radius within which Dreamview will find all the map "
               "elements around the car.");
 
@@ -92,6 +92,26 @@ DEFINE_int32(monitor_msg_pending_queue_size, 10,
 DEFINE_string(default_data_collection_config_path,
               "/apollo/modules/dreamview/conf/data_collection_table.pb.txt",
               "Data collection table config path.");
+DEFINE_string(
+    data_collection_config_path,
+    "/apollo/modules/dreamview/conf/mkz7_data_collection_table.pb.txt",
+    "Data collection table config path.");
+
+DEFINE_bool(fortiss_simcontrol_set_start_pose, true,
+            "If false: standard apollo behavior; if true: set the vehicle to "
+            "the provided x,y pose as start position");
+
+DEFINE_double(
+    fortiss_simcontrol_start_x, 693261.014351,
+    "Sim Control picks a start pose on the map next to this x position");
+
+DEFINE_double(
+    fortiss_simcontrol_start_y, 5339243.52646,
+    "Sim Control picks a start pose on the map next to this y position");
+
+DEFINE_bool(fortiss_publish_empty_prediction, true,
+            "If true: standard apollo behavior, simctrl regularly outputs "
+            "empty prediction msgs; if false: no dummy prediction.");
 
 DEFINE_int32(loop_routing_end_to_start_distance_threshold, 10,
              "Loop routing distance threshold: start to end");

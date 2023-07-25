@@ -163,6 +163,13 @@ DEFINE_double(change_lane_min_length, 30.0,
               "meters. If the change lane target has longer length than this "
               "threshold, it can shortcut the default lane.");
 
+DEFINE_double(replan_lateral_distance_threshold, 0.5,
+              "The lateral distance threshold of replan");
+DEFINE_double(replan_longitudinal_distance_threshold, 2.5,
+              "The longitudinal distance threshold of replan");
+DEFINE_double(replan_standstill_velocity_threshold, 0.3,
+              "The velocity threshold (standstill) of replan");
+
 DEFINE_bool(enable_reference_line_provider_thread, true,
             "Enable reference line provider thread.");
 
@@ -536,6 +543,15 @@ DEFINE_bool(use_soft_bound_in_nonlinear_speed_opt, true,
 DEFINE_bool(use_front_axe_center_in_path_planning, false,
             "If using front axe center in path planning, the path can be "
             "more agile.");
+
+DEFINE_double(trajectory_stitching_advance_time, 0.0,
+              "Zero starts the trajectory to be planned exactly at the next "
+              "(expected) position of the car, a value greater than zero "
+              "starts x seconds in advance on the old trajectory");
+
+DEFINE_bool(always_update_trajectory, true,
+            "publish an updated trajectory even if planning failed (apollo "
+            "default = true)");
 
 DEFINE_bool(use_road_boundary_from_map, false, "get road boundary from HD map");
 

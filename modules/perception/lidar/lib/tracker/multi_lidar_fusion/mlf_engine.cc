@@ -65,7 +65,7 @@ bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
 
   // default value
   if (main_sensors_.empty()) {
-    main_sensors_.emplace("velodyne64");
+    main_sensors_.emplace("velodyne32");
   }
 
   use_histogram_for_match_ = config.use_histogram_for_match();

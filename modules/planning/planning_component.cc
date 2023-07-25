@@ -103,6 +103,16 @@ bool PlanningComponent::Init() {
           relative_map_.CopyFrom(*map_message);
         });
   }
+
+  bark_response_reader_ = node_->CreateReader<BarkResponse>(
+      FLAGS_planning_bark_response_topic,
+      [this](const std::shared_ptr<BarkResponse>& bark_response) {
+        ADEBUG << "Received bark response: run callback.";
+        // TODO: use own lock?
+        std::lock_guard<std::mutex> lock(mutex_);
+        bark_response_.CopyFrom(*bark_response);
+      });
+
   planning_writer_ = node_->CreateWriter<ADCTrajectory>(
       config_.topic_config().planning_trajectory_topic());
 
@@ -111,6 +121,12 @@ bool PlanningComponent::Init() {
 
   planning_learning_data_writer_ = node_->CreateWriter<PlanningLearningData>(
       config_.topic_config().planning_learning_data_topic());
+  
+  apollo_to_bark_msg_writer_ =
+      node_->CreateWriter<ApolloToBarkMsg>(FLAGS_planning_apollo_to_bark_topic);
+
+  planning_base_->SetBarkInterfacePointers(apollo_to_bark_msg_writer_,
+                                           &bark_response_, &mutex_);
 
   return true;
 }
@@ -187,15 +203,16 @@ bool PlanningComponent::Proc(
 
   ADCTrajectory adc_trajectory_pb;
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
-  auto start_time = adc_trajectory_pb.header().timestamp_sec();
-  common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
+  if (planning_base_->PublishTrajectory()) {
+    auto start_time = adc_trajectory_pb.header().timestamp_sec();
+    common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
 
-  // modify trajectory relative time due to the timestamp change in header
-  const double dt = start_time - adc_trajectory_pb.header().timestamp_sec();
-  for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
-    p.set_relative_time(p.relative_time() + dt);
-  }
-  planning_writer_->Write(adc_trajectory_pb);
+    // modify trajectory relative time due to the timestamp change in header
+    const double dt = start_time - adc_trajectory_pb.header().timestamp_sec();
+    for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
+      p.set_relative_time(p.relative_time() + dt);
+    }
+    planning_writer_->Write(adc_trajectory_pb);
 
   // record in history
   auto* history = injector_->history();

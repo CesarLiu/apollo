@@ -28,6 +28,7 @@ It lists all available disks mounted under /media, and prioritize them in order:
 
 1. If we have NVME disk, it will be used to record all data.
 2. If we have Non-NVME disk, it will only record smaller topics (blacklist LARGE_TOPICS), unless '--all' is
+2. If we have Non-NVME disk, it will only record smaller topics (blacklist LARGE_TOPICS), unless '--all' is
    specified.
 3. If no external disks are available, we will take '/apollo' as a
    'Non-NVME disk' and follow the rule above.
@@ -46,16 +47,25 @@ import psutil
 
 LARGE_TOPICS = [
     '/apollo/sensor/camera/front_12mm/image',
+    '/apollo/sensor/camera/front_12mm/image',
     '/apollo/sensor/camera/front_12mm/image/compressed',
+    '/apollo/sensor/camera/front_12mm/video/compressed',
+    '/apollo/sensor/camera/front_6mm/image',
     '/apollo/sensor/camera/front_12mm/video/compressed',
     '/apollo/sensor/camera/front_6mm/image',
     '/apollo/sensor/camera/front_6mm/image/compressed',
     '/apollo/sensor/camera/front_6mm/video/compressed',
     '/apollo/sensor/camera/left_fisheye/image',
+    '/apollo/sensor/camera/front_6mm/video/compressed',
+    '/apollo/sensor/camera/left_fisheye/image',
     '/apollo/sensor/camera/left_fisheye/image/compressed',
     '/apollo/sensor/camera/left_fisheye/video/compressed',
     '/apollo/sensor/camera/rear_6mm/image',
+    '/apollo/sensor/camera/left_fisheye/video/compressed',
+    '/apollo/sensor/camera/rear_6mm/image',
     '/apollo/sensor/camera/rear_6mm/image/compressed',
+    '/apollo/sensor/camera/rear_6mm/video/compressed',
+    '/apollo/sensor/camera/right_fisheye/image',
     '/apollo/sensor/camera/rear_6mm/video/compressed',
     '/apollo/sensor/camera/right_fisheye/image',
     '/apollo/sensor/camera/right_fisheye/image/compressed',
@@ -103,11 +113,13 @@ class ArgManager(object):
         self.parser.add_argument('--stop', default=False, action="store_true",
                                  help='Stop recorder.')
         self.parser.add_argument('--stop_signal', default="SIGINT",
+        self.parser.add_argument('--stop_signal', default="SIGINT",
                                  help='Signal to stop the recorder.')
         self.parser.add_argument('--all', default=False, action="store_true",
                                  help='Record all topics even without high '
                                  'performance disks.')
         self.parser.add_argument('--small', default=False, action="store_true",
+                                 help='Record small topics only.')
                                  help='Record small topics only.')
         self.parser.add_argument('--split_duration', default="1m",
                                  help='Duration to split bags, will be applied '
@@ -170,7 +182,11 @@ class Recorder(object):
         disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else '/apollo'
 
         # Record small topics to quickly copy and process
+        # Record small topics to quickly copy and process
         if record_all:
+            self.record_task(disk_to_use, False)
+
+        self.record_task(disk_to_use, record_all)
             self.record_task(disk_to_use, False)
 
         self.record_task(disk_to_use, record_all)
@@ -181,8 +197,10 @@ class Recorder(object):
             self.args.stop_signal))
 
     def record_task(self, disk, record_all):
+    def record_task(self, disk, record_all):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
         task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        if not record_all:
         if not record_all:
             task_id += "_s"
         task_dir = os.path.join(disk, 'data/bag', task_id)
@@ -190,9 +208,13 @@ class Recorder(object):
 
         topics_str = "--all"
 
+        topics_str = "--all"
+
         log_file = '/apollo/data/log/apollo_record.out'
         if not record_all:
+        if not record_all:
             log_file += "_s"
+            topics_str += " -k {}".format(' -k '.join(list(LARGE_TOPICS)))
             topics_str += " -k {}".format(' -k '.join(list(LARGE_TOPICS)))
 
         if not os.path.exists(task_dir):

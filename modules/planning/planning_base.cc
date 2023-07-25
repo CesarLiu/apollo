@@ -21,6 +21,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/bark_interface.pb.h"
 #include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
@@ -53,5 +54,14 @@ void PlanningBase::FillPlanningPb(const double timestamp,
   trajectory_pb->mutable_routing_header()->CopyFrom(
       local_view_.routing->header());
 }
+
+bool PlanningBase::PublishTrajectory() { return true; }
+
+void PlanningBase::SetBarkInterfacePointers(
+    const std::shared_ptr<cyber::Writer<ApolloToBarkMsg>>& request_writer,
+    BarkResponse* response, std::mutex* mutex) {
+  planner_->SetBarkInterfacePointers(request_writer, response, mutex);
+}
+
 }  // namespace planning
 }  // namespace apollo

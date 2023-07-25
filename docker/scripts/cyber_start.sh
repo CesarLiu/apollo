@@ -55,6 +55,7 @@ function show_usage() {
 Usage: $0 [options] ...
 OPTIONS:
     -g <us|cn>             Pull docker image from mirror registry based on geolocation.
+    -g <us|cn>             Pull docker image from mirror registry based on geolocation.
     -h, --help             Display this help and exit.
     -t, --tag <TAG>        Specify docker image with tag to start
     -d, --dist             Specify Apollo distribution(stable/testing)
@@ -234,6 +235,8 @@ function setup_devices_and_mount_volumes() {
                 ;;
         esac
     fi
+    echo "${display}"
+}
 
     volumes="${volumes} -v /etc/localtime:/etc/localtime:ro"
     # volumes="${volumes} -v /usr/src:/usr/src"
@@ -260,6 +263,8 @@ function docker_pull_if_needed() {
         info "Image ${image} found locally, will be used."
         use_local_image=1
     fi
+    if [[ ${use_local_image} -eq 1 ]]; then
+        return
     if [[ ${use_local_image} -eq 1 ]]; then
         return
     fi
@@ -320,6 +325,8 @@ function start_cyber_container() {
 
     set -x
     ${DOCKER_RUN_CMD} -it \
+    set -x
+    ${DOCKER_RUN_CMD} -it \
         -d \
         --privileged \
         --name "${CYBER_CONTAINER}" \
@@ -335,6 +342,7 @@ function start_cyber_container() {
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
         -e OMP_NUM_THREADS=1 \
         ${local_volumes} \
+        ${local_volumes} \
         --net host \
         -w /apollo \
         --add-host "${CYBER_INSIDE}:172.0.0.1" \
@@ -342,6 +350,7 @@ function start_cyber_container() {
         --hostname "${CYBER_INSIDE}" \
         --shm-size "${SHM_SIZE}" \
         --pid=host \
+        "${image}" \
         "${image}" \
         /bin/bash
 

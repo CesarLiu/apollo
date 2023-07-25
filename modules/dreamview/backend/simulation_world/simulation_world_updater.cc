@@ -306,11 +306,18 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
                     "parkingInfo", landmark.parking_info());
             place["parkingInfo"] = parking_info["data"];
 
+
+            Json parking_info =
+                apollo::common::util::JsonUtil::ProtoToTypedJson(
+                    "parkingInfo", landmark.parking_info());
+            place["parkingInfo"] = parking_info["data"];
+
             Json waypoint_list;
             for (const auto &waypoint : landmark.waypoint()) {
               waypoint_list.push_back(GetPointJsonFromLaneWaypoint(waypoint));
             }
             place["waypoint"] = waypoint_list;
+
 
             poi_list.push_back(place);
           }

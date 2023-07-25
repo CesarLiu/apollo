@@ -3,6 +3,11 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+config_setting(
+    name = "_planner_miqp",
+    values = {"define": "planner_miqp=true"},
+)
+
 cc_library(
     name = "planner",
     hdrs = ["planner.h"],
@@ -15,6 +20,7 @@ cc_library(
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios:scenario_manager",
+        "//modules/planning/proto:bark_interface_proto",
     ],
 )
 
@@ -32,8 +38,8 @@ cc_library(
     ],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
-        "-fopenmp",
-    ],
+        "-fopenmp"]
+        + select({":_planner_miqp" : ["-D USE_PLANNER_MIQP"], "//conditions:default": []}),
     deps = [
         ":planner",
         "//modules/common/status",
@@ -43,7 +49,9 @@ cc_library(
         "//modules/planning/planner/public_road:public_road_planner",
         "//modules/planning/planner/rtk:rtk_planner",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-    ],
+        "//modules/planning/planner/reference_tracking:reference_tracking_planner",
+        "//modules/planning/planner/bark_rl_wrapper:bark_rl_planner"]
+        + select({":_planner_miqp" : ["//modules/planning/planner/miqp:miqp_planner"], "//conditions:default": []}),
 )
 
 cc_test(

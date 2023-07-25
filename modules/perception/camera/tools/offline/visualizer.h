@@ -15,6 +15,8 @@
  *****************************************************************************/
 #pragma once
 
+#include <opencv2/opencv.hpp>
+
 #include <map>
 #include <string>
 #include <vector>
@@ -66,10 +68,11 @@ class Visualizer {
       const Eigen::Matrix4d &extrinsic, const Eigen::Affine3d &world2camera,
       const base::MotionBufferPtr motion_buffer);
   bool DrawTrajectories(const base::ObjectPtr &object,
-                        const base::MotionBufferPtr motion_buffer);
+      const base::MotionBufferPtr motion_buffer);
   cv::Point world_point_to_bigimg(const Eigen::Vector2d &p);
   cv::Point world_point_to_bigimg(const Eigen::Vector4f &p);
-  Eigen::Vector2d image2ground(const std::string &camera_name, cv::Point p_img);
+  Eigen::Vector2d image2ground(const std::string &camera_name,
+                               cv::Point p_img);
   cv::Point ground2image(const std::string &camera_name,
                          Eigen::Vector2d p_ground);
   std::string type_to_string(const apollo::perception::base::ObjectType type);

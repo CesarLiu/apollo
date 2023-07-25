@@ -20,6 +20,9 @@ cc_binary(
     copts = [
         "-Iexternal/qt",
     ],
+    copts = [
+        "-Iexternal/qt",
+    ],
     includes = [
         ".",
     ],
@@ -30,6 +33,10 @@ cc_binary(
     deps = [
         ":visualizer_lib",
         "@fastrtps",
+        "@qt//:qt_core",
+        "@qt//:qt_gui",
+        "@qt//:qt_opengl",
+        "@qt//:qt_widgets",
         "@qt//:qt_core",
         "@qt//:qt_gui",
         "@qt//:qt_opengl",

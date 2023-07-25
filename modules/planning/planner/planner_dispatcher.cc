@@ -22,6 +22,11 @@
 #include "modules/planning/planner/navi/navi_planner.h"
 #include "modules/planning/planner/public_road/public_road_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
+#ifdef USE_PLANNER_MIQP
+#include "modules/planning/planner/miqp/miqp_planner.h"
+#endif
+#include "modules/planning/planner/bark_rl_wrapper/bark_rl_planner.h"
+#include "modules/planning/planner/reference_tracking/reference_tracking_planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
@@ -47,6 +52,29 @@ void PlannerDispatcher::RegisterPlanners() {
       PlannerType::NAVI,
       [](const std::shared_ptr<DependencyInjector>& injector) -> Planner* {
         return new NaviPlanner(injector);
+      });
+#ifdef USE_PLANNER_MIQP
+  // planner_factory_.Register(PlannerType::MIQP,
+  //                           []() -> Planner* { return new MiqpPlanner(); });
+  planner_factory_.Register(
+      PlannerType::MIQP,
+      [](const std::shared_ptr<DependencyInjector>& injector) -> Planner* {
+        return new MiqpPlanner(injector);
+      });
+#endif
+  // planner_factory_.Register(PlannerType::BARK_RL,
+  //                           []() -> Planner* { return new BarkRlPlanner(); });
+  planner_factory_.Register(
+      PlannerType::BARK_RL,
+      [](const std::shared_ptr<DependencyInjector>& injector) -> Planner* {
+        return new BarkRlPlanner(injector);
+      });
+  // planner_factory_.Register(PlannerType::REFERENCE_TRACKING,
+  //                           []() -> Planner* { return new ReferenceTrackingPlanner(); });
+  planner_factory_.Register(
+      PlannerType::REFERENCE_TRACKING,
+      [](const std::shared_ptr<DependencyInjector>& injector) -> Planner* {
+        return new ReferenceTrackingPlanner(injector);
       });
 }
 

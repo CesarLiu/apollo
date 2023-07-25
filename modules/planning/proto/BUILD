@@ -30,6 +30,8 @@ install_files(
         ":planner_open_space_config_py_pb2",
         ":task_config_py_pb2",
         ":planning_config_py_pb2",
+        ":miqp_planner_config_py_pb2",
+        ":bark_rl_planner_config_py_pb2",
     ]
 )
 
@@ -58,6 +60,8 @@ install_files(
         ":planner_open_space_config_cc_proto",
         ":task_config_cc_proto",
         ":planning_config_cc_proto",
+        ":miqp_planner_config_cc_proto",
+        ":bark_rl_planner_config_cc_proto",
     ]
 )
 
@@ -400,5 +404,66 @@ py_proto_library(
         ":open_space_task_config_py_pb2",
         ":task_config_py_pb2",
         "//modules/common_msgs/planning_msgs:scenario_type_py_pb2",
+    ],
+)
+
+cc_proto_library(
+    name = "miqp_planner_config_cc_proto",
+    deps = [
+        ":miqp_planner_config_proto",
+    ],
+)
+
+proto_library(
+    name = "miqp_planner_config_proto",
+    srcs = ["miqp_planner_config.proto"],
+)
+
+py_proto_library(
+    name = "miqp_planner_config_py_pb2",
+    deps = [
+        ":miqp_planner_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "bark_rl_planner_config_cc_proto",
+    deps = [
+        ":bark_rl_planner_config_proto",
+    ],
+)
+
+proto_library(
+    name = "bark_rl_planner_config_proto",
+    srcs = ["bark_rl_planner_config.proto"],
+)
+
+py_proto_library(
+    name = "bark_rl_planner_config_py_pb2",
+    deps = [
+        ":bark_rl_planner_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "bark_interface_cc_proto",
+    deps = [
+        ":bark_interface_proto",
+    ],
+)
+
+proto_library(
+    name = "bark_interface_proto",
+    srcs = ["bark_interface.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:pnc_point_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
+        "//modules/common_msgs/planning_msgs:planning_proto",
+    ],
+)
+
+py_proto_library(
+    name = "bark_interface_py_pb2",
+    deps = [
+        ":bark_interface_proto",
     ],
 )

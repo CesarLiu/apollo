@@ -1,0 +1,11 @@
+ip_address: "192.168.140.165"
+tcp_port: 3000
+udp_port: 4711
+localization_topic: "/apollo/sensor/gnss/odometry"
+imu_topic: "/apollo/sensor/gnss/corrected_imu"
+imar_status_topic: "/apollo/sensor/fortiss_imar_status"
+ins_status_topic: "/apollo/sensor/gnss/ins_stat"
+x_lever : 0.0
+y_lever : 0.0
+z_lever : 0.0
+gps_available: true

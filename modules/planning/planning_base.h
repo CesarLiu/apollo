@@ -39,6 +39,7 @@
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/traffic_rule_config.pb.h"
+#include "modules/planning/proto/bark_interface.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -73,6 +74,12 @@ class PlanningBase {
       const double current_time_stamp,
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
       ADCTrajectory* const trajectory) = 0;
+
+  virtual bool PublishTrajectory();
+
+  virtual void SetBarkInterfacePointers(
+      const std::shared_ptr<cyber::Writer<ApolloToBarkMsg>>& request_writer,
+      BarkResponse* response, std::mutex* mutex);
 
  protected:
   virtual void FillPlanningPb(const double timestamp,

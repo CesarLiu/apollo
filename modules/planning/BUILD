@@ -42,6 +42,7 @@ cc_library(
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",
         "//modules/common_msgs/storytelling_msgs:story_cc_proto",
+        "//modules/planning/proto:bark_interface_proto",
     ],
     alwayslink = True,
 )
@@ -81,6 +82,7 @@ cc_library(
         "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/proto:traffic_rule_config_cc_proto",
         "//modules/planning/tasks:task_factory",
+        "//modules/planning/proto:bark_interface_proto",
     ],
 )
 

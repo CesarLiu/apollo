@@ -13,6 +13,11 @@ cc_library(
         "lossless_map_pool.cc",
     ],
     hdrs = glob(["*.h"]),
+    linkopts = [
+        "-lopencv_core",
+        "-lopencv_highgui",
+        "-lopencv_imgproc",
+    ],
     deps = [
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/common/util:base_map_cache",

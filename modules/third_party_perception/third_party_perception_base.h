@@ -1,5 +1,6 @@
 /******************************************************************************
  * Copyright 2020 The Apollo Authors. All Rights Reserved.
+ * Copyright 2020 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +47,9 @@ class ThirdPartyPerception {
   explicit ThirdPartyPerception(apollo::cyber::Node* const node);
   ThirdPartyPerception() = default;
   virtual ~ThirdPartyPerception() = default;
+  explicit ThirdPartyPerception(apollo::cyber::Node* const node);
+  ThirdPartyPerception() = default;
+  virtual ~ThirdPartyPerception() = default;
   std::string Name() const;
   apollo::common::Status Init();
   apollo::common::Status Start();
@@ -60,11 +64,18 @@ class ThirdPartyPerception {
   virtual bool Process(apollo::perception::PerceptionObstacles* const response);
 
  protected:
+ protected:
   std::mutex third_party_perception_mutex_;
   apollo::localization::LocalizationEstimate localization_;
   apollo::canbus::Chassis chassis_;
   RadarObstacles current_radar_obstacles_;
   RadarObstacles last_radar_obstacles_;
+  std::shared_ptr<apollo::cyber::Node> node_ = nullptr;
+  std::shared_ptr<
+      apollo::cyber::Reader<apollo::localization::LocalizationEstimate>>
+      localization_reader_ = nullptr;
+  std::shared_ptr<apollo::cyber::Reader<apollo::canbus::Chassis>>
+      chassis_reader_ = nullptr;
   std::shared_ptr<apollo::cyber::Node> node_ = nullptr;
   std::shared_ptr<
       apollo::cyber::Reader<apollo::localization::LocalizationEstimate>>

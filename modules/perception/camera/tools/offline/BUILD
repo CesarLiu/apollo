@@ -18,6 +18,11 @@ cc_library(
         "keycode.h",
         "visualizer.h",
     ],
+    linkopts = [
+        "-lopencv_core",
+        "-lopencv_imgproc",
+        "-lopencv_highgui",
+    ],
     deps = [
         ":transform_server",
         "//modules/common/util:util_tool",

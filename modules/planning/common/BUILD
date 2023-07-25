@@ -5,6 +5,21 @@ package(default_visibility = ["//visibility:public"])
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
+    name = "fortiss_common",
+    hdrs = ["fortiss_common.h"],
+    srcs = ["fortiss_common.cc"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        ":reference_line_info",
+        "//modules/planning/common/smoothers:trajectory_smoother_nlopt",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+    ],
+)
+
+cc_library(
     name = "indexed_list",
     hdrs = ["indexed_list.h"],
     copts = PLANNING_COPTS,

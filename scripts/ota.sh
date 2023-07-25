@@ -41,6 +41,8 @@ function update() {
 
   [ -e "${CACHE_DIR}/apollo_release" ] && rm -rf "${CACHE_DIR}/apollo_release"
   tar xzf ${CACHE_DIR}/apollo_release.tar.gz -C ${CACHE_DIR}
+  [ -e "${CACHE_DIR}/apollo_release" ] && rm -rf "${CACHE_DIR}/apollo_release"
+  tar xzf ${CACHE_DIR}/apollo_release.tar.gz -C ${CACHE_DIR}
   NEW_TAG="${UPDATE_TAG}-local"
 
   ssh $DOCKER_USER@localhost bash ${CACHE_DIR}/ota.sh setup $NEW_TAG
@@ -77,6 +79,7 @@ function download() {
     docker stop test_container 1> /dev/null
     docker rm -f test_container 1> /dev/null
   fi
+  docker run -d -it --name test_container -v ${CACHE_DIR}:/root/mnt $UPDATE_TAG
   docker run -d -it --name test_container -v ${CACHE_DIR}:/root/mnt $UPDATE_TAG
   docker exec test_container cp /root/sec_apollo_release.tar.gz /root/mnt
 }

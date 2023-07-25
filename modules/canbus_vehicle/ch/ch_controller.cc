@@ -329,6 +329,13 @@ Chassis ChController::chassis() {
         chassis_detail.throttle_status__510().throttle_pedal_en_sts() == 1);
   }
 
+  // 27 battery soc
+  if (chassis_detail.ch().has_ecu_status_2_516() &&
+      chassis_detail.ch().ecu_status_2_516().has_battery_soc()) {
+    chassis_.set_battery_soc_percentage(
+        chassis_detail.ch().ecu_status_2_516().battery_soc());
+  }
+
   return chassis_;
 }
 

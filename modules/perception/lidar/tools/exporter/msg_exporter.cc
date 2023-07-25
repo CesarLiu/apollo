@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/lidar/tools/exporter/msg_exporter.h"
 
+#include <opencv2/opencv.hpp>
+
 #include <fstream>
 #include <memory>
 #include <vector>

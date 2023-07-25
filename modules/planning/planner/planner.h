@@ -20,6 +20,7 @@
 #include <string>
 
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
+#include "modules/planning/proto/bark_interface.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -69,6 +70,10 @@ class Planner {
 
   virtual void Stop() = 0;
 
+  virtual void SetBarkInterfacePointers(
+      const std::shared_ptr<cyber::Writer<ApolloToBarkMsg>>& request_writer,
+      BarkResponse* response, std::mutex* mutex) = 0;
+
  protected:
   PlanningConfig config_;
   scenario::ScenarioManager scenario_manager_;
@@ -104,6 +109,10 @@ class PlannerWithReferenceLine : public Planner {
     CHECK_NOTNULL(frame);
     return apollo::common::Status::OK();
   }
+
+  virtual void SetBarkInterfacePointers(
+      const std::shared_ptr<cyber::Writer<ApolloToBarkMsg>>& request_writer,
+      BarkResponse* response, std::mutex* mutex) override{};
 };
 
 }  // namespace planning

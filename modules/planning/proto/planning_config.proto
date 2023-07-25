@@ -5,6 +5,8 @@ package apollo.planning;
 import "modules/planning/proto/open_space_task_config.proto";
 import "modules/planning/proto/task_config.proto";
 import "modules/common_msgs/planning_msgs/scenario_type.proto";
+import "modules/planning/proto/miqp_planner_config.proto";
+import "modules/planning/proto/bark_rl_planner_config.proto";
 
 // Planning's configuration is based on the following architecture
 // * Scenario has one more multiple stages
@@ -248,6 +250,9 @@ enum PlannerType {
   PUBLIC_ROAD = 1;  // public road planner
   NAVI = 2;         // navigation planner
   LATTICE = 3;      // lattice planner
+  MIQP = 4;         // miqp planner
+  BARK_RL = 5;      // bark rl planner
+  REFERENCE_TRACKING = 6; // smoother only planner
 }
 
 message RtkPlanningConfig {
@@ -300,4 +305,8 @@ message PlanningConfig {
   // default task config, it will be used if there is no scenario-specific
   // task config.
   repeated TaskConfig default_task_config = 6;
+
+  optional BarkRlPlannerConfiguration bark_rl_planner_config = 7;
+
+  optional MiqpPlannerConfiguration miqp_planner_config = 8;
 }

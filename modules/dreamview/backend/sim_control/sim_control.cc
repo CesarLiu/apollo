@@ -111,10 +111,15 @@ void SimControl::InitTimerAndIO() {
   sim_prediction_timer_.reset(new cyber::Timer(
       kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
       false));
+  sim_prediction_timer_.reset(new cyber::Timer(
+      kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
+      false));
 }
 
-void SimControl::Init(double start_velocity, double start_acceleration) {
-  if (!FLAGS_use_navigation_mode) {
+void SimControl::Init(bool set_start_point, double start_velocity,
+                      double start_acceleration) {
+  if ((set_start_point && !FLAGS_use_navigation_mode) ||
+      FLAGS_fortiss_simcontrol_set_start_pose) {
     InitStartPoint(start_velocity, start_acceleration);
   }
 }
@@ -143,12 +148,22 @@ void SimControl::InitStartPoint(double start_velocity,
   // Use the latest localization position as start point,
   // fall back to a dummy point from map
   localization_reader_->Observe();
-  if (localization_reader_->Empty()) {
+  if (localization_reader_->Empty() ||
+      FLAGS_fortiss_simcontrol_set_start_pose) {
     start_point_from_localization_ = false;
     apollo::common::PointENU start_point;
-    if (!map_service_->GetStartPoint(&start_point)) {
-      AWARN << "Failed to get a dummy start point from map!";
-      return;
+    if (!FLAGS_fortiss_simcontrol_set_start_pose) {  // apollo default
+      if (!map_service_->GetStartPoint(&start_point)) {
+        AWARN << "Failed to get a dummy start point from map!";
+        return;
+      }
+    } else {
+      if (!map_service_->GetStartPointAtXY(&start_point,
+                                           FLAGS_fortiss_simcontrol_start_x,
+                                           FLAGS_fortiss_simcontrol_start_y)) {
+        AWARN << "Failed to get a dummy start point from map!";
+        return;
+      }
     }
     point.mutable_path_point()->set_x(start_point.x());
     point.mutable_path_point()->set_y(start_point.y());
@@ -517,15 +532,17 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
 }
 
 void SimControl::PublishDummyPrediction() {
-  auto prediction = std::make_shared<PredictionObstacles>();
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (!send_dummy_prediction_) {
-      return;
+  if (FLAGS_fortiss_publish_empty_prediction) {
+    auto prediction = std::make_shared<PredictionObstacles>();
+    {
+      std::lock_guard<std::mutex> lock(mutex_);
+      if (!send_dummy_prediction_) {
+        return;
+      }
+      FillHeader("SimPrediction", prediction.get());
     }
-    FillHeader("SimPrediction", prediction.get());
+    prediction_writer_->Write(prediction);
   }
-  prediction_writer_->Write(prediction);
 }
 
 }  // namespace dreamview

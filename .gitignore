@@ -24,6 +24,7 @@ py_proto
 
 # Atom IDE files
 *.gch
+*_pb2.py
 
 # Logs
 nohup.out
@@ -60,10 +61,13 @@ modules/map/data
 # calibration files
 modules/calibration/data
 
+# Package archive
+docker/build/archive/
+
 # Data bag
 docs/demo_guide/*.bag
 docs/demo_guide/*.record
-
+docs/demo_guide/*.record*
 # Bash Environment
 .dev_bash_hist
 
@@ -82,3 +86,9 @@ tools/FlameGraph
 .DS_Store
 
 #WORKSPACE
+
+# bazel cache and others
+.cache/
+
+## Planning models only with force add 
+modules/planning/data

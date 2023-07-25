@@ -1,3 +1,13 @@
+<img src="https://www.fortiss.org/fileadmin/user_upload/Veroeffentlichungen/Informationsmaterialien/Logo_fortiss_RGB_blue.png" height="150">
+
+This is a fork of the great [apollo](https://github.com/ApolloAuto/apollo) plattform to serve as a basic software stack on our prototype autonomous vehicle [fortuna](https://arxiv.org/abs/1905.02980). It contains the necessary sensor drivers, perception setup, and the vehicle control access using a MicroAutobox 2. [Here](fortiss.md) we provide a comprehensive list, some highlights are the:
+* [map converter](tools/opendrive_to_apollo) to generate an a map for apollo from a standard opendrive map
+* [pure-C implementation](modules/bridge-c) of apollo's bridge module to run a real-time control unit
+* [trajectory tracking controller](modules/autobox_control) for apollo's ADCTrajectory written in Simulink 
+* [CAN bus interface](modules/canbus/vehicle/fortuna) for a VW Passat GTE
+
+***
+
 ![](docs/02_Quick%20Start/demo_guide/images/Apollo_logo.png)
 
 [![Build Status](http://180.76.142.62:8111/app/rest/builds/buildType:Apollo_Build/statusIcon)](http://180.76.142.62:8111/viewType.html?buildTypeId=Apollo_Build&guest=1)
@@ -21,13 +31,18 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 ## Table of Contents
 
-1. [Introduction](#introduction)
-2. [Prerequisites](#prerequisites)
-3. [Individual Versions](#individual-versions)
-4. [Architecture](#architecture)
-5. [Installation](#installation)
-6. [Quick Starts](#quick-starts)
-7. [Documents](#documents)
+- [Table of Contents](#table-of-contents)
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+- [Individual Versions:](#individual-versions)
+- [Architecture](#architecture)
+- [Installation](#installation)
+- [Quick Starts:](#quick-starts)
+- [Documents](#documents)
+- [Questions](#questions)
+- [Copyright and License](#copyright-and-license)
+- [Disclaimer](#disclaimer)
+- [Connect with us](#connect-with-us)
 
 ## Introduction
 

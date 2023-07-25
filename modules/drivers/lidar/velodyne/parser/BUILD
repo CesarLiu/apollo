@@ -27,6 +27,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/drivers/lidar/velodyne/parser:convert",
+        "//modules/drivers/lidar/velodyne/parser:convert",
     ],
     alwayslink = True
 )

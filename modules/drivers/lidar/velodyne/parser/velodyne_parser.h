@@ -50,6 +50,7 @@
 
 #pragma once
 
+#include <boost/format.hpp>
 #include <cerrno>
 #include <cmath>
 #include <cstdint>

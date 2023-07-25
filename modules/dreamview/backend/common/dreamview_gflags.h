@@ -60,42 +60,10 @@ DECLARE_int32(monitor_msg_pending_queue_size);
 
 DECLARE_string(default_data_collection_config_path);
 
-DECLARE_int32(loop_routing_end_to_start_distance_threshold);
+DECLARE_bool(fortiss_simcontrol_set_start_pose);
 
-DECLARE_string(default_preprocess_config_path);
+DECLARE_double(fortiss_simcontrol_start_x);
 
-DECLARE_string(vehicle_calibration_mode);
+DECLARE_double(fortiss_simcontrol_start_y);
 
-DECLARE_string(lidar_calibration_mode);
-
-DECLARE_string(camera_calibration_mode);
-
-DECLARE_double(parking_routing_distance_threshold);
-
-DECLARE_string(plugin_path);
-
-DECLARE_string(plugin_config_file_name_suffix);
-
-DECLARE_string(plugin_channel_prefix);
-
-DECLARE_string(resource_scenario_path);
-
-DECLARE_string(resource_dynamic_model_path);
-
-DECLARE_string(dynamic_model_root_path);
-
-DECLARE_string(dynamic_model_library_path);
-
-DECLARE_string(sim_obstacle_stop_command);
-
-DECLARE_string(sim_obstacle_path);
-
-DECLARE_string(gflag_command_arg);
-
-DECLARE_string(sim_perfect_control);
-
-DECLARE_string(resource_record_path);
-
-DECLARE_string(cyber_recorder_stop_command);
-
-DECLARE_string(vehicles_config_path);
+DECLARE_bool(fortiss_publish_empty_prediction);

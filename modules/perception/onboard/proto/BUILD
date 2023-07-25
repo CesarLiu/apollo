@@ -82,6 +82,27 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "fortuna_radar_component_config_proto",
+    deps = [
+        ":fortuna_radar_component_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "fortuna_radar_component_config_proto_lib",
+    srcs = [
+        "fortuna_radar_component_config.proto",
+    ],
+)
+
+py_proto_library(
+    name = "fortuna_radar_component_config_py_pb2",
+    deps = [
+        ":fortuna_radar_component_config_proto",
+    ],
+)
+
+cc_proto_library(
     name = "lidar_component_config_cc_proto",
     deps = [
         ":lidar_component_config_proto",
