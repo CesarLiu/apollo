@@ -20,15 +20,15 @@
 
 #include "cyber/component/timer_component.h"
 #include "cyber/cyber.h"
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/fake_obstacle/proto/fake_obstacle_conf.pb.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 namespace apollo {
 namespace fake_obstacle {

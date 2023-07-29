@@ -4,7 +4,7 @@ This is a fork of the great [apollo](https://github.com/ApolloAuto/apollo) platt
 * [map converter](tools/opendrive_to_apollo) to generate an a map for apollo from a standard opendrive map
 * [pure-C implementation](modules/bridge-c) of apollo's bridge module to run a real-time control unit
 * [trajectory tracking controller](modules/autobox_control) for apollo's ADCTrajectory written in Simulink 
-* [CAN bus interface](modules/canbus/vehicle/fortuna) for a VW Passat GTE
+* [CAN bus interface](modules/canbus_vehicle/fortuna) for a VW Passat GTE
 
 ***
 

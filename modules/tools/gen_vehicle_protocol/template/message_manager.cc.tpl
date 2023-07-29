@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/%(car_type_lower)s/%(car_type_lower)s_message_manager.h"
+#include "modules/canbus_vehicle/%(car_type_lower)s/%(car_type_lower)s_message_manager.h"
 
 %(control_header_list)s
 

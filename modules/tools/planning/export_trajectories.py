@@ -29,7 +29,7 @@ See the gflags for more optional args.
 import sys
 from cyber_py import cyber
 from cyber_py.record import RecordReader
-from modules.planning.proto import planning_pb2
+from modules.common_msgs.planning_msgs import planning_pb2
 
 if len(sys.argv) < 3:
     print("Usage: %s <filename> <fbags>" % sys.argv[0])

@@ -17,7 +17,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/monitor_log",
-        "//modules/control/proto:control_command_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_proto",
         "//modules/autobox_bridge/proto:autobox_chassis_proto",
         "//modules/autobox_bridge/proto:autobox_bridge_conf_proto",
     ],
@@ -38,7 +38,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/monitor_log",
-        "//modules/control/proto:control_command_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_proto",
 	    "//modules/autobox_bridge/proto:autobox_control_proto",
         "//modules/autobox_bridge/proto:autobox_bridge_conf_proto",
     ],
@@ -59,7 +59,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/monitor_log",
-        "//modules/localization/proto:localization_proto",
+        "//modules/common_msgs/localization_msgs:localization_proto",
 	    "//modules/autobox_bridge/proto:autobox_localization_proto",
         "//modules/autobox_bridge/proto:autobox_bridge_conf_proto",
     ],
@@ -80,9 +80,9 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/monitor_log",
-        "//modules/control/proto:control_command_proto",
-        "//modules/planning/proto:planning_proto",
-        "//modules/localization/proto:localization_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_proto",
         "//modules/autobox_bridge/proto:autobox_trajectory_proto",
         "//modules/autobox_bridge/proto:autobox_bridge_conf_proto",
     ],

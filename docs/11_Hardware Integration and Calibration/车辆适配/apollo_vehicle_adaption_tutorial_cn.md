@@ -264,10 +264,10 @@ rm -rf output/
 ![ge3_chassis_detail](images/vehicle_adaption_tutorial/ge3_chassis_detail.png) 
 在`pollo/modules/canbus/proto`目录的`BUILD`文件内添加上述新`proto`的依赖：`"ge3.proto"`；
 ![BUILD_depend](images/vehicle_adaption_tutorial/proto_BUILD_depend.png)
-（2）将`apollo/modules/tools/gen_vehicle_protocol/output/vehicle/` 内的ge3文件夹拷贝至`apollo/modules/canbus/vehicle/` 文件夹下；
+（2）将`apollo/modules/tools/gen_vehicle_protocol/output/vehicle/` 内的ge3文件夹拷贝至`apollo/modules/canbus_vehicle/` 文件夹下；
 ![copy_ge3](images/vehicle_adaption_tutorial/copy_ge3.png)
 ### 3.实现新的车辆控制逻辑
-实现新的车辆控制逻辑，在`apollo/modules/canbus/vehicle/ge3/ge3_controller.cc` 文件编写控制逻辑代码，主要包含将解析的底盘反馈报文的信息，通过`chassis`和`chassis_detail`广播出车辆底盘信息。`chassis`主要包括获取底盘的车速、轮速、发动机转速、踏板反馈、转角反馈等信息， `chassis_detail`是每一帧报文的实际信息，这一部分编写的代码如下所示：
+实现新的车辆控制逻辑，在`apollo/modules/canbus_vehicle/ge3/ge3_controller.cc` 文件编写控制逻辑代码，主要包含将解析的底盘反馈报文的信息，通过`chassis`和`chassis_detail`广播出车辆底盘信息。`chassis`主要包括获取底盘的车速、轮速、发动机转速、踏板反馈、转角反馈等信息， `chassis_detail`是每一帧报文的实际信息，这一部分编写的代码如下所示：
 ```
   // 3
   chassis_.set_engine_started(true);
@@ -774,15 +774,15 @@ void Ge3Controller::SetTurningSignal(const ControlCommand& command) {
 
 `is_esp_online->制动模式反馈信号`
 
-在`apollo/modules/canbus/vehicle/ge3/protocol/scu_eps_311.cc`文件内，增加以下代码：
+在`apollo/modules/canbus_vehicle/ge3/protocol/scu_eps_311.cc`文件内，增加以下代码：
 ```
 chassis->mutable_check_response()->set_is_eps_online(eps_drvmode(bytes, length) == 3);
 ```
-在`apollo/modules/canbus/vehicle/ge3/protocol/scu_vcu_1_312.cc`文件内，增加以下代码：
+在`apollo/modules/canbus_vehicle/ge3/protocol/scu_vcu_1_312.cc`文件内，增加以下代码：
 ```
 chassis->mutable_check_response()->set_is_vcu_online(vcu_drvmode(bytes, length) == 3);
 ```
-在`apollo/modules/canbus/vehicle/ge3/protocol/scu_bcs_1_306.cc`文件内，增加以下代码：
+在`apollo/modules/canbus_vehicle/ge3/protocol/scu_bcs_1_306.cc`文件内，增加以下代码：
 ```
 chassis->mutable_check_response()->set_is_esp_online(bcs_drvmode(bytes, length) == 3);
 ```
@@ -836,16 +836,16 @@ bool Ge3Controller::CheckResponse(const int32_t flags, bool need_wait) {
 ```
 ### 4.修改底盘车速反馈协议，将车速反馈单位由km/h转化为m/s
 Apollo系统内默认使用车速反馈量为`m/s`，底盘车速信息对Apollo非常重要，在车辆标定、控制、规划等都需要采集该数据，所以开发者要在开发适配代码时，重点检查车速反馈的单位。车速由`km/h`转化为`m/s`时，在反馈车速的信号除以`3.6`即可。
-找到Ge3车辆反馈车速的报文在文件`apollo/modules/canbus/vehicle/ge3/protocol/scu_bcs_2_307.cc` 下，反馈车速消息为`Scubcs2307::bcs_vehspd{}`，如下图所示：
+找到Ge3车辆反馈车速的报文在文件`apollo/modules/canbus_vehicle/ge3/protocol/scu_bcs_2_307.cc` 下，反馈车速消息为`Scubcs2307::bcs_vehspd{}`，如下图所示：
 ![speed_transfer](images/vehicle_adaption_tutorial/speed_transfer.png)
 
 ### 5.注册新车辆
-在`modules/canbus/vehicle/vehicle_factory.cc`里注册新的车辆，在该文件内新建如下类：
+在`modules/canbus_vehicle/vehicle_factory.cc`里注册新的车辆，在该文件内新建如下类：
 ![register_ge3](images/vehicle_adaption_tutorial/register_ge3.png)
 添加头文件
 ![add_head_file](images/vehicle_adaption_tutorial/add_head_file.png)
 添加BUILD依赖库
-在`apollo/modules/canbus/vehicle/BUILD` 文件内添加`ge3_vehicle_factory`依赖库。
+在`apollo/modules/canbus_vehicle/BUILD` 文件内添加`ge3_vehicle_factory`依赖库。
 ![add_build_depend](images/vehicle_adaption_tutorial/add_build_depend.png)
 
 ### 6.更新配置文件

@@ -2,9 +2,9 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/common/proto/header.proto";
-import "modules/common/proto/pnc_point.proto";
-import "modules/planning/proto/planning.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/pnc_point.proto";
+import "modules/common_msgs/planning_msgs/planning.proto";
 
 message BarkObstacle {
     optional int32 id = 1;  // obstacle ID.

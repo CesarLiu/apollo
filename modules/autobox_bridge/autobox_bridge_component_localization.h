@@ -24,7 +24,7 @@
 #include "cyber/component/timer_component.h"
 #include "cyber/timer/timer.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/autobox_bridge/proto/autobox_bridge_conf.pb.h"
 #include "modules/autobox_bridge/proto/autobox_localization.pb.h"
 

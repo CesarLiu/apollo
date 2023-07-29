@@ -24,7 +24,7 @@ from google.protobuf.internal import decoder
 from google.protobuf.internal import encoder
 import numpy as np
 
-from modules.prediction.proto import offline_features_pb2
+from modules.common_msgs.prediction_msgs import offline_features_pb2
 from modules.tools.prediction.data_pipelines.common.bounding_rectangle import BoundingRectangle
 from modules.tools.prediction.data_pipelines.common.configure import parameters
 

@@ -2,8 +2,8 @@ syntax = "proto2";
 
 package apollo.control;
 
-//import "modules/canbus/proto/chassis.proto";
-import "modules/common/proto/header.proto";
+//import "modules/common_msgs/chassis_msgs/chassis.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
 // next id : 27
 message ControlCommandToAutoboxBridge {
   // replaced Header by timestamp_sec

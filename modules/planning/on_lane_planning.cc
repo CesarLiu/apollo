@@ -46,7 +46,6 @@
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/tasks/task_factory.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"
-#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {

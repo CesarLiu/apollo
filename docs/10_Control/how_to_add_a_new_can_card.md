@@ -26,7 +26,7 @@ Use the following code to implement the specific `CANClient` class:
 #include "hermes_can/include/bcan.h"
 #include "modules/canbus/can_client/can_client.h"
 #include "modules/canbus/common/canbus_consts.h"
-#include "modules/common/proto/error_code.pb.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
 
 /**
  * @namespace apollo::canbus::can

@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/%(car_type_lower)s/%(car_type_lower)s_vehicle_factory.h"
+#include "modules/canbus_vehicle/%(car_type_lower)s/%(car_type_lower)s_vehicle_factory.h"
 
-#include "modules/canbus/vehicle/%(car_type_lower)s/%(car_type_lower)s_controller.h"
-#include "modules/canbus/vehicle/%(car_type_lower)s/%(car_type_lower)s_message_manager.h"
+#include "modules/canbus_vehicle/%(car_type_lower)s/%(car_type_lower)s_controller.h"
+#include "modules/canbus_vehicle/%(car_type_lower)s/%(car_type_lower)s_message_manager.h"
 #include "cyber/common/log.h"
 #include "modules/common/util/util.h"
 

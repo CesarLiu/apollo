@@ -143,6 +143,29 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "fortiss_hardware_status_cc_proto",
+    deps = [
+        ":fortiss_hardware_status_proto",
+    ],
+)
+
+proto_library(
+    name = "fortiss_hardware_status_proto",
+    srcs = ["fortiss_hardware_status.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
+    ],
+)
+
+py_proto_library(
+    name = "fortiss_hardware_status_py_pb2",
+    deps = [
+        ":fortiss_hardware_status_proto",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
+    ],
+)
+
+cc_proto_library(
     name = "smartereye_cc_proto",
     deps = [
         ":smartereye_proto",

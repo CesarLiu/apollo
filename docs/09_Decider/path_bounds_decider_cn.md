@@ -225,7 +225,7 @@ class ReferenceLineInfo {
  private:
   static std::unordered_map<std::string, bool> junction_right_of_way_map_;
   const common::VehicleState vehicle_state_;  // 车辆状态
-  const common::TrajectoryPoint adc_planning_point_;  // TrajectoryPoint定义在modules/common/proto/pnc_point.proto中
+  const common::TrajectoryPoint adc_planning_point_;  // TrajectoryPoint定义在modules/common_msgs/basic_msgs/pnc_point.proto中
 
   /* 参考线，以道路中心线，做过顺滑的一条轨迹，往后80米，往前130米。
   class ReferenceLine {

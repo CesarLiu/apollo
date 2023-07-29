@@ -1,3 +1,6 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_proto_library")
+load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
@@ -29,8 +32,8 @@ proto_library(
         "autobox_trajectory.proto",
     ],
     deps = [
-        "//modules/common/proto:pnc_point_proto_lib",
-        "//modules/common/proto:header_proto_lib",
+        "//modules/common_msgs/basic_msgs:pnc_point_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
     ],
 )
 
@@ -47,9 +50,9 @@ proto_library(
         "autobox_localization.proto",
     ],
     deps = [
-        "//modules/localization/proto:pose_proto_lib",
-        "//modules/localization/proto:localization_proto_lib",
-        "//modules/common/proto:header_proto_lib",
+        "//modules/common_msgs/localization_msgs:pose_proto",
+        "//modules/common_msgs/localization_msgs:localization_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
     ],
 )
 
@@ -67,8 +70,8 @@ proto_library(
         "autobox_control.proto",
     ],
     deps = [
-        "//modules/canbus/proto:canbus_proto_lib",
-        "//modules/common/proto:header_proto_lib",
+        "//modules/common_msgs/chassis_msgs:chassis_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
     ],
 )
 
@@ -85,7 +88,7 @@ proto_library(
         "autobox_chassis.proto",
     ],
     deps = [
-        "//modules/common/proto:header_proto_lib",
+        "//modules/common_msgs/basic_msgs:header_proto",
     ],
 )
 

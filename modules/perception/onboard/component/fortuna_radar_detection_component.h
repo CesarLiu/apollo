@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "cyber/component/component.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/lib/utils/time_util.h"
 #include "modules/perception/map/hdmap/hdmap_input.h"
@@ -30,7 +30,7 @@
 #include "modules/perception/onboard/msg_buffer/msg_buffer.h"
 #include "modules/perception/onboard/proto/fortuna_radar_component_config.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
-#include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
 
 namespace apollo {
 namespace perception {

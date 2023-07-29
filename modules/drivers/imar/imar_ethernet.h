@@ -27,14 +27,14 @@
 #include <vector>
 
 #include "cyber/cyber.h"
-#include "modules/drivers/gnss/proto/ins.pb.h"
+#include "modules/common_msgs/sensor_msgs/ins.pb.h"
 #include "modules/drivers/imar/imar_sdk/insClass.h"
 #include "modules/drivers/imar/proto/imar_conf.pb.h"
-#include "modules/drivers/proto/fortiss_hardware_status.pb.h"
-#include "modules/localization/proto/gps.pb.h"
-#include "modules/localization/proto/imu.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/localization/proto/pose.pb.h"
+#include "modules/common_msgs/sensor_msgs/fortiss_hardware_status.pb.h"
+#include "modules/common_msgs/localization_msgs/gps.pb.h"
+#include "modules/common_msgs/sensor_msgs/imu.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/localization_msgs/pose.pb.h"
 
 /**
  * @namespace apollo::drivers

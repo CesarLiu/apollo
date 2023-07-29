@@ -23,7 +23,7 @@ proto_library(
         "velodyne.proto",
     ],
     deps = [
-        "//modules/common/proto:header_proto_lib",
+        "//modules/common_msgs/basic_msgs:header_proto",
     ],
 )
 

@@ -28,10 +28,10 @@ import os
 from cyber_py import cyber
 from cyber_py import record
 from cyber.proto import record_pb2
-from modules.localization.proto import localization_pb2, imu_pb2, gps_pb2
-from modules.planning.proto import planning_pb2
-from modules.prediction.proto import prediction_obstacle_pb2
-from modules.perception.proto import perception_obstacle_pb2
+from modules.common_msgs.localization_msgs import localization_pb2, imu_pb2, gps_pb2
+from modules.common_msgs.planning_msgs import planning_pb2
+from modules.common_msgs.prediction_msgs import prediction_obstacle_pb2
+from modules.common_msgs.perception_msgs import perception_obstacle_pb2
 
 def parseIMU(freader, outputDir, substr):
     freader.reset()

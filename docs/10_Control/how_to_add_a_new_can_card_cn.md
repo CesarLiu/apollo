@@ -26,7 +26,7 @@ Apollo中使用的默认CAN卡是 **ESD CAN-PCIe卡**。您可以使用以下步
 #include "hermes_can/include/bcan.h"
 #include "modules/canbus/can_client/can_client.h"
 #include "modules/canbus/common/canbus_consts.h"
-#include "modules/common/proto/error_code.pb.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
 
 /**
  * @namespace apollo::canbus::can

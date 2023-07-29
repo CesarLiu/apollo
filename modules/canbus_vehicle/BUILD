@@ -15,6 +15,7 @@ install(
         "//modules/canbus_vehicle/transit:install",
         "//modules/canbus_vehicle/wey:install",
         "//modules/canbus_vehicle/zhongyun:install",
+        "//modules/canbus_vehicle/fortuna:install",
     ],
 )
 
@@ -31,5 +32,6 @@ install_src_files(
         "//modules/canbus_vehicle/transit:install_src",
         "//modules/canbus_vehicle/wey:install_src",
         "//modules/canbus_vehicle/zhongyun:install_src",
+        "//modules/canbus_vehicle/fortuna:install_src",
     ],
 )

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/%(car_type_lower)s/protocol/%(protocol_name_lower)s.h"
+#include "modules/canbus_vehicle/%(car_type_lower)s/protocol/%(protocol_name_lower)s.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

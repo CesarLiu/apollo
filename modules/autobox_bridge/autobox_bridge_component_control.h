@@ -25,7 +25,7 @@
 #include "cyber/component/timer_component.h"
 #include "cyber/timer/timer.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/autobox_bridge/proto/autobox_control.pb.h"
 #include "modules/autobox_bridge/proto/autobox_bridge_conf.pb.h"
 namespace apollo {

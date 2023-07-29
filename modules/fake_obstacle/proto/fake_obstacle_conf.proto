@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-import "modules/perception/proto/perception_obstacle.proto";
+import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
 
 message FakeObstacleConf {
   optional int32 id = 1 [default = 1];

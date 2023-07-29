@@ -12,11 +12,11 @@ from numpy.lib.function_base import copy
 from cyber_py3 import cyber
 from cyber_py3 import cyber_time
 
-from modules.planning.proto import planning_pb2
-from modules.planning.proto import bark_interface_pb2
-from modules.canbus.proto import chassis_detail_pb2
-from modules.localization.proto import localization_pb2
-from modules.planning.proto import planning_config_pb2
+from modules.common_msgs.planning_msgs import planning_pb2
+from modules.common_msgs.planning_msgs import bark_interface_pb2
+from modules.common_msgs.chassis_msgs import chassis_detail_pb2 
+from modules.common_msgs.localization_msgs import localization_pb2
+from modules.common_msgs.planning_msgs import planning_config_pb2
 
 import common.proto_utils as proto_utils
 

@@ -41,7 +41,7 @@ def gen_vehicle_controller_header(content, output_dir):
         fmt_val["car_type_cap"] = car_type.capitalize()
 
         control_protocol_include_list = []
-        control_protocol_include_fmt = "#include \"modules/canbus/vehicle/%s/protocol/%s.h\""
+        control_protocol_include_fmt = "#include \"modules/canbus_vehicle/%s/protocol/%s.h\""
 
         control_protocol_ptr_list = []
         control_protocol_ptr_fmt = "  %s* %s_ = nullptr;"
@@ -143,7 +143,7 @@ def gen_message_manager_cpp(content, output_dir):
 
         control_header_list = []
         report_header_list = []
-        header_fmt = "#include \"modules/canbus/vehicle/%s/protocol/%s.h\""
+        header_fmt = "#include \"modules/canbus_vehicle/%s/protocol/%s.h\""
 
         control_add_list = []
         report_add_list = []

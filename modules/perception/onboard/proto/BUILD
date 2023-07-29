@@ -84,12 +84,12 @@ py_proto_library(
 cc_proto_library(
     name = "fortuna_radar_component_config_proto",
     deps = [
-        ":fortuna_radar_component_config_proto_lib",
+        ":fortuna_radar_component_config_proto",
     ],
 )
 
 proto_library(
-    name = "fortuna_radar_component_config_proto_lib",
+    name = "fortuna_radar_component_config_proto",
     srcs = [
         "fortuna_radar_component_config.proto",
     ],

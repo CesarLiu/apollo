@@ -21,7 +21,7 @@ import h5py
 import numpy as np
 import os
 
-from modules.prediction.proto import offline_features_pb2
+from modules.common_msgs.prediction_msgs import offline_features_pb2
 
 
 junction_label_label_dim = 12

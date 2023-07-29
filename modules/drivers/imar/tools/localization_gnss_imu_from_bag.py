@@ -27,7 +27,7 @@ import csv
 from cyber_py import cyber
 from cyber_py import record
 from cyber.proto import record_pb2
-from modules.localization.proto import localization_pb2, imu_pb2, gps_pb2
+from modules.common_msgs.localization_msgs import localization_pb2, imu_pb2, gps_pb2
 
 
 def print_channel_info(file_path):
