@@ -1,0 +1,23 @@
+<package format="2">
+  <name>fake_obstacle</name>
+  <version>local</version>
+  <description>
+    fake obstacle module to generate fake obstacle for test 
+  </description>
+  
+  <maintainer email="infor@fortiss.org">fortiss</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.fortiss.org/ergebnisse/software/apollo</url>
+  <url type="repository">https://github.com/fortiss/apollo</url>
+  <url type="bugtracker">https://github.com/fortiss/apollo/issues</url>
+  
+  <type>module</type>
+  <src_path url="https://github.com/fortiss/apollo">//modules/fake_obstacle</src_path>
+  
+  <depend type="binary" repo_name="cyber">cyber-dev</depend>
+  <depend type="binary" repo_name="map" lib_names="map">map-dev</depend>
+  <depend type="binary" repo_name="planning" lib_names="planning">planning-dev</depend>
+  <depend type="binary" repo_name="common" lib_names="common">common-dev</depend>
+  <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest-dev</depend>
+</package>

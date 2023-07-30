@@ -28,6 +28,8 @@ install(
         #"//docs:install",
         "//modules/audio:install",
         "//modules/bridge:install",
+        "//modules/autobox_bridge:install",
+        "//modules/fake_obstacle:install",
         "//modules/calibration:install",
         "//modules/canbus:install",
         "//modules/canbus_vehicle:install",

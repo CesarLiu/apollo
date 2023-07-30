@@ -1,6 +1,52 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "conf/*.txt",
+        "dag/*.dag",
+        "launch/*.launch",
+    ]),
+)
+
+install(
+    name = "install",
+    library_dest = "autobox_bridge/lib",
+    data_dest = "autobaox_bridge",
+    data = [
+      ":runtime_data",
+      "cyberfile.xml",
+      "autobox_bridge.BUILD"
+    ],
+    targets = [
+        ":libautobox_bridge_component_chassis.so",
+        ":libautobox_bridge_component_control.so",
+        ":libautobox_bridge_component_localization.so",
+        ":libautobox_bridge_component_trajectory.so",
+    ],
+    deps = [
+        "//modules/autobox_bridge/proto:autobox_bridge_conf_proto",
+        "//modules/autobox_bridge/proto:autobox_chassis_proto",
+        "//modules/autobox_bridge/proto:autobox_control_proto",
+        "//modules/autobox_bridge/proto:autobox_localization_proto",
+        "//modules/autobox_bridge/proto:autobox_trajectory_proto",
+    ],
+)
+install(
+    name = "pb_hdrs",
+    data_dest = "autobox_bridge/include",
+    data = [
+        "//modules/autobox_bridge/proto:autobox_bridge_conf_cc_proto",
+        "//modules/autobox_bridge/proto:autobox_chassis_cc_proto",
+        "//modules/autobox_bridge/proto:autobox_control_cc_proto",
+        "//modules/autobox_bridge/proto:autobox_localization_cc_proto",
+        "//modules/autobox_bridge/proto:autobox_trajectory_cc_proto",
+    ],
+)
 
 cc_binary(
     name = "libautobox_bridge_component_chassis.so",
@@ -88,11 +134,26 @@ cc_library(
     ],
 )
 
-filegroup(
-    name = "ros_to_ma_testdata",
-    srcs = glob([
-        "testdata/**",
-    ]),
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_autobox_bridge_src",
+        ":install_autobox_bridge_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_autobox_bridge_src",
+    src_dir = ["."],
+    dest = "bridge/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_autobox_bridge_hdrs",
+    src_dir = ["."],
+    dest = "bridge/include",
+    filter = "*.h",
 )
 
 cpplint()
