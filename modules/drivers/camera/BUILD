@@ -184,7 +184,7 @@ cc_library(
     ] + if_x86_64(
         ["@adv_plat"],
     ) + if_aarch64(
-        ["//modules/drivers/camera/format:convert",]
+        ["@ffmpeg//:avformat"],
     ),
     copts = [ 
         '-fopenmp',

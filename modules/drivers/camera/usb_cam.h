@@ -41,8 +41,8 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 
-#include <immintrin.h>
-#include <x86intrin.h>
+// #include <immintrin.h>
+// #include <x86intrin.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>

@@ -31,6 +31,7 @@ ENABLE_PROFILER=true
 CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
 DISABLED_TARGETS=
+DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/drivers/camera/..."
 
 function _determine_drivers_disabled() {
   if ! ${USE_ESD_CAN}; then

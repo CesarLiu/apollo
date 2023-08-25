@@ -21,7 +21,7 @@ source "${CURR_DIR}/docker_base.sh"
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 DOCKER_REPO="apolloauto/apollo"
-DEV_CONTAINER_PREFIX='apollo_dev_'
+DEV_CONTAINER_PREFIX='apollo_dev_tx2_'
 DEV_CONTAINER="${DEV_CONTAINER_PREFIX}${USER}"
 DEV_INSIDE="in-dev-docker"
 
@@ -31,7 +31,8 @@ TARGET_ARCH="$(uname -m)"
 VERSION_X86_64="dev-x86_64-18.04-20230724_1143"
 TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20210112_0008"
 
-VERSION_AARCH64="dev-aarch64-20.04-20230719_2137"
+# VERSION_AARCH64="dev-aarch64-20.04-20230719_2137"
+VERSION_AARCH64="dev-aarch64-18.04-20230825_1706"
 USER_VERSION_OPT=
 
 FAST_MODE="no"
@@ -69,15 +70,11 @@ DEFAULT_INSTALL_MODEL=(
 CROSS_PLATFORM_FLAG=0
 
 DEFAULT_MAPS=(
-    sunnyvale_big_loop
     sunnyvale_loop
     sunnyvale_with_two_offices
-    san_mateo
-    apollo_virutal_map
 )
 
 DEFAULT_TEST_MAPS=(
-    sunnyvale_big_loop
     sunnyvale_loop
 )
 
@@ -349,7 +346,7 @@ function restart_map_volume_if_needed() {
     local map_volume="apollo_map_volume-${map_name}_${USER}"
     local map_path="/apollo/modules/map/data/${map_name}"
     # some map image does not support aarch64, force to use image of x86_64
-    local TARGET_ARCH="x86_64"
+    local TARGET_ARCH="aarch64"
 
     if [[ ${MAP_VOLUMES_CONF} == *"${map_volume}"* ]]; then
         info "Map ${map_name} has already been included."
@@ -389,7 +386,7 @@ function mount_map_volumes() {
 function mount_other_volumes() {
     info "Mount other volumes ..."
     local volume_conf=
-    local TARGET_ARCH="x86_64"
+    local TARGET_ARCH="aarch64"
 
     # AUDIO
     local audio_volume="apollo_audio_volume_${USER}"
@@ -405,7 +402,7 @@ function install_python_tools() {
 
   for tool in ${DEFAULT_PYTHON_TOOLS[@]}; do
     info "Install python tool ${tool} ..."
-    pip3 install --user "${tool}"
+    python3 -m pip install --user "${tool}"
     if [ $? -ne 0 ]; then
         error "Failed to install ${tool}"
         exit 1
@@ -435,6 +432,7 @@ function main() {
     fi
 
     determine_dev_image "${USER_VERSION_OPT}"
+    # DEV_IMAGE="nvcr.io/nvidia/l4t-base:r32.7.1"
     geo_specific_config "${GEOLOC}"
 
     if [[ "${USE_LOCAL_IMAGE}" -gt 0 ]]; then

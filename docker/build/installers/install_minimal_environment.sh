@@ -44,6 +44,7 @@ if [[ "${ARCH}" == "x86_64" ]]; then
     fi
 else # aarch64
     if [[ ! "${LSB_RELEASE}" == "20.04" ]]; then
+        cp -f "${RCFILES_DIR}/sources.list.jetson-tx2.aarch64" /etc/apt/sources.list
         if [[ "${MY_GEO}" == "cn" ]]; then
             cp -f "${RCFILES_DIR}/sources.list.cn.aarch64" /etc/apt/sources.list
         fi
@@ -62,8 +63,11 @@ apt_get_update_and_install \
     less    \
     lsof    \
     python3     \
-    python3-pip \
     python3-distutils \
+    python3.7 \
+    python3.7-dev \
+    python3.7-distutils \
+    python3-pip \
     sed         \
     software-properties-common \
     sudo    \
@@ -116,7 +120,7 @@ ln -s /bin/bash /bin/sh -f
 ##----------------##
 ## Python Setings |
 ##----------------##
-update-alternatives --install /usr/bin/python python /usr/bin/python3 36
+update-alternatives --install /usr/bin/python python /usr/bin/python3 37
 
 if [[ "${MY_GEO}" == "cn" ]]; then
     # configure tsinghua's pypi mirror for x86_64 and aarch64
