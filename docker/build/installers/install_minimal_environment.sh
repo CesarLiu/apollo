@@ -64,9 +64,6 @@ apt_get_update_and_install \
     lsof    \
     python3     \
     python3-distutils \
-    python3.7 \
-    python3.7-dev \
-    python3.7-distutils \
     python3-pip \
     sed         \
     software-properties-common \
@@ -80,7 +77,11 @@ apt_get_update_and_install \
 if [[ "${ARCH}" == "aarch64" ]]; then
     apt-get -y install kmod
 fi
-
+apt_get_update_and_install \
+    python3.7 \
+    python3.7-dev \
+    python3.7-distutils \
+    python3-pip
 MY_STAGE=
 if [[ -f /etc/apollo.conf ]]; then
     MY_STAGE="$(awk -F '=' '/^stage=/ {print $2}' /etc/apollo.conf 2>/dev/null)"
@@ -120,7 +121,11 @@ ln -s /bin/bash /bin/sh -f
 ##----------------##
 ## Python Setings |
 ##----------------##
-update-alternatives --install /usr/bin/python python /usr/bin/python3 37
+update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
+update-alternatives --config python3
+update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
+update-alternatives --config python
+
 
 if [[ "${MY_GEO}" == "cn" ]]; then
     # configure tsinghua's pypi mirror for x86_64 and aarch64

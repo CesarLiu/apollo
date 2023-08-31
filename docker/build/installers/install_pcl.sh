@@ -75,56 +75,56 @@ if [[ -d "/usr/include/boost" ]]; then
     rm -rf /usr/include/boost
     cp -r /opt/apollo/sysroot/include/boost /usr/include/boost
 fi
-apt_get_update_and_install libpcl-dev
+# apt_get_update_and_install libpcl-dev
 # NOTE(storypku)
 # libglfw3-dev depends on libglfw3,
 # and libglew-dev have a dependency over libglew2.0
 
-# THREAD_NUM=$(nproc)
+THREAD_NUM=$(nproc)
 
-# # VERSION="1.11.0"
-# # CHECKSUM="4255c3d3572e9774b5a1dccc235711b7a723197b79430ef539c2044e9ce65954" # 1.11.0
+# VERSION="1.11.0"
+# CHECKSUM="4255c3d3572e9774b5a1dccc235711b7a723197b79430ef539c2044e9ce65954" # 1.11.0
 
-# VERSION="1.10.1"
-# CHECKSUM="61ec734ec7c786c628491844b46f9624958c360012c173bbc993c5ff88b4900e" # 1.10.1
-# PKG_NAME="pcl-${VERSION}.tar.gz"
+VERSION="1.10.1"
+CHECKSUM="61ec734ec7c786c628491844b46f9624958c360012c173bbc993c5ff88b4900e" # 1.10.1
+PKG_NAME="pcl-${VERSION}.tar.gz"
 
-# DOWNLOAD_LINK="https://github.com/PointCloudLibrary/pcl/archive/${PKG_NAME}"
+DOWNLOAD_LINK="https://github.com/PointCloudLibrary/pcl/archive/${PKG_NAME}"
 
-# download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-# tar xzf ${PKG_NAME}
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+tar xzf ${PKG_NAME}
 
-# # Ref: https://src.fedoraproject.org/rpms/pcl.git
-# #  -DPCL_PKGCONFIG_SUFFIX:STRING="" \
-# #  -DCMAKE_SKIP_RPATH=ON \
+# Ref: https://src.fedoraproject.org/rpms/pcl.git
+#  -DPCL_PKGCONFIG_SUFFIX:STRING="" \
+#  -DCMAKE_SKIP_RPATH=ON \
 
-# pushd pcl-pcl-${VERSION}/
-#     # disable sse patch for avoiding eigen core dump
-#     # patch -p1 < ${CURR_DIR}/pcl-sse-fix-${VERSION}.patch
-#     mkdir build && cd build
-#     cmake .. \
-#         "${GPU_OPTIONS}" \
-#         "${ARCH_OPTIONS}" \
-#         -DPCL_ENABLE_SSE=ON \
-#         -DWITH_DOCS=OFF \
-#         -DWITH_TUTORIALS=OFF \
-#         -DBUILD_global_tests=OFF \
-#         -DOPENNI_INCLUDE_DIR:PATH=/usr/include/ni \
-#         -DBoost_NO_SYSTEM_PATHS=TRUE \
-#         -DBOOST_ROOT:PATHNAME="${SYSROOT_DIR}" \
-#         -DBUILD_SHARED_LIBS=ON \
-#         -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
-#         -DCMAKE_BUILD_TYPE=Release
-#     make -j${THREAD_NUM}
-#     make install
-# popd
+pushd pcl-pcl-${VERSION}/
+    # disable sse patch for avoiding eigen core dump
+    # patch -p1 < ${CURR_DIR}/pcl-sse-fix-${VERSION}.patch
+    mkdir build && cd build
+    cmake .. \
+        "${GPU_OPTIONS}" \
+        "${ARCH_OPTIONS}" \
+        -DPCL_ENABLE_SSE=ON \
+        -DWITH_DOCS=OFF \
+        -DWITH_TUTORIALS=OFF \
+        -DBUILD_global_tests=OFF \
+        -DOPENNI_INCLUDE_DIR:PATH=/usr/include/ni \
+        -DBoost_NO_SYSTEM_PATHS=TRUE \
+        -DBOOST_ROOT:PATHNAME="${SYSROOT_DIR}" \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
+        -DCMAKE_BUILD_TYPE=Release
+    make -j${THREAD_NUM}
+    make install
+popd
 
 ldconfig
 
 ok "Successfully installed PCL ${VERSION}"
 
 # Clean up
-# rm -fr ${PKG_NAME} pcl-pcl-${VERSION}
+rm -fr ${PKG_NAME} pcl-pcl-${VERSION}
 
 if [[ -n "${CLEAN_DEPS}" ]]; then
     # Remove build-deps for PCL
