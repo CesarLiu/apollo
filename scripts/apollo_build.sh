@@ -243,8 +243,8 @@ function run_bazel_build() {
   info "${TAB}Bazel Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
   info "${TAB}Build Targets: ${GREEN}${build_targets}${NO_COLOR}"
   info "${TAB}Disabled:      ${YELLOW}${disabled_targets}${NO_COLOR}"
-
-  local job_args="--copt=-march=native --host_copt=-march=native --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
+  local count="$(($(nproc) - 2))"
+  local job_args="--copt=-march=native --host_copt=-march=native --jobs=${count} --local_ram_resources=HOST_RAM*0.5"
   bazel build ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }
 

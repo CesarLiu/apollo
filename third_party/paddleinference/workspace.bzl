@@ -17,7 +17,6 @@ def repo():
 
     http_archive(
         name = "paddleinference-aarch64",
-        sha256 = "048d1d7799ffdd7bd8876e33bc68f28c3af911ff923c10b362340bd83ded04b3",
-        strip_prefix = "paddleinference",
-        urls = ["https://apollo-pkg-beta.bj.bcebos.com/archive/paddleinference-linux-aarch64-1.0.0.tar.gz"],
+        strip_prefix = "paddleinference-aarch64",
+        url = "file:///opt/apollo/paddleinference-aarch64.tar.gz",
     )

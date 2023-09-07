@@ -245,7 +245,7 @@ function run_bazel_coverage() {
   info "${TAB}Disabled: ${YELLOW}${disabled_targets}${NO_COLOR}"
 
   local count="$(($(nproc) / 2))"
-  local job_args="--jobs=${count} --local_ram_resources=HOST_RAM*0.7"
+  local job_args="--jobs=${count} --local_ram_resources=HOST_RAM*0.6"
   bazel coverage ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }
 

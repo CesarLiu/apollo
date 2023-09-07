@@ -183,8 +183,6 @@ cc_library(
         "@ffmpeg//:avcodec",
     ] + if_x86_64(
         ["@adv_plat"],
-    ) + if_aarch64(
-        ["@ffmpeg//:avformat"],
     ),
     copts = [ 
         '-fopenmp',

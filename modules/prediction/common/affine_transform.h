@@ -16,6 +16,7 @@
 
 #include <memory>
 #include <vector>
+#include <cuda_runtime.h>
 #include <nppi.h>
 
 #include "opencv2/opencv.hpp"

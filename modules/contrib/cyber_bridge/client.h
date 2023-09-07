@@ -9,7 +9,9 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-
+#include <mutex>
+#include <thread>
+#include <unistd.h>
 #include "boost/asio.hpp"
 
 class Clients;
