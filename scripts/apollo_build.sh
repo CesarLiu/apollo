@@ -31,7 +31,7 @@ ENABLE_PROFILER=true
 CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
 DISABLED_TARGETS=
-DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/drivers/camera/..."
+DISABLED_TARGETS=
 
 function _determine_drivers_disabled() {
   if ! ${USE_ESD_CAN}; then
@@ -244,7 +244,7 @@ function run_bazel_build() {
   info "${TAB}Build Targets: ${GREEN}${build_targets}${NO_COLOR}"
   info "${TAB}Disabled:      ${YELLOW}${disabled_targets}${NO_COLOR}"
   local count="$(($(nproc) - 2))"
-  local job_args="--copt=-march=native --host_copt=-march=native --jobs=${count} --local_ram_resources=HOST_RAM*0.5"
+  local job_args="--copt=-march=native --host_copt=-march=native --jobs=${count} --local_ram_resources=HOST_RAM*0.8"
   bazel build ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }
 

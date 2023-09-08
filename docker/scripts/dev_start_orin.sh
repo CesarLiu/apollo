@@ -21,7 +21,7 @@ source "${CURR_DIR}/docker_base.sh"
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 DOCKER_REPO="apolloauto/apollo"
-DEV_CONTAINER_PREFIX='apollo_dev_tx2_'
+DEV_CONTAINER_PREFIX='apollo_dev_orin_'
 DEV_CONTAINER="${DEV_CONTAINER_PREFIX}${USER}"
 DEV_INSIDE="in-dev-docker"
 
@@ -31,15 +31,14 @@ TARGET_ARCH="$(uname -m)"
 VERSION_X86_64="dev-x86_64-18.04-20230724_1143"
 TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20210112_0008"
 
-# VERSION_AARCH64="dev-aarch64-20.04-20230719_2137"
-VERSION_AARCH64="dev-aarch64-tx2-18.04-20230908_1330"
+VERSION_AARCH64="dev-aarch64-20.04-20230719_2137"
 USER_VERSION_OPT=
 
 FAST_MODE="no"
 
 GEOLOC=
 
-USE_LOCAL_IMAGE=1
+USE_LOCAL_IMAGE=0
 CUSTOM_DIST=
 USER_AGREED="no"
 
@@ -405,7 +404,7 @@ function install_python_tools() {
 
   for tool in ${DEFAULT_PYTHON_TOOLS[@]}; do
     info "Install python tool ${tool} ..."
-    python3 -m pip install --user "${tool}"
+    pip3 install --user "${tool}"
     if [ $? -ne 0 ]; then
         error "Failed to install ${tool}"
         exit 1
@@ -435,7 +434,6 @@ function main() {
     fi
 
     determine_dev_image "${USER_VERSION_OPT}"
-    # DEV_IMAGE="cesarliu/apollo:dev-aarch64-tx2-18.04-20230908_1330"
     geo_specific_config "${GEOLOC}"
 
     if [[ "${USE_LOCAL_IMAGE}" -gt 0 ]]; then
@@ -517,7 +515,7 @@ function main() {
 
     ok "Congratulations! You have successfully finished setting up Apollo Dev Environment."
     ok "To login into the newly created ${DEV_CONTAINER} container, please run the following command:"
-    ok "  bash docker/scripts/dev_into.sh"
+    ok "  bash docker/scripts/dev_into_orin.sh"
     ok "Enjoy!"
 }
 

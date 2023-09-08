@@ -138,16 +138,11 @@ cc_library(
         "//modules/common_msgs/basic_msgs:header_cc_proto",
         "//modules/drivers/camera/proto:config_cc_proto",
         "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
-    ] + if_aarch64(
-        [
-            "@nvjpeg//:nvjpeg"
-        ], [
-            "@opencv//:core",
-            "@opencv//:highgui",
-            "@opencv//:imgcodecs",
-            "@opencv//:imgproc",
-        ],
-    ),
+        "@opencv//:core",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
+        "@opencv//:imgproc",
+    ],
 )
 
 cc_library(
