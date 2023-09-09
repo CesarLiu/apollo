@@ -20,7 +20,7 @@ source "${CURR_DIR}/docker_base.sh"
 
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
-DOCKER_REPO="apolloauto/apollo"
+DOCKER_REPO="cesarliu/apollo"
 DEV_CONTAINER_PREFIX='apollo_dev_tx2_'
 DEV_CONTAINER="${DEV_CONTAINER_PREFIX}${USER}"
 DEV_INSIDE="in-dev-docker"
