@@ -31,7 +31,7 @@
 #include "cyber/logger/logger_util.h"
 #include "cyber/time/rate.h"
 #include "modules/common/math/path_matcher.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/time.h"
 #include "modules/planning/common/fortiss_common.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/collision_checker.h"

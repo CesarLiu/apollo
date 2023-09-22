@@ -28,13 +28,13 @@ install(
         ":libautobox_bridge_component_localization.so",
         ":libautobox_bridge_component_trajectory.so",
     ],
-    deps = [
-        "//modules/autobox_bridge/proto:autobox_bridge_conf_proto",
-        "//modules/autobox_bridge/proto:autobox_chassis_proto",
-        "//modules/autobox_bridge/proto:autobox_control_proto",
-        "//modules/autobox_bridge/proto:autobox_localization_proto",
-        "//modules/autobox_bridge/proto:autobox_trajectory_proto",
-    ],
+#    deps = [
+#        "//modules/autobox_bridge/proto:autobox_bridge_conf_cc_proto",
+#        "//modules/autobox_bridge/proto:autobox_chassis_cc_proto",
+#        "//modules/autobox_bridge/proto:autobox_control_cc_proto",
+#        "//modules/autobox_bridge/proto:autobox_localization_cc_proto",
+#        "//modules/autobox_bridge/proto:autobox_trajectory_cc_proto",
+#    ],
 )
 install(
     name = "pb_hdrs",
@@ -63,9 +63,9 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/monitor_log",
-        "//modules/common_msgs/control_msgs:control_cmd_proto",
-        "//modules/autobox_bridge/proto:autobox_chassis_proto",
-        "//modules/autobox_bridge/proto:autobox_bridge_conf_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
+        "//modules/autobox_bridge/proto:autobox_chassis_cc_proto",
+        "//modules/autobox_bridge/proto:autobox_bridge_conf_cc_proto",
     ],
 )
 
@@ -84,9 +84,9 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/monitor_log",
-        "//modules/common_msgs/control_msgs:control_cmd_proto",
-	    "//modules/autobox_bridge/proto:autobox_control_proto",
-        "//modules/autobox_bridge/proto:autobox_bridge_conf_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
+	    "//modules/autobox_bridge/proto:autobox_control_cc_proto",
+        "//modules/autobox_bridge/proto:autobox_bridge_conf_cc_proto",
     ],
 )
 
@@ -105,9 +105,9 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/monitor_log",
-        "//modules/common_msgs/localization_msgs:localization_proto",
-	    "//modules/autobox_bridge/proto:autobox_localization_proto",
-        "//modules/autobox_bridge/proto:autobox_bridge_conf_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
+	    "//modules/autobox_bridge/proto:autobox_localization_cc_proto",
+        "//modules/autobox_bridge/proto:autobox_bridge_conf_cc_proto",
     ],
 )
 
@@ -126,11 +126,11 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/monitor_log",
-        "//modules/common_msgs/control_msgs:control_cmd_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/common_msgs/localization_msgs:localization_proto",
-        "//modules/autobox_bridge/proto:autobox_trajectory_proto",
-        "//modules/autobox_bridge/proto:autobox_bridge_conf_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
+        "//modules/autobox_bridge/proto:autobox_trajectory_cc_proto",
+        "//modules/autobox_bridge/proto:autobox_bridge_conf_cc_proto",
     ],
 )
 

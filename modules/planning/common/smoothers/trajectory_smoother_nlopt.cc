@@ -26,7 +26,7 @@
 #include "cyber/common/log.h"
 #include "cyber/logger/logger_util.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 
 // Create function pointers for nlopt outside the namespace
@@ -57,7 +57,7 @@ std::string GetTimeString() {
   // from cyber/logger/log_file_object.cc
   struct ::tm tm_time;
   const time_t timestamp =
-      static_cast<time_t>(apollo::common::time::Clock::NowInSeconds());
+      static_cast<time_t>(apollo::cyber::Clock::NowInSeconds());
   localtime_r(&timestamp, &tm_time);
   std::ostringstream time_pid_stream;
   time_pid_stream.fill('0');

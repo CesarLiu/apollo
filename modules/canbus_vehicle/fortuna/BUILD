@@ -27,6 +27,13 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "libfortuna_vehicle_factory_lib.so",
+    linkshared = True,
+    linkstatic = True,
+    deps = [":fortuna_vehicle_factory"],
+)
+
 cc_library(
     name = "fortuna_message_manager",
     srcs = [
@@ -37,7 +44,7 @@ cc_library(
     ],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:canbus_conf_cc_proto",
         "//modules/canbus_vehicle/fortuna/proto:fortiss_hardware_status_cc_proto",
         "//modules/canbus_vehicle/fortuna/protocol:canbus_fortuna_protocol",
         "//modules/drivers/canbus/can_comm:message_manager_base",
@@ -63,7 +70,6 @@ cc_library(
         "//modules/canbus_vehicle/fortuna/protocol:canbus_fortuna_protocol",
         "//modules/common_msgs/basic_msgs:error_code_cc_proto",
         "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
-        "//modules/canbus_vehicle/fortuna/protocol:canbus_fortuna_protocol",
         "//modules/common/kv_db",
     ],
 )
@@ -74,7 +80,7 @@ cc_test(
    srcs = [
        "fortuna_controller_test.cc",
    ],
-   data = ["//modules/canbus:canbus_testdata"],
+   data = ["//modules/canbus:test_data"],
    deps = [
        "fortuna_controller",
        "@com_google_googletest//:gtest_main",

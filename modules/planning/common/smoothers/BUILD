@@ -24,7 +24,7 @@ cc_library(
         "//cyber/common:log",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/common/time:time",
+        "//cyber/time:clock",
         "//cyber/logger:logger_util",
         "@nlopt",
         "@eigen",
@@ -41,9 +41,9 @@ filegroup(
 cc_test(
     name = "trajectory_smoother_nlopt_test",
     srcs = ["trajectory_smoother_nlopt_test.cc"],
-    deps = ["@gtest//:main",
+    deps = ["@com_google_googletest//:gtest",
             ":trajectory_smoother_nlopt",
-            "//modules/common/math:geometry"],
+            "//modules/common/math"],
     data = [":miqp_testdata"]
 )
 

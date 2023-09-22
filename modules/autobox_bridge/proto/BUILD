@@ -4,7 +4,7 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "autobox_bridge_conf_proto",
+    name = "autobox_bridge_conf_cc_proto",
     deps = [
         ":autobox_bridge_conf_proto_lib",
     ],
@@ -20,7 +20,7 @@ proto_library(
 # Delete the suff from here on if the repacking of protobuf messages is obsolete!
 
 cc_proto_library(
-    name = "autobox_trajectory_proto",
+    name = "autobox_trajectory_cc_proto",
     deps = [
         ":autobox_trajectory_proto_lib",
     ],
@@ -38,7 +38,7 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "autobox_localization_proto",
+    name = "autobox_localization_cc_proto",
     deps = [
         ":autobox_localization_proto_lib",
     ],
@@ -58,7 +58,7 @@ proto_library(
 
 
 cc_proto_library(
-    name = "autobox_control_proto",
+    name = "autobox_control_cc_proto",
     deps = [
         ":autobox_control_proto_lib",
     ],
@@ -76,7 +76,7 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "autobox_chassis_proto",
+    name = "autobox_chassis_cc_proto",
     deps = [
         ":autobox_chassis_proto_lib",
     ],

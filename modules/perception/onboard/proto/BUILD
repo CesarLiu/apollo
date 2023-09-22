@@ -82,7 +82,7 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "fortuna_radar_component_config_proto",
+    name = "fortuna_radar_component_config_cc_proto",
     deps = [
         ":fortuna_radar_component_config_proto",
     ],

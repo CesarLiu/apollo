@@ -37,7 +37,7 @@ cc_library(
         "steering_rpt_0x02.h",        
     ],
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:canbus_conf_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -54,7 +54,7 @@ cc_library(
 #     ],
 #     deps = [
 #         "//modules/canbus_vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
-#         "@gtest//:main",
+#         "@com_google_googletest//:gtest",
 #     ],
 # )
 

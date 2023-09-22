@@ -23,7 +23,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "cyber/logger/logger_util.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/time.h"
 
 namespace apollo {
 namespace planning {

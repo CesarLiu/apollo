@@ -20,7 +20,7 @@ cc_library(
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios:scenario_manager",
-        "//modules/planning/proto:bark_interface_proto",
+        "//modules/planning/proto:bark_interface_cc_proto",
     ],
 )
 

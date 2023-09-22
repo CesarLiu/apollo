@@ -9,7 +9,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//modules/common/math:path_matcher",
+        "//modules/common/math",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/constraint_checker",
