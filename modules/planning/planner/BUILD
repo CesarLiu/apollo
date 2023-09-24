@@ -30,12 +30,16 @@ cc_library(
         "navi_planner_dispatcher.cc",
         "on_lane_planner_dispatcher.cc",
         "planner_dispatcher.cc",
-    ],
+        "bark_rl_planner_dispatcher.cc",
+        "reference_tracking_planner_dispatcher.cc"]
+        + select({":_planner_miqp" : ["miqp_planner_dispatcher.cc"], "//conditions:default": []}),
     hdrs = [
         "navi_planner_dispatcher.h",
         "on_lane_planner_dispatcher.h",
         "planner_dispatcher.h",
-    ],
+        "bark_rl_planner_dispatcher.h",
+        "reference_tracking_planner_dispatcher.h"]
+        + select({":_planner_miqp" : ["miqp_planner_dispatcher.h"], "//conditions:default": []}),
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
         "-fopenmp"]

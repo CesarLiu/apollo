@@ -944,7 +944,6 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
 }
 
 bool UsbCam::process_image(void* src, int len, CameraImagePtr dest) {
-bool UsbCam::process_image(void* src, int len, CameraImagePtr dest) {
   if (src == nullptr || dest == nullptr) {
     AERROR << "process image error. src or dest is null";
     return false;

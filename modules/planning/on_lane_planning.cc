@@ -46,6 +46,9 @@
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/tasks/task_factory.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"
+#include "modules/planning/constraint_checker/collision_checker.h"
+#include "modules/planning/constraint_checker/constraint_checker.h"
+
 
 namespace apollo {
 namespace planning {

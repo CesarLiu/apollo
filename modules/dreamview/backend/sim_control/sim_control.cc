@@ -116,9 +116,9 @@ void SimControl::InitTimerAndIO() {
       false));
 }
 
-void SimControl::Init(bool set_start_point, double start_velocity,
+void SimControl::Init(double start_velocity,
                       double start_acceleration) {
-  if ((set_start_point && !FLAGS_use_navigation_mode) ||
+  if ((!FLAGS_use_navigation_mode) ||
       FLAGS_fortiss_simcontrol_set_start_pose) {
     InitStartPoint(start_velocity, start_acceleration);
   }

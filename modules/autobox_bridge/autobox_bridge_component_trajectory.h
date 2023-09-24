@@ -24,7 +24,7 @@
 #include "cyber/component/timer_component.h"
 #include "cyber/timer/timer.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/autobox_bridge/proto/autobox_bridge_conf.pb.h"
 #include "modules/autobox_bridge/proto/autobox_trajectory.pb.h"
 

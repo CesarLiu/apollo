@@ -23,7 +23,7 @@
 #include "gflags/gflags.h"
 #include "gtest/gtest.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -32,7 +32,7 @@ void CompareTrajectories(DiscretizedTrajectory traj1,
                          DiscretizedTrajectory traj2) {
   EXPECT_EQ(traj1.size(), traj2.size());
 
-  for (int idx = 0; idx < traj1.size(); ++idx) {
+  for (size_t idx = 0; idx < traj1.size(); ++idx) {
     auto tp1 = traj1.at(idx);
     auto tp2 = traj2.at(idx);
 
@@ -81,7 +81,7 @@ void OptimizeFromFileHelper(std::string path_to_file, std::string input_file,
   params.max_num_evals = 1e3;
   tsm2.SetSolverParameters(params);
   tsm2.InitializeProblem(subsampling, traj_in, start_point);
-  int status2 = tsm2.Optimize();
+  // int status2 = tsm2.Optimize();
 
   CompareTrajectories(tsm.GetOptimizedTrajectory(),
                       tsm2.GetOptimizedTrajectory());

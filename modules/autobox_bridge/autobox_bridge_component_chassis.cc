@@ -21,7 +21,7 @@
 namespace apollo {
 namespace autobox_bridge {
 
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::cyber::proto::RoleAttributes;
 using apollo::drivers::AutoboxBridgeConf;
 

@@ -15,11 +15,34 @@ cc_proto_library(
 proto_library(
     name = "fortiss_hardware_status_proto",
     srcs = ["fortiss_hardware_status.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
+    ],
 )
 
 py_proto_library(
     name = "fortiss_hardware_status_py_pb2",
     deps = [
         ":fortiss_hardware_status_proto",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
+    ],
+)
+
+cc_proto_library(
+    name = "fortuna_cc_proto",
+    deps = [
+        ":fortuna_proto",
+    ],
+)
+
+proto_library(
+    name = "fortuna_proto",
+    srcs = ["fortuna.proto"],
+)
+
+py_proto_library(
+    name = "fortuna_py_pb2",
+    deps = [
+        ":fortuna_proto",
     ],
 )

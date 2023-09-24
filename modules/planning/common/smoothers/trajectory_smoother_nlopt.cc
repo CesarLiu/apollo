@@ -73,7 +73,7 @@ namespace apollo {
 namespace planning {
 
 using namespace Eigen;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 TrajectorySmootherNLOpt::TrajectorySmootherNLOpt(const char logdir[],
                                                  const double pts_offset_x,
@@ -178,7 +178,7 @@ void TrajectorySmootherNLOpt::InitializeProblem(
   C_vel_.resize(STATES::STATES_SIZE * nr_integration_steps_,
                 nr_integration_steps_);
   offset = 0;
-  for (size_t idx = 0; idx < nr_integration_steps_; ++idx) {
+  for (int idx = 0; idx < nr_integration_steps_; ++idx) {
     X_lb_[offset + STATES::X] = -1e3;
     X_lb_[offset + STATES::Y] = -1e3;
     X_lb_[offset + STATES::THETA] = -1e3;
@@ -718,7 +718,7 @@ bool TrajectorySmootherNLOpt::CheckConstraints(const std::vector<double>& u,
   for (int idx = 0; idx < size_state_vector / STATES::STATES_SIZE; ++idx) {
     double kappa = X[idx * STATES::STATES_SIZE + STATES::KAPPA];
     double v = X[idx * STATES::STATES_SIZE + STATES::V];
-    double a = X[idx * STATES::STATES_SIZE + STATES::A];
+    // double a = X[idx * STATES::STATES_SIZE + STATES::A];
     double j = u[idx * INPUTS::INPUTS_SIZE + INPUTS::J];
     double xi = u[idx * INPUTS::INPUTS_SIZE + INPUTS::XI];
     // evaluate acc and kappa only at idx>0, as that's what the optimizer can
@@ -885,7 +885,7 @@ bool TrajectorySmootherNLOpt::CheckBoundsAfterIntegration(double jerk,
   const Eigen::Vector2d u_eigen = Eigen::Vector2d(jerk, dkappa);
   const std::vector<double> u_vector = {jerk, dkappa};
   Vector6d x_in = x0_;
-  for (int idx = 0; idx < steps; ++idx) {
+  for (size_t idx = 0; idx < steps; ++idx) {
     Vector6d x_out;
     model_f(x_in, u_eigen, stepsize_, x_out);
     x_in = x_out;

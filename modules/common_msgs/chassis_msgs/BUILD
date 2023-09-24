@@ -48,6 +48,7 @@ proto_library(
     srcs = ["chassis_detail.proto"],
     deps = [
         "//modules/common_msgs/basic_msgs:vehicle_id_proto",
+        "//modules/canbus_vehicle/fortuna/proto:fortuna_proto",
         ":chassis_proto",
     ],
 )
@@ -57,6 +58,7 @@ py_proto_library(
     deps = [
         ":chassis_detail_proto",
         "//modules/common_msgs/basic_msgs:vehicle_id_py_pb2",
+        "//modules/canbus_vehicle/fortuna/proto:fortuna_py_pb2",
         ":chassis_py_pb2",
     ],
 )

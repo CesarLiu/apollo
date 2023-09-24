@@ -321,7 +321,7 @@ std::string GetTimeString() {
   // from cyber/logger/log_file_object.cc
   struct ::tm tm_time;
   const time_t timestamp =
-      static_cast<time_t>(apollo::common::time::Clock::NowInSeconds());
+      static_cast<time_t>(apollo::cyber::Clock::NowInSeconds());
   localtime_r(&timestamp, &tm_time);
   std::ostringstream time_pid_stream;
   time_pid_stream.fill('0');

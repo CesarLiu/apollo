@@ -30,7 +30,7 @@ using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacles;

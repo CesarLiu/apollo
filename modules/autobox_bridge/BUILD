@@ -28,13 +28,6 @@ install(
         ":libautobox_bridge_component_localization.so",
         ":libautobox_bridge_component_trajectory.so",
     ],
-#    deps = [
-#        "//modules/autobox_bridge/proto:autobox_bridge_conf_cc_proto",
-#        "//modules/autobox_bridge/proto:autobox_chassis_cc_proto",
-#        "//modules/autobox_bridge/proto:autobox_control_cc_proto",
-#        "//modules/autobox_bridge/proto:autobox_localization_cc_proto",
-#        "//modules/autobox_bridge/proto:autobox_trajectory_cc_proto",
-#    ],
 )
 install(
     name = "pb_hdrs",
@@ -50,8 +43,8 @@ install(
 
 cc_binary(
     name = "libautobox_bridge_component_chassis.so",
-    linkopts = ["-shared"],
-    linkstatic = False,
+    linkshared = True,
+    linkstatic = True,
     deps = [":autobox_bridge_component_lib_chassis"],
 )
 
@@ -71,8 +64,8 @@ cc_library(
 
 cc_binary(
     name = "libautobox_bridge_component_control.so",
-    linkopts = ["-shared"],
-    linkstatic = False,
+    linkshared = True,
+    linkstatic = True,
     deps = [":autobox_bridge_component_lib_control"],
 )
 
@@ -92,8 +85,8 @@ cc_library(
 
 cc_binary(
     name = "libautobox_bridge_component_localization.so",
-    linkopts = ["-shared"],
-    linkstatic = False,
+    linkshared = True,
+    linkstatic = True,
     deps = [":autobox_bridge_component_lib_localization"],
 )
 
@@ -113,8 +106,8 @@ cc_library(
 
 cc_binary(
     name = "libautobox_bridge_component_trajectory.so",
-    linkopts = ["-shared"],
-    linkstatic = False,
+    linkshared = True,
+    linkstatic = True,
     deps = [":autobox_bridge_component_lib_trajectory"],
 )
 

@@ -40,7 +40,9 @@ namespace planning {
  **/
 class MiqpPlanner : public LatticePlanner {
  public:
-  MiqpPlanner();
+  MiqpPlanner() = delete;
+  explicit MiqpPlanner(const std::shared_ptr<DependencyInjector>& injector)
+      : LatticePlanner(injector) {}
 
   virtual ~MiqpPlanner() = default;
 

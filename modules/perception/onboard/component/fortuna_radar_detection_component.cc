@@ -16,15 +16,15 @@
 
 #include "modules/perception/onboard/component/fortuna_radar_detection_component.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
-#include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/radar/lib/interface/base_radar_obstacle_perception.h"
 #include "modules/perception/radar/common/radar_util.h"
 
-#include "modules/canbus/proto/fortuna.pb.h"
+#include "modules/canbus_vehicle/fortuna/proto/fortuna.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace onboard {
+using apollo::cyber::Clock;
 
 bool FortunaRadarDetectionComponent::Init() {
   if (!GetProtoConfig(&comp_config_)) {
@@ -54,7 +54,7 @@ bool FortunaRadarDetectionComponent::Init() {
 
 bool FortunaRadarDetectionComponent::Proc(const std::shared_ptr<ChassisDetail>& message) {
   //!Todo add header to chassis_detail?
-  AINFO << "Enter fortuna radar process node at current timestamp " << lib::TimeUtil::GetCurrentTime();
+  AINFO << "Enter fortuna radar process node at current timestamp " << Clock::NowInSeconds();
   std::shared_ptr<SensorFrameMessage> out_message(new (std::nothrow) SensorFrameMessage);
   if (!InternalProc(message, out_message)) {
     return false;
@@ -73,7 +73,7 @@ bool FortunaRadarDetectionComponent::InternalProc(
     chassis_detail_time = in_message->timestamp();
   } else {
     //This is a hack that works if no latencies are in the system
-    chassis_detail_time = lib::TimeUtil::GetCurrentTime();
+    chassis_detail_time = Clock::NowInSeconds();
   }
 
   GetRawRadarData(in_message, chassis_detail_time); // fills raw_radar_detections_

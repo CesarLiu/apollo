@@ -26,8 +26,8 @@
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/planner/lattice/lattice_planner.h"
 #include "modules/planning/planner/planner.h"
+#include "modules/planning/planner/lattice/lattice_planner.h"
 #include "modules/planning/proto/bark_interface.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
@@ -40,7 +40,9 @@ namespace planning {
  **/
 class BarkRlPlanner : public LatticePlanner {
  public:
-  BarkRlPlanner();
+  BarkRlPlanner() = delete;
+  explicit BarkRlPlanner(const std::shared_ptr<DependencyInjector>& injector)
+      : LatticePlanner(injector) {}
 
   virtual ~BarkRlPlanner() = default;
 

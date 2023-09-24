@@ -40,7 +40,9 @@ namespace planning {
  **/
 class ReferenceTrackingPlanner : public LatticePlanner {
  public:
-  ReferenceTrackingPlanner();
+  ReferenceTrackingPlanner() = delete;
+  explicit ReferenceTrackingPlanner(const std::shared_ptr<DependencyInjector>& injector)
+      : LatticePlanner(injector) {}
 
   virtual ~ReferenceTrackingPlanner() = default;
 

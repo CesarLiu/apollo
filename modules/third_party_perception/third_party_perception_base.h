@@ -47,9 +47,6 @@ class ThirdPartyPerception {
   explicit ThirdPartyPerception(apollo::cyber::Node* const node);
   ThirdPartyPerception() = default;
   virtual ~ThirdPartyPerception() = default;
-  explicit ThirdPartyPerception(apollo::cyber::Node* const node);
-  ThirdPartyPerception() = default;
-  virtual ~ThirdPartyPerception() = default;
   std::string Name() const;
   apollo::common::Status Init();
   apollo::common::Status Start();

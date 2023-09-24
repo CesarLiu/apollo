@@ -189,7 +189,7 @@ cc_library(
         "//modules/perception/onboard/common_flags",
         "//modules/perception/onboard/inner_component_messages",
         "//modules/perception/onboard/msg_buffer",
-        "//modules/perception/onboard/proto:radar_component_config_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
         "//modules/perception/onboard/proto:fortuna_radar_component_config_cc_proto",
         "//modules/perception/onboard/transform_wrapper",
         "//modules/perception/radar/app:radar_obstacle_perception",

@@ -41,9 +41,9 @@ filegroup(
 cc_test(
     name = "trajectory_smoother_nlopt_test",
     srcs = ["trajectory_smoother_nlopt_test.cc"],
-    deps = ["@com_google_googletest//:gtest",
+    deps = ["@com_google_googletest//:gtest_main",
             ":trajectory_smoother_nlopt",
-            "//modules/common/math"],
+            "//modules/common/math",],
     data = [":miqp_testdata"]
 )
 

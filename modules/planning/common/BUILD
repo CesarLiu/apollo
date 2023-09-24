@@ -12,6 +12,7 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
+        "//cyber",
         ":reference_line_info",
         "//modules/planning/common/smoothers:trajectory_smoother_nlopt",
         "//modules/planning/common/trajectory:discretized_trajectory",

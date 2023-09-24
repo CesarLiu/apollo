@@ -29,7 +29,7 @@ namespace bridge {
 #define BRIDGE_IMPL(pb_msg) template class UDPAutoBoxBridgeSenderComponent<pb_msg>
 
 using apollo::bridge::UDPBridgeSenderRemoteInfo;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::cyber::io::Session;
 using apollo::localization::LocalizationEstimate;
 template <typename T>

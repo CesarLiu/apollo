@@ -46,26 +46,26 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::planning::DiscretizedTrajectory;
 using apollo::planning::fortiss::MapOffset;
 
-MiqpPlanner::MiqpPlanner() {
-  // from cyber/logger/log_file_object.cc
-  struct ::tm tm_time;
-  const time_t timestamp = static_cast<time_t>(Clock::NowInSeconds());
-  localtime_r(&timestamp, &tm_time);
-  std::ostringstream time_pid_stream;
-  time_pid_stream.fill('0');
-  time_pid_stream << 1900 + tm_time.tm_year << std::setw(2)
-                  << 1 + tm_time.tm_mon << std::setw(2) << tm_time.tm_mday
-                  << '-' << std::setw(2) << tm_time.tm_hour << std::setw(2)
-                  << tm_time.tm_min << std::setw(2) << tm_time.tm_sec << '.'
-                  << apollo::cyber::logger::GetMainThreadPid();
-  const std::string& time_pid_string = time_pid_stream.str();
-  logdir_ += "/apollo/data/log/";
-  // logdir_ += time_pid_string;
-}
+// MiqpPlanner::MiqpPlanner() {
+//   // from cyber/logger/log_file_object.cc
+//   struct ::tm tm_time;
+//   const time_t timestamp = static_cast<time_t>(Clock::NowInSeconds());
+//   localtime_r(&timestamp, &tm_time);
+//   std::ostringstream time_pid_stream;
+//   time_pid_stream.fill('0');
+//   time_pid_stream << 1900 + tm_time.tm_year << std::setw(2)
+//                   << 1 + tm_time.tm_mon << std::setw(2) << tm_time.tm_mday
+//                   << '-' << std::setw(2) << tm_time.tm_hour << std::setw(2)
+//                   << tm_time.tm_min << std::setw(2) << tm_time.tm_sec << '.'
+//                   << apollo::cyber::logger::GetMainThreadPid();
+//   const std::string& time_pid_string = time_pid_stream.str();
+//   logdir_ += "/apollo/data/log/";
+//   // logdir_ += time_pid_string;
+// }
 
 common::Status MiqpPlanner::Init(const PlanningConfig& config) {
   MiqpPlannerSettings settings = DefaultSettings();

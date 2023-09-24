@@ -394,6 +394,8 @@ proto_library(
         ":open_space_task_config_proto",
         ":task_config_proto",
         "//modules/common_msgs/planning_msgs:scenario_type_proto",
+        ":miqp_planner_config_proto",
+        ":bark_rl_planner_config_proto",
     ],
 )
 
@@ -404,6 +406,8 @@ py_proto_library(
         ":open_space_task_config_py_pb2",
         ":task_config_py_pb2",
         "//modules/common_msgs/planning_msgs:scenario_type_py_pb2",
+        ":miqp_planner_config_py_pb2",
+        ":bark_rl_planner_config_py_pb2",
     ],
 )
 

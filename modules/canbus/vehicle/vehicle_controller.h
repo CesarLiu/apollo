@@ -256,40 +256,49 @@ ErrorCode VehicleController<SensorType>::Update(
     return ErrorCode::CANBUS_ERROR;
   }
 
-  // Execute action to transform driving mode
-  if (control_command.has_pad_msg() && control_command.pad_msg().has_action()) {
-    AINFO << "Canbus received pad msg: "
-          << control_command.pad_msg().ShortDebugString();
-    if (control_command.pad_msg().action() == control::DrivingAction::VIN_REQ) {
-      if (!VerifyID()) {
-        AINFO << "Response vid failed, please request again.";
-      } else {
-        AINFO << "Response vid success!";
-      }
-    } else {
-      Chassis::DrivingMode mode = Chassis::COMPLETE_MANUAL;
-      switch (control_command.pad_msg().action()) {
-        case control::DrivingAction::START: {
-          mode = Chassis::COMPLETE_AUTO_DRIVE;
-          break;
-        }
-        case control::DrivingAction::STOP:
-        case control::DrivingAction::RESET: {
-          // In COMPLETE_MANUAL mode
-          break;
-        }
-        default: {
-          AERROR << "No response for this action.";
-          break;
-        }
-      }
-      auto error_code = SetDrivingMode(mode);
-      if (error_code != ErrorCode::OK) {
-        AERROR << "Failed to set driving mode.";
-      } else {
-        AINFO << "Set driving mode success.";
-      }
-    }
+  // // Execute action to transform driving mode
+  // if (control_command.has_pad_msg() && control_command.pad_msg().has_action()) {
+  //   AINFO << "Canbus received pad msg: "
+  //         << control_command.pad_msg().ShortDebugString();
+  //   if (control_command.pad_msg().action() == control::DrivingAction::VIN_REQ) {
+  //     if (!VerifyID()) {
+  //       AINFO << "Response vid failed, please request again.";
+  //     } else {
+  //       AINFO << "Response vid success!";
+  //     }
+  //   } else {
+  //     Chassis::DrivingMode mode = Chassis::COMPLETE_MANUAL;
+  //     switch (control_command.pad_msg().action()) {
+  //       case control::DrivingAction::START: {
+  //         mode = Chassis::COMPLETE_AUTO_DRIVE;
+  //         break;
+  //       }
+  //       case control::DrivingAction::STOP:
+  //       case control::DrivingAction::RESET: {
+  //         // In COMPLETE_MANUAL mode
+  //         break;
+  //       }
+  //       default: {
+  //         AERROR << "No response for this action.";
+  //         break;
+  //       }
+  //     }
+  //     auto error_code = SetDrivingMode(mode);
+  //     if (error_code != ErrorCode::OK) {
+  //       AERROR << "Failed to set driving mode.";
+  //     } else {
+  //       AINFO << "Set driving mode success.";
+  //     }
+  //   }
+  // }
+  // currently, we do not have pad msgs or any other msg to activate the full autonomy.
+  // set to complete autonomy with the control msg present
+  mode = Chassis::COMPLETE_AUTO_DRIVE;
+  auto error_code = SetDrivingMode(mode);
+  if (error_code != ErrorCode::OK) {
+    AERROR << "Failed to set driving mode.";
+  } else {
+    AINFO << "Set driving mode success.";
   }
 
   if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||

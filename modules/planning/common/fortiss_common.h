@@ -20,10 +20,11 @@
 #include <iomanip>
 #include <iostream>
 
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "cyber/logger/logger_util.h"
-#include "cyber/time/time.h"
+#include "cyber/cyber.h"
+#include "cyber/time/clock.h"
 
 namespace apollo {
 namespace planning {

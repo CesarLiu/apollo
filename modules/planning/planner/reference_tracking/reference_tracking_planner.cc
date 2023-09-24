@@ -48,14 +48,14 @@ using apollo::common::math::Box2d;
 using apollo::common::math::PathMatcher;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::cyber::Rate;
 using apollo::planning::DiscretizedTrajectory;
 using apollo::planning::fortiss::MapOffset;
 
-ReferenceTrackingPlanner::ReferenceTrackingPlanner() {
-  logdir_ += "/apollo/data/log/";
-}
+// ReferenceTrackingPlanner::ReferenceTrackingPlanner() {
+//   logdir_ += "/apollo/data/log/";
+// }
 
 common::Status ReferenceTrackingPlanner::Init(const PlanningConfig& config) {
   minimum_valid_speed_planning_ = 1.0;   // below our model is invalid
@@ -84,7 +84,6 @@ Status ReferenceTrackingPlanner::PlanOnReferenceLine(
   const double timestep = Clock::NowInSeconds();
   AINFO << std::setprecision(15)
         << "############## Smoother-only planning called at t = " << timestep;
-  double current_time = timestep;
   const double start_time = timestep;
   const MapOffset map_offset(config_.bark_rl_planner_config().pts_offset_x(),
                              config_.bark_rl_planner_config().pts_offset_y());

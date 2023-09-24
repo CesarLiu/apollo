@@ -37,7 +37,7 @@
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 #include "modules/autobox_bridge/proto/autobox_control.pb.h"
 #include "modules/autobox_bridge/proto/autobox_localization.pb.h"

@@ -1,10 +1,10 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "vehicle_controller_base",
-    srcs = ["vehicle_controller.cc"],
     hdrs = ["vehicle_controller.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
@@ -29,6 +29,9 @@ cc_library(
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
+        "//modules/common_msgs/control_msgs:input_debug_cc_proto",
     ],
 )
 
