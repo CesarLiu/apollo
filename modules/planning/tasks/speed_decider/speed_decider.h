@@ -28,7 +28,7 @@
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/planning/planning_base/common/frame.h"
 #include "modules/planning/planning_base/common/obstacle.h"
-#include "modules/planning/planning_base/task_base/task.h"
+#include "modules/planning/planning_interface_base/task_base/task.h"
 
 namespace apollo {
 namespace planning {
@@ -105,6 +105,9 @@ class SpeedDecider : public Task {
    * reasonable deceleration
    **/
   bool IsFollowTooClose(const Obstacle& obstacle) const;
+
+  double EstimateProperOvertakingGap(const double target_obs_speed,
+                                     const double adc_speed) const;
 
  private:
   SLBoundary adc_sl_boundary_;

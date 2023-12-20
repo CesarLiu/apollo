@@ -366,3 +366,4 @@ REGISTER_OBSTACLE_DETECTOR(Yolov3ObstacleDetector);
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo
+

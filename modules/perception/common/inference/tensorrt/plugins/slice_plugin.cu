@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <vector>
 #include <NvInferVersion.h>
+
+#include <vector>
 
 #include "modules/perception/common/inference/tensorrt/plugins/slice_plugin.h"
 
@@ -47,21 +48,22 @@ __global__ void Slice(const int nthreads, const Dtype *in_data,
 int SLICEPlugin::enqueue(int batchSize, const void *const *inputs,
                          void **outputs, void *workspace, cudaStream_t stream) {
 #else
-int32_t SLICEPlugin::enqueue(int32_t batchSize, const void *const *inputs,
-                         void *const *outputs, void *workspace, cudaStream_t stream) noexcept {
+int SLICEPlugin::enqueue(int batchSize, const void *const *inputs,
+                         void *const *outputs, void *workspace,
+                         cudaStream_t stream) noexcept {
 #endif
 #endif
   int slice_size = 1;
-  for (size_t index = axis_ + 1; index < input_dims_.nbDims; index++) {
+  for (size_t index = axis_ + 1; index < input_dims_.nbDims; ++index) {
     slice_size *= input_dims_.d[index];
   }
   int num_slices = batchSize;
-  for (size_t index = 0; index < axis_; index++) {
+  for (size_t index = 0; index < axis_; ++index) {
     num_slices *= input_dims_.d[index];
   }
   int offset_slice_axis = 0;
 
-  for (int i = 0; i < out_slice_dims_.size(); i++) {
+  for (int i = 0; i < out_slice_dims_.size(); ++i) {
     const int top_slice_axis = out_slice_dims_[i];
     const int top_slice_size = top_slice_axis * slice_size;
     const int nthreads = top_slice_size * num_slices;

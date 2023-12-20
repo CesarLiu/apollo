@@ -35,10 +35,10 @@
 #include "modules/planning/planning_base/common/dependency_injector.h"
 #include "modules/planning/planning_base/common/frame.h"
 #include "modules/planning/planning_base/common/obstacle.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 #include "modules/planning/planning_base/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/planning_base/common/trajectory/publishable_trajectory.h"
-#include "modules/planning/planning_base/task_base/common/decider.h"
+#include "modules/planning/planning_interface_base/task_base/common/decider.h"
 
 namespace apollo {
 namespace planning {
@@ -64,6 +64,14 @@ class OpenSpaceFallbackDecider : public Decider {
 
   bool QuardraticFormulaLowerSolution(const double a, const double b,
                                       const double c, double* sol);
+
+  bool IsCollisionFreeEgoBox();
+
+  void PathPointNormalizing(double rotate_angle,
+                            const common::math::Vec2d& translate_origin,
+                            double* x,
+                            double* y,
+                            double* phi);
 
  private:
   OpenSpaceFallBackDeciderConfig config_;

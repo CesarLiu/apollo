@@ -38,7 +38,7 @@ bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   track_id_ = 0;
   frame_num_ = 0;
   // frame list
-  frame_list_.Init(omt_param_.img_capability());
+  frame_buffer_.set_capacity(omt_param_.img_capability());
   // similar map
   gpu_id_ = options.gpu_id;
   similar_map_.Init(omt_param_.img_capability(), gpu_id_);
@@ -257,22 +257,18 @@ void OMTObstacleTracker::GenerateHypothesis(const TrackObjectPtrs &objects) {
       float ss = ScoreShape(targets_[i], objects[j]);
       // calculate the overlap similarity (iou) between Target and object
       float so = ScoreOverlap(targets_[i], objects[j]);
-      if (sa == 0) {
-        hypo.score = omt_param_.weight_diff_camera().motion() * sm +
-                     omt_param_.weight_diff_camera().shape() * ss +
-                     omt_param_.weight_diff_camera().overlap() * so;
-      } else {
-        hypo.score = (omt_param_.weight_same_camera().appearance() * sa +
-                      omt_param_.weight_same_camera().motion() * sm +
-                      omt_param_.weight_same_camera().shape() * ss +
-                      omt_param_.weight_same_camera().overlap() * so);
-      }
+
+      hypo.score = (omt_param_.weight_same_camera().appearance() * sa +
+                    omt_param_.weight_same_camera().motion() * sm);
+
       int change_from_type = static_cast<int>(targets_[i].type);
       int change_to_type = static_cast<int>(objects[j]->object->sub_type);
       hypo.score += -kTypeAssociatedCost_[change_from_type][change_to_type];
-      ADEBUG << "Detection " << objects[j]->indicator.frame_id << "(" << j
-             << ") sa:" << sa << " sm: " << sm << " ss: " << ss << " so: " << so
-             << " score: " << hypo.score;
+
+      AINFO << "Detection " << objects[j]->indicator.frame_id << " object "
+            << objects[j]->object->id << " "
+            << "(" << j << ") sa:" << sa << " sm: " << sm << " ss: " << ss
+            << " so: " << so << " score: " << hypo.score;
 
       // 95.44% area is range [mu - sigma*2, mu + sigma*2]
       // don't match if motion is beyond the range
@@ -325,11 +321,11 @@ float OMTObstacleTracker::ScoreAppearance(const Target &target,
                                           TrackObjectPtr track_obj) {
   float energy = 0.0f;
   int count = 0;
-  auto sensor_name = track_obj->indicator.sensor_name;
+  // auto sensor_name = track_obj->indicator.sensor_name;
   for (int i = target.Size() - 1; i >= 0; --i) {
-    if (target[i]->indicator.sensor_name != sensor_name) {
-      continue;
-    }
+    // if (target[i]->indicator.sensor_name != sensor_name) {
+    //   continue;
+    // }
     PatchIndicator p1 = target[i]->indicator;
     PatchIndicator p2 = track_obj->indicator;
 
@@ -428,24 +424,30 @@ int OMTObstacleTracker::CreateNewTarget(const TrackObjectPtrs &objects) {
 
 bool OMTObstacleTracker::Associate2D(
     std::shared_ptr<CameraTrackingFrame> frame) {
+  // pre-compute appearance similarities between frames
   inference::CudaUtil::set_device_id(gpu_id_);
-  frame_list_.Add(frame);
+  frame_buffer_.push_back(frame);
   // calculate the similarity between the current frame and the previous frames
-  for (int t = 0; t < frame_list_.Size(); t++) {
-    int frame1 = frame_list_[t]->frame_id;
-    int frame2 = frame_list_[-1]->frame_id;
-    // calculate the tracked feature similarity between frame1 and frame2
-    similar_->Calc(frame_list_[frame1], frame_list_[frame2],
-                   similar_map_.get(frame1, frame2).get());
+  std::shared_ptr<CameraTrackingFrame> cur_frame_ptr = frame_buffer_.back();
+  for (auto frame_ptr : frame_buffer_) {
+    int pre_frame_id = frame_ptr->frame_id;
+    int cur_frame_id = cur_frame_ptr->frame_id;
+    similar_->Calc(frame_ptr.get(), cur_frame_ptr.get(),
+                   similar_map_.get(pre_frame_id, cur_frame_id).get());
   }
+
   // remove oldest frame in Target
   for (auto &target : targets_) {
-    target.RemoveOld(frame_list_.OldestFrameId());
+    target.RemoveOld(frame_buffer_.front()->frame_id);
     ++target.lost_age;
   }
+  // clear non Target in targets_
+  ClearTargets();
+  // correct detection 3d size
+  reference_.CorrectSize(frame.get());
+
   TrackObjectPtrs track_objects;
   for (size_t i = 0; i < frame->detected_objects.size(); ++i) {
-    // TODO(gaohan): use pool
     TrackObjectPtr track_ptr(new TrackObject);
     track_ptr->object = frame->detected_objects[i];
     track_ptr->object->id = static_cast<int>(i);
@@ -459,7 +461,6 @@ bool OMTObstacleTracker::Associate2D(
     track_objects.push_back(track_ptr);
   }
   // wxt todo: solve reference and calibration_service
-  reference_.CorrectSize(frame.get());
   used_.clear();
   used_.resize(frame->detected_objects.size(), false);
   // generate hypothesis between existing Targets
@@ -485,8 +486,6 @@ bool OMTObstacleTracker::Associate2D(
 
   // combine targets using iou after association
   CombineDuplicateTargets();
-  // clear non Target in targets_
-  ClearTargets();
 
   // return filter reulst to original box
   Eigen::Matrix3d inverse_project = frame->project_matrix.inverse();

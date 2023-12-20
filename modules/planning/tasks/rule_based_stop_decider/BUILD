@@ -58,10 +58,11 @@ apollo_plugin(
     name = "librule_based_stop_decider.so",
     srcs = ["rule_based_stop_decider.cc"],
     hdrs = ["rule_based_stop_decider.h"],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     description = ":plugins.xml",
     deps = [
         "//modules/common/status",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/tasks/rule_based_stop_decider/proto:rule_based_stop_decider_cc_proto",
     ],
 )

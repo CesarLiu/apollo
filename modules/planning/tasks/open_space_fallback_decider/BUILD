@@ -19,7 +19,7 @@ apollo_cc_test(
     deps = [
         ":open_space_fallback_decider_lib",
         "@com_google_googletest//:gtest_main",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
     ],
 )
 
@@ -28,8 +28,9 @@ apollo_plugin(
     srcs = ["open_space_fallback_decider.cc"],
     hdrs = ["open_space_fallback_decider.h"],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/tasks/open_space_fallback_decider/proto:open_space_fallback_decider_cc_proto",
     ],
 )

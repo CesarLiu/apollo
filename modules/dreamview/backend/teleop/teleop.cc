@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/teleop/teleop.h"
+#include "modules/dreamview/backend/common/teleop/teleop.h"
 
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"

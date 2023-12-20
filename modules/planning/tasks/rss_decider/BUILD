@@ -67,11 +67,12 @@ apollo_plugin(
     name = "librss_decider.so",
     srcs = ["rss_decider.cc"],
     hdrs = ["rss_decider.h"],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     description = ":plugins.xml",
     deps = [
         "//modules/common/status",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/tasks/rss_decider/proto:rss_decider_cc_proto",
         "@ad_rss_lib//:ad_rss",
     ],

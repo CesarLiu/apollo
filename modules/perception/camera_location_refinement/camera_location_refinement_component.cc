@@ -31,6 +31,8 @@ void CameraLocationRefinementComponent::InitCalibrationService(
   base::BaseCameraModelPtr model =
       algorithm::SensorManager::Instance()->GetUndistortCameraModel(
           location_refinement_param.camera_name());
+  ACHECK(model) << "Can't find " << location_refinement_param.camera_name()
+                << " in data/conf/sensor_meta.pb.txt";
   auto pinhole = static_cast<base::PinholeCameraModel*>(model.get());
   name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
       location_refinement_param.camera_name(),
@@ -40,7 +42,7 @@ void CameraLocationRefinementComponent::InitCalibrationService(
       location_refinement_param.calibration_service_param();
   CalibrationServiceInitOptions calibration_service_init_options;
   calibration_service_init_options.calibrator_working_sensor_name =
-      location_refinement_param.lane_calibration_working_sensor_name();
+      location_refinement_param.camera_name();
   calibration_service_init_options.name_intrinsic_map = name_intrinsic_map_;
   calibration_service_init_options.calibrator_method =
       calibration_service_param.calibrator_method();
@@ -106,7 +108,7 @@ bool CameraLocationRefinementComponent::Init() {
 
 bool CameraLocationRefinementComponent::Proc(
     const std::shared_ptr<onboard::CameraFrame>& msg) {
-  PERF_FUNCION()
+  PERF_FUNCTION()
   PostprocessorOptions obstacle_postprocessor_options;
   obstacle_postprocessor_options.do_refinement_with_calibration_service =
       calibration_service_ != nullptr;

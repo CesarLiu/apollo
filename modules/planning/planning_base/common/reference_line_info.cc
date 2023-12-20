@@ -26,6 +26,7 @@
 
 #include "modules/common_msgs/planning_msgs/sl_boundary.pb.h"
 #include "modules/planning/planning_base/proto/planning_status.pb.h"
+
 #include "cyber/task/task.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/point_factory.h"
@@ -739,9 +740,8 @@ void ReferenceLineInfo::ExportVehicleSignal(
 }
 
 bool ReferenceLineInfo::ReachedDestination() const {
-  static constexpr double kDestinationDeltaS = 0.05;
   const double distance_destination = SDistanceToDestination();
-  return distance_destination <= kDestinationDeltaS;
+  return distance_destination <= FLAGS_passed_destination_threshold;
 }
 
 double ReferenceLineInfo::SDistanceToDestination() const {
@@ -802,9 +802,8 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
       main_stop.reason_code() != STOP_REASON_PULL_OVER) {
     return;
   }
-  const auto& adc_pos = adc_planning_point_.path_point();
-  if (common::util::DistanceXY(adc_pos, main_stop.stop_point()) >
-      FLAGS_destination_check_distance) {
+  const double distance_destination = SDistanceToDestination();
+  if (distance_destination > FLAGS_destination_check_distance) {
     return;
   }
 

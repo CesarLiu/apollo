@@ -56,12 +56,13 @@ apollo_plugin(
     srcs = ["speed_decider.cc"],
     hdrs = ["speed_decider.h"],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/status",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/tasks/speed_decider/proto:speed_decider_cc_proto",
     ],
 )

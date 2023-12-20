@@ -136,6 +136,9 @@ export default class DataProfile extends React.Component {
     return (<div className='local-record-list'>
       {Object.keys(toJS(records)).map((item) => {
         // record下载状态
+        /**
+         * @param recordStatus {downloadStatus: number}
+         */
         const recordStatus = records[item];
         return (
           <LocalRecordItem
@@ -143,7 +146,7 @@ export default class DataProfile extends React.Component {
             item={item}
             updateRecordList={this.updateRecordList}
             // 0 下载中 1 下载完成
-            recordStatus={recordStatus}
+            recordStatus={recordStatus?.downloadStatus}
             currentRecordId={currentRecordId}
             changeRecord={this.onRecordChange}
           />
@@ -199,6 +202,7 @@ export default class DataProfile extends React.Component {
       remoteDynamicModelListFiltered,
       remoteRecordListFiltered,
     } = store.studioConnector;
+
 
     const remoteResourceLength = remoteScenarioSetList.length
       + remoteDynamicModelList.length
@@ -291,9 +295,6 @@ export default class DataProfile extends React.Component {
                     className={currentKey === tab.key ? 'active' : ''}
                     onClick={() => {
                       this.setState({ currentKey: tab.key });
-                      if (tab.key === 'recordProfiles') {
-                        WS.checkWsConnection().loadLocalRecords();
-                      }
                     }}
                   >{tab.title}</span>
                 );

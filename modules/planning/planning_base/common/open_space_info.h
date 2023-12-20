@@ -24,10 +24,12 @@
 #include <vector>
 
 #include "Eigen/Dense"
+
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/map_msgs/map_id.pb.h"
 #include "modules/common_msgs/planning_msgs/planning_internal.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
@@ -35,9 +37,9 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/planning_base/common/indexed_queue.h"
 #include "modules/planning/planning_base/common/obstacle.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
 #include "modules/planning/planning_base/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/planning_base/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -133,8 +135,8 @@ class OpenSpaceInfo {
     return obstacles_vertices_vec_;
   }
 
-  std::vector<std::vector<common::math::Vec2d>>
-      *mutable_obstacles_vertices_vec() {
+  std::vector<std::vector<common::math::Vec2d>> *
+  mutable_obstacles_vertices_vec() {
     return &obstacles_vertices_vec_;
   }
 
@@ -245,19 +247,23 @@ class OpenSpaceInfo {
 
   void set_fallback_flag(const bool flag) { fallback_flag_ = flag; }
 
+  bool stop_flag() const { return stop_flag_; }
+
+  void set_stop_flag(const bool flag) { stop_flag_ = flag; }
+
   TrajGearPair *mutable_fallback_trajectory() { return &fallback_trajectory_; }
 
   const TrajGearPair &fallback_trajectory() const {
     return fallback_trajectory_;
   }
 
-  std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
-      *mutable_publishable_trajectory_data() {
+  std::pair<PublishableTrajectory, canbus::Chassis::GearPosition> *
+  mutable_publishable_trajectory_data() {
     return &publishable_trajectory_data_;
   }
 
-  const std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
-      &publishable_trajectory_data() const {
+  const std::pair<PublishableTrajectory, canbus::Chassis::GearPosition> &
+  publishable_trajectory_data() const {
     return publishable_trajectory_data_;
   }
 
@@ -363,6 +369,8 @@ class OpenSpaceInfo {
   TrajGearPair chosen_partitioned_trajectory_;
 
   bool fallback_flag_ = false;
+
+  bool stop_flag_ = false;
 
   TrajGearPair fallback_trajectory_;
 

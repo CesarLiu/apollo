@@ -17,11 +17,12 @@ apollo_plugin(
     srcs = ["destination.cc"],
     hdrs = ["destination.h"],
     description = ":plugins.xml",
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/util:util_tool",
         "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/planning_base/proto:planning_config_cc_proto",
         "//modules/planning/traffic_rules/destination/proto:destination_cc_proto",
     ],

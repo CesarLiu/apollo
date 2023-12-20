@@ -36,7 +36,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/planning_base/common/planning_context.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 /**
  * @namespace apollo::planning
@@ -205,6 +205,9 @@ void ReferenceLineProvider::Reset() {
   route_segments_.clear();
   is_reference_line_updated_ = false;
   planning_command_.Clear();
+  while (!reference_line_history_.empty()) {
+    reference_line_history_.pop();
+  }
 }
 
 void ReferenceLineProvider::UpdateReferenceLine(
@@ -330,9 +333,9 @@ bool ReferenceLineProvider::GetReferenceLines(
     }
   }
 
-  ADEBUG << "Reference line is NOT ready.";
+  AINFO << "Reference line is NOT ready.";
   if (reference_line_history_.empty()) {
-    ADEBUG << "Failed to use reference line latest history";
+    AINFO << "Failed to use reference line latest history";
     return false;
   }
 
@@ -572,7 +575,7 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
     // project adc point to lane to check if it is out of lane range
     double s = 0.0;
     double l = 0.0;
-    if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
+    if (!lane->GetProjection({point.x(), point.y()}, state.heading(), &s, &l)) {
       continue;
     }
     static constexpr double kEpsilon = 1e-6;
@@ -659,7 +662,10 @@ bool ReferenceLineProvider::CreateReferenceLine(
         iter = segments->erase(iter);
       } else {
         common::SLPoint sl;
-        if (!reference_lines->back().XYToSL(vehicle_state, &sl)) {
+        if (!reference_lines->back().XYToSL(
+                vehicle_state.heading(),
+                common::math::Vec2d(vehicle_state.x(), vehicle_state.y()),
+                &sl)) {
           AWARN << "Failed to project point: {" << vehicle_state.x() << ","
                 << vehicle_state.y() << "} to stitched reference line";
         }
@@ -709,7 +715,8 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   common::SLPoint sl_point;
   Vec2d vec2d(state.x(), state.y());
   LaneWaypoint waypoint;
-  if (!prev_segment->GetProjection(vec2d, &sl_point, &waypoint)) {
+  if (!prev_segment->GetProjection(vec2d, state.heading(), &sl_point,
+                                   &waypoint)) {
     AWARN << "Vehicle current point: " << vec2d.DebugString()
           << " not on previous reference line";
     return SmoothRouteSegment(*segments, reference_line);
@@ -765,7 +772,7 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
   *segments = shifted_segments;
   segments->SetProperties(segment_properties);
   common::SLPoint sl;
-  if (!reference_line->XYToSL(vec2d, &sl)) {
+  if (!reference_line->XYToSL(state.heading(), vec2d, &sl)) {
     AWARN << "Failed to project point: " << vec2d.DebugString()
           << " to stitched reference line";
   }
@@ -775,8 +782,6 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
 bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
                                    ReferenceLine *reference_line,
                                    RouteSegments *segments) {
-  static constexpr double kMaxHeadingDiff = M_PI * 4.0 / 6.0;
-  static constexpr double kMaxBackwardHeadingDiff = M_PI / 6.0;
   // shrink reference line
   double new_backward_distance = sl.s();
   double new_forward_distance = reference_line->Length() - sl.s();
@@ -794,8 +799,8 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
   const double cur_heading = ref_points[index].heading();
   auto last_index = index;
   while (last_index < ref_points.size() &&
-         AngleDiff(cur_heading, ref_points[last_index].heading()) <
-             kMaxHeadingDiff) {
+         std::fabs(AngleDiff(cur_heading, ref_points[last_index].heading())) <
+             FLAGS_referfece_line_max_forward_heading_diff) {
     ++last_index;
   }
   --last_index;
@@ -810,7 +815,7 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
   last_index = index;
   while (last_index > 0 &&
          abs(AngleDiff(cur_heading, ref_points[last_index].heading())) <
-             kMaxBackwardHeadingDiff) {
+             FLAGS_referfece_line_max_backward_heading_diff) {
     --last_index;
   }
   if (last_index != 0) {
