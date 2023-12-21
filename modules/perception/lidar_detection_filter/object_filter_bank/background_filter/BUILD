@@ -1,4 +1,4 @@
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_plugin")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_plugin")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,6 +7,12 @@ PERCEPTION_COPTS = ['-DMODULE_NAME=\\"perception\\"']
 
 apollo_plugin(
     name = "libbackground_filter.so",
+    description = ":plugins.xml",
+    deps = [":lib_bf"],
+)
+
+apollo_cc_library(
+    name = "lib_bf",
     srcs = ["background_filter.cc"],
     hdrs = ["background_filter.h"],
     description = ":plugins.xml",

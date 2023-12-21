@@ -22,11 +22,15 @@
 #include <random>
 #include <utility>
 
+#if GPU_PLATFORM == NVIDIA
 #include <cuda_runtime_api.h>
+#elif GPU_PLATFORM == AMD
+#include <hip/hip_runtime.h>
+#include <hip/hip_runtime_api.h>
+#endif
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/perception/common/util.h"
 #include "modules/perception/common/base/object_pool_types.h"
 #include "modules/perception/common/base/point_cloud_util.h"
 #include "modules/perception/common/inference/inference_factory.h"
@@ -34,7 +38,10 @@
 #include "modules/perception/common/lidar/common/cloud_mask.h"
 #include "modules/perception/common/lidar/common/lidar_timer.h"
 #include "modules/perception/common/lidar/common/pcl_util.h"
+#include "modules/perception/common/util.h"
 #include "modules/perception/lidar_detection/detector/center_point_detection/params.h"
+
+#include "cyber/profiler/profiler.h"
 
 namespace apollo {
 namespace perception {
@@ -70,10 +77,7 @@ bool CenterPointDetection::Init(const LidarDetectorInitOptions &options) {
   output_blob_names_ = inference::GetBlobNames(model_info.outputs());
 
   inference_.reset(inference::CreateInferenceByName(
-      model_info.framework(),
-      proto_file,
-      weight_file,
-      output_blob_names_,
+      model_info.framework(), proto_file, weight_file, output_blob_names_,
       input_blob_names_));
 
   std::map<std::string, std::vector<int>> shape_map;
@@ -85,13 +89,67 @@ bool CenterPointDetection::Init(const LidarDetectorInitOptions &options) {
   }
 
   if (model_param_.preprocess().enable_ground_removal()) {
-    z_min_range_ =
-        std::max(z_min_range_,
-                 static_cast<float>(
-                  model_param_.preprocess().ground_removal_height()));
+    z_min_range_ = std::max(
+        z_min_range_,
+        static_cast<float>(model_param_.preprocess().ground_removal_height()));
   }
-
+  nms_strategy_ = model_param_.nms_strategy();
+  diff_class_iou_ = model_param_.diff_class_iou();
+  diff_class_nms_ = model_param_.diff_class_nms();
+  if (diff_class_nms_) {
+    nms_strategy_table_ = {
+      {base::ObjectType::BICYCLE, {base::ObjectType::PEDESTRIAN,
+       base::ObjectType::UNKNOWN}},
+      {base::ObjectType::PEDESTRIAN, {base::ObjectType::UNKNOWN}},
+      {base::ObjectType::VEHICLE, {base::ObjectType::BICYCLE,
+       base::ObjectType::PEDESTRIAN, base::ObjectType::UNKNOWN}}
+    };
+  }
   return true;
+}
+
+float get_3Dbox_iou_len(float center1, float len1, float center2, float len2) {
+    float x11 = center1 - len1 / 2;
+    float x12 = center2 - len2 / 2;
+    float x21 = center1 + len1 / 2;
+    float x22 = center2 + len2 / 2;
+    if (std::min(x22, x21) - std::max(x12, x11) < 0) {
+        return 0;
+    }
+    return std::min(x22, x21) - std::max(x12, x11);
+}
+
+float get_3dbox_iou(base::ObjectPtr obj1, base::ObjectPtr obj2,
+                    int index1, int index2) {
+    auto center1 = obj1->center;
+    auto center2 = obj2->center;
+    auto size1 = obj1->size;
+    auto size2 = obj2->size;
+    float x_len = get_3Dbox_iou_len(center1(0), size1(0), center2(0), size2(0));
+    float y_len = get_3Dbox_iou_len(center1(1), size1(1), center2(1), size2(1));
+    float z_len = get_3Dbox_iou_len(center1(2), size1(2), center2(2), size2(2));
+    float v1 = size1(0) * size1(1) * size1(2);
+    float v2 = size2(0) * size2(1) * size2(2);
+    float vo = x_len * y_len * z_len;
+    ADEBUG << "center point IOU: (" << index1 << ", " << index2
+           << ") v1:" << v1 << " v2:" << v2 << " vo:" << vo;
+    return vo / (v1 + v2 - vo);
+}
+
+bool nms_by_strategy(std::shared_ptr<base::Object> obj1,
+            std::shared_ptr<base::Object> obj2,
+            std::map<base::ObjectType, std::vector<base::ObjectType>> table) {
+    if (obj1.get()->type == obj2.get()->type) {
+        return obj1.get()->confidence > obj2.get()->confidence;
+    }
+    std::vector<base::ObjectType> obj_type_array = table[obj1.get()->type];
+    if (std::find(obj_type_array.begin(), obj_type_array.end(),
+                  obj2->type) != obj_type_array.end()) {
+        return true;
+    } else {
+        return false;
+    }
+    return true;
 }
 
 bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
@@ -138,8 +196,8 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
   if (model_param_.preprocess().enable_downsample_beams()) {
     base::PointFCloudPtr downsample_beams_cloud_ptr(new base::PointFCloud());
     if (DownSamplePointCloudBeams(
-          cur_cloud_ptr_, downsample_beams_cloud_ptr,
-          model_param_.preprocess().downsample_beams_factor())) {
+            cur_cloud_ptr_, downsample_beams_cloud_ptr,
+            model_param_.preprocess().downsample_beams_factor())) {
       cur_cloud_ptr_ = downsample_beams_cloud_ptr;
     } else {
       AWARN << "Down-sample beams factor must be >= 1. Cancel down-sampling."
@@ -156,8 +214,7 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
         new pcl::PointCloud<pcl::PointXYZI>());
     TransformToPCLXYZI(*cur_cloud_ptr_, pcl_cloud_ptr);
     DownSampleCloudByVoxelGrid(
-        pcl_cloud_ptr,
-        filtered_cloud_ptr,
+        pcl_cloud_ptr, filtered_cloud_ptr,
         model_param_.preprocess().downsample_voxel_size_x(),
         model_param_.preprocess().downsample_voxel_size_y(),
         model_param_.preprocess().downsample_voxel_size_z());
@@ -216,8 +273,8 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
 
   // shuffle points and cut off
   if (model_param_.preprocess().enable_shuffle_points()) {
-    num_points = std::min(num_points,
-                          model_param_.preprocess().max_num_points());
+    num_points =
+        std::min(num_points, model_param_.preprocess().max_num_points());
     std::vector<int> point_indices = GenerateIndices(0, num_points, true);
     base::PointFCloudPtr shuffle_cloud_ptr(
         new base::PointFCloud(*cur_cloud_ptr_, point_indices));
@@ -226,8 +283,8 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
   shuffle_time_ = timer.toc(true);
 
   // points_array[x, y, z, i,timestampe, ......]
-  std::vector<float> points_data(
-      num_points * model_param_.preprocess().num_point_feature());
+  std::vector<float> points_data(num_points *
+                                 model_param_.preprocess().num_point_feature());
 
   CloudToArray(cur_cloud_ptr_, points_data.data(),
                model_param_.preprocess().normalizing_factor());
@@ -238,8 +295,8 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
   auto output_score_blob = inference_->get_blob(output_blob_names_.at(1));
   auto output_label_blob = inference_->get_blob(output_blob_names_.at(2));
 
-  std::vector<int> points_shape{
-    num_points, model_param_.preprocess().num_point_feature()};
+  std::vector<int> points_shape{num_points,
+                                model_param_.preprocess().num_point_feature()};
   input_data_blob->Reshape(points_shape);
   float *data_ptr = input_data_blob->mutable_cpu_data();
   memcpy(data_ptr, points_data.data(), points_data.size() * sizeof(float));
@@ -257,10 +314,34 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
               model_param_.postprocess().score_threshold(), &out_detections,
               &out_labels, &out_scores);
 
-  GetObjects(frame->lidar2world_pose, out_detections, out_labels,
+  GetObjects(frame->lidar2world_pose, out_detections, out_labels, out_scores,
              &frame->segmented_objects);
 
+  if (model_param_.filter_by_points()) {
+    FilterObjectsbyPoints(&frame->segmented_objects);
+  }
+
   FilterForegroundPoints(&frame->segmented_objects);
+
+  std::stringstream sstr;
+  sstr << "[CenterPointDetection BeforeNMS] "
+       << std::to_string(frame->timestamp)
+       << " objs: " << frame->segmented_objects.size() << std::endl;
+  for (auto obj : frame->segmented_objects) {
+      sstr << "id = " << obj->id << ": " << obj->center(0) << ", "
+           << obj->center(1) << ", " << obj->center(2) << ", "
+           << obj->size(0) << ", " << obj->size(1) << ", "
+           << obj->size(2) << ", " << obj->theta << ", "
+           << static_cast<int>(obj->type) << std::endl;
+  }
+  ADEBUG << sstr.str();
+
+  PERF_BLOCK("class_nms")
+  if (diff_class_nms_) {
+      FilterObjectsbyClassNMS(&frame->segmented_objects);
+  }
+  PERF_BLOCK_END
+  nms_time_ = timer.toc(true);
 
   SetPointsInROI(&frame->segmented_objects);
 
@@ -273,7 +354,22 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
         << "shuffle: " << shuffle_time_ << "\t"
         << "cloud_to_array: " << cloud_to_array_time_ << "\t"
         << "inference: " << inference_time_ << "\t"
-        << "postprocess: " << postprocess_time_ << "\t";
+        << "postprocess: " << postprocess_time_ << "\t"
+        << "nms: " << nms_time_ << "\t";
+
+  std::stringstream ssstr;
+  ssstr << "[CenterPointDetection AfterNMS] "
+        << std::to_string(frame->timestamp)
+        << " objs: " << frame->segmented_objects.size() << std::endl;
+  for (auto obj : frame->segmented_objects) {
+      ssstr << "id = " << obj->id << ": " << obj->center(0) << ", "
+            << obj->center(1) << ", " << obj->center(2) << ", "
+            << obj->size(0) << ", " << obj->size(1) << ", "
+            << obj->size(2) << ", " << obj->theta << ", "
+            << static_cast<int>(obj->type) << std::endl;
+  }
+  ADEBUG << ssstr.str();
+
   return true;
 }
 
@@ -345,16 +441,16 @@ void CenterPointDetection::GetBoxCorner(int num_objects,
                                         std::vector<float> &box_corner,
                                         std::vector<float> &box_rectangular) {
   for (int i = 0; i < num_objects; ++i) {
-    float x = detections[
-      i * model_param_.postprocess().num_output_box_feature()];
-    float y = detections[
-      i * model_param_.postprocess().num_output_box_feature() + 1];
-    float w = detections[
-      i * model_param_.postprocess().num_output_box_feature() + 3];
-    float l = detections[
-      i * model_param_.postprocess().num_output_box_feature() + 4];
-    float a = detections[
-      i * model_param_.postprocess().num_output_box_feature() + 6];
+    float x =
+        detections[i * model_param_.postprocess().num_output_box_feature()];
+    float y =
+        detections[i * model_param_.postprocess().num_output_box_feature() + 1];
+    float w =
+        detections[i * model_param_.postprocess().num_output_box_feature() + 3];
+    float l =
+        detections[i * model_param_.postprocess().num_output_box_feature() + 4];
+    float a =
+        detections[i * model_param_.postprocess().num_output_box_feature() + 6];
     if (model_param_.quantize() > 0) {
       w = ceil(w / model_param_.quantize()) * model_param_.quantize();
       l = ceil(l / model_param_.quantize()) * model_param_.quantize();
@@ -373,11 +469,11 @@ void CenterPointDetection::GetBoxCorner(int num_objects,
 
     float left_up_x = (-hw) * cos_a + (-hl) * sin_a + x;
     float left_up_y = (-hw) * (-sin_a) + (-hl) * cos_a + y;
-    float right_up_x = (-hw) * cos_a + (hl) * sin_a + x;
-    float right_up_y = (-hw) * (-sin_a) + (hl) * cos_a + y;
-    float right_down_x = (hw) * cos_a + (hl) * sin_a + x;
-    float right_down_y = (hw) * (-sin_a) + (hl) * cos_a + y;
-    float left_down_x = (hw) * cos_a + (-hl) * sin_a + x;
+    float right_up_x = (-hw) * cos_a + (hl)*sin_a + x;
+    float right_up_y = (-hw) * (-sin_a) + (hl)*cos_a + y;
+    float right_down_x = (hw)*cos_a + (hl)*sin_a + x;
+    float right_down_y = (hw) * (-sin_a) + (hl)*cos_a + y;
+    float left_down_x = (hw)*cos_a + (-hl) * sin_a + x;
     float left_down_y = (hw) * (-sin_a) + (-hl) * cos_a + y;
 
     box_corner[i * 8 + 0] = left_up_x;
@@ -389,23 +485,22 @@ void CenterPointDetection::GetBoxCorner(int num_objects,
     box_corner[i * 8 + 6] = left_down_x;
     box_corner[i * 8 + 7] = left_down_y;
 
-    box_rectangular[i * 4] = std::min(std::min(std::min(left_up_x,
-                              right_up_x), right_down_x), left_down_x);
-    box_rectangular[i * 4 + 1] = std::min(std::min(std::min(left_up_y,
-                                  right_up_y), right_down_y), left_down_y);
-    box_rectangular[i * 4 + 2] = std::max(std::max(std::max(left_up_x,
-                                  right_up_x), right_down_x), left_down_x);
-    box_rectangular[i * 4 + 3] = std::max(std::max(std::max(left_up_y,
-                                  right_up_y), right_down_y), left_down_y);
+    box_rectangular[i * 4] = std::min(
+        std::min(std::min(left_up_x, right_up_x), right_down_x), left_down_x);
+    box_rectangular[i * 4 + 1] = std::min(
+        std::min(std::min(left_up_y, right_up_y), right_down_y), left_down_y);
+    box_rectangular[i * 4 + 2] = std::max(
+        std::max(std::max(left_up_x, right_up_x), right_down_x), left_down_x);
+    box_rectangular[i * 4 + 3] = std::max(
+        std::max(std::max(left_up_y, right_up_y), right_down_y), left_down_y);
   }
 }
 
 void CenterPointDetection::GetBoxIndices(
-      int num_objects,
-      const std::vector<float> &detections,
-      const std::vector<float> &box_corner,
-      const std::vector<float> &box_rectangular,
-      std::vector<std::shared_ptr<Object>> *objects) {
+    int num_objects, const std::vector<float> &detections,
+    const std::vector<float> &box_corner,
+    const std::vector<float> &box_rectangular,
+    std::vector<std::shared_ptr<Object>> *objects) {
   for (size_t point_idx = 0; point_idx < original_cloud_->size(); ++point_idx) {
     const auto &point = original_cloud_->at(point_idx);
     float px = point.x;
@@ -427,14 +522,17 @@ void CenterPointDetection::GetBoxIndices(
         continue;
       }
 
-      float z = detections[
-        box_idx * model_param_.postprocess().num_output_box_feature() + 2];
-      float h = detections[
-        box_idx * model_param_.postprocess().num_output_box_feature() + 5];
+      float z =
+          detections[box_idx *
+                         model_param_.postprocess().num_output_box_feature() +
+                     2];
+      float h =
+          detections[box_idx *
+                         model_param_.postprocess().num_output_box_feature() +
+                     5];
       if (pz < (z - h / 2 -
-            model_param_.postprocess().bottom_enlarge_height()) ||
-          pz > (z + h / 2 +
-            model_param_.postprocess().top_enlarge_height())) {
+                model_param_.postprocess().bottom_enlarge_height()) ||
+          pz > (z + h / 2 + model_param_.postprocess().top_enlarge_height())) {
         continue;
       }
 
@@ -459,23 +557,22 @@ void CenterPointDetection::GetBoxIndices(
 
       if ((angl1 <= 0 && angl2 <= 0 && angl3 <= 0 && angl4 <= 0) ||
           (angl1 >= 0 && angl2 >= 0 && angl3 >= 0 && angl4 >= 0)) {
-          auto &object = objects->at(box_idx);
-          const auto &world_point = original_world_cloud_->at(point_idx);
-          object->lidar_supplement.point_ids.push_back(point_idx);
-          object->lidar_supplement.cloud.push_back(point);
-          object->lidar_supplement.cloud_world.push_back(world_point);
+        auto &object = objects->at(box_idx);
+        const auto &world_point = original_world_cloud_->at(point_idx);
+        object->lidar_supplement.point_ids.push_back(point_idx);
+        object->lidar_supplement.cloud.push_back(point);
+        object->lidar_supplement.cloud_world.push_back(world_point);
       }
     }
   }
 }
 
 void CenterPointDetection::GetObjects(
-    const Eigen::Affine3d &pose,
-    const std::vector<float> &detections,
-    const std::vector<int64_t> &labels,
+    const Eigen::Affine3d &pose, const std::vector<float> &detections,
+    const std::vector<int64_t> &labels, const std::vector<float> &scores,
     std::vector<std::shared_ptr<Object>> *objects) {
-  int num_objects = detections.size() /
-    model_param_.postprocess().num_output_box_feature();
+  int num_objects =
+      detections.size() / model_param_.postprocess().num_output_box_feature();
 
   objects->clear();
   base::ObjectPool::Instance().BatchGet(num_objects, objects);
@@ -486,20 +583,20 @@ void CenterPointDetection::GetObjects(
 
     // no velocity
     float x = detections.at(
-      i * model_param_.postprocess().num_output_box_feature() + 0);
+        i * model_param_.postprocess().num_output_box_feature() + 0);
     float y = detections.at(
-      i * model_param_.postprocess().num_output_box_feature() + 1);
+        i * model_param_.postprocess().num_output_box_feature() + 1);
     float z = detections.at(
-      i * model_param_.postprocess().num_output_box_feature() + 2);
+        i * model_param_.postprocess().num_output_box_feature() + 2);
     float dx = detections.at(
-      i * model_param_.postprocess().num_output_box_feature() + 4);
+        i * model_param_.postprocess().num_output_box_feature() + 4);
     float dy = detections.at(
-      i * model_param_.postprocess().num_output_box_feature() + 3);
+        i * model_param_.postprocess().num_output_box_feature() + 3);
     float dz = detections.at(
-      i * model_param_.postprocess().num_output_box_feature() + 5);
+        i * model_param_.postprocess().num_output_box_feature() + 5);
     float yaw = detections.at(
-      i * model_param_.postprocess().num_output_box_feature() + 6);
-    yaw = -yaw - M_PI/2;
+        i * model_param_.postprocess().num_output_box_feature() + 6);
+    yaw = -yaw - M_PI / 2;
 
     object->size(0) = dx;
     object->size(1) = dy;
@@ -514,6 +611,7 @@ void CenterPointDetection::GetObjects(
     object->direction[1] = sinf(yaw);
     object->direction[2] = 0;
     object->lidar_supplement.is_orientation_ready = true;
+    object->confidence = scores.at(i);
 
     // compute vertexes of bounding box and transform to world coordinate
     object->lidar_supplement.on_use = true;
@@ -536,6 +634,7 @@ void CenterPointDetection::GetObjects(
   std::vector<float> box_rectangular(num_objects * 4);
   GetBoxCorner(num_objects, detections, box_corner, box_rectangular);
   GetBoxIndices(num_objects, detections, box_corner, box_rectangular, objects);
+  AINFO << "[CenterPoint] we get " << num_objects << " objs";
 }
 
 // for nuscenes model
@@ -604,9 +703,10 @@ void CenterPointDetection::FilterScore(
   for (int i = 0; i < scores->count(); ++i) {
     if (score_ptr[i] > score_threshold) {
       box3d_filtered->insert(
-        box3d_filtered->end(),
-        bbox_ptr + model_param_.postprocess().num_output_box_feature() * i,
-        bbox_ptr + model_param_.postprocess().num_output_box_feature() * (i+1));
+          box3d_filtered->end(),
+          bbox_ptr + model_param_.postprocess().num_output_box_feature() * i,
+          bbox_ptr +
+              model_param_.postprocess().num_output_box_feature() * (i + 1));
       label_preds_filtered->insert(label_preds_filtered->end(),
                                    static_cast<int64_t>(label_ptr[i]));
 
@@ -615,13 +715,27 @@ void CenterPointDetection::FilterScore(
   }
 }
 
+void CenterPointDetection::FilterObjectsbyPoints(
+    std::vector<std::shared_ptr<Object>> *objects) {
+  size_t valid_num = 0;
+  for (uint32_t i = 0; i < objects->size(); i++) {
+    auto &object = objects->at(i);
+    uint32_t num_points_thresholds = model_param_.min_points_threshold();
+    if (object->lidar_supplement.cloud.size() >= num_points_thresholds) {
+      objects->at(valid_num) = object;
+      valid_num++;
+    }
+  }
+  objects->resize(valid_num);
+}
+
 void CenterPointDetection::FilterForegroundPoints(
-      std::vector<std::shared_ptr<Object>> *objects) {
+    std::vector<std::shared_ptr<Object>> *objects) {
   CloudMask mask;
   mask.Set(original_cloud_->size(), 0);
   mask.AddIndicesOfIndices(lidar_frame_ref_->roi_indices,
-    lidar_frame_ref_->non_ground_indices, 1);
-  for (uint32_t i=0; i < objects->size(); ++i) {
+                           lidar_frame_ref_->non_ground_indices, 1);
+  for (uint32_t i = 0; i < objects->size(); ++i) {
     auto &object = objects->at(i);
     base::PointIndices ind;
     ind.indices = object->lidar_supplement.point_ids;
@@ -630,15 +744,63 @@ void CenterPointDetection::FilterForegroundPoints(
   mask.GetValidIndices(&lidar_frame_ref_->secondary_indices);
 }
 
+void CenterPointDetection::FilterObjectsbyClassNMS(
+    std::vector<std::shared_ptr<base::Object>> *objects) {
+    std::vector<bool> delete_array(objects->size(), false);
+    // different class nms
+    for (size_t i = 0; i < objects->size(); i++) {
+        auto &obj_i = objects->at(i);
+        if (!obj_i) {
+            continue;
+        }
+        for (size_t j = i + 1; j < objects->size(); j++) {
+            auto &obj_j = objects->at(j);
+            if (!obj_j) {
+                continue;
+            }
+            if (get_3dbox_iou(obj_i, obj_j, i, j) <= diff_class_iou_) {
+                continue;
+            }
+            // should NMS
+            if (nms_strategy_) {
+                if (nms_by_strategy(obj_i, obj_j, nms_strategy_table_)) {
+                    delete_array[j] = true;
+                } else {
+                    delete_array[i] = true;
+                }
+            } else {
+                // reserve by score
+                if (objects->at(i)->confidence > objects->at(j)->confidence) {
+                    delete_array[j] = true;
+                } else {
+                    delete_array[i] = true;
+                }
+                // size_t index = (objects->at(i)->confidence
+                // >= objects->at(j)->confidence ? i : j);
+                // delete_array[index] = true;
+            }
+        }
+    }
+    size_t valid_num = 0;
+    for (size_t i = 0; i < objects->size(); i++) {
+        auto &object = objects->at(i);
+        if (!delete_array[i]) {
+            objects->at(valid_num) = object;
+            valid_num++;
+        }
+    }
+    objects->resize(valid_num);
+}
+
 void CenterPointDetection::SetPointsInROI(
-  std::vector<std::shared_ptr<Object>> *objects) {
+    std::vector<std::shared_ptr<Object>> *objects) {
   CloudMask roi_mask_;
   roi_mask_.Set(original_cloud_->size(), 0);
   roi_mask_.AddIndices(lidar_frame_ref_->roi_indices, 1);
-  for (uint32_t i=0; i < objects->size(); ++i) {
+  for (uint32_t i = 0; i < objects->size(); ++i) {
     auto &object = objects->at(i);
     object->lidar_supplement.num_points_in_roi =
-      roi_mask_.ValidIndicesCount(object->lidar_supplement.point_ids);
+        roi_mask_.ValidIndicesCount(object->lidar_supplement.point_ids);
   }
 }
 

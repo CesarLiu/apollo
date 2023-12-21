@@ -206,6 +206,7 @@ bool LaneDetectionComponent::Init() {
   double roll_adj_degree = 0.0;
   // load in lidar to imu extrinsic
   Eigen::Matrix4d ex_lidar2imu;
+  // Todo(zero): need fix! use tf
   LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" +
                      FLAGS_lidar_sensor_name + "_novatel_extrinsics.yaml",
                  &ex_lidar2imu);
@@ -427,6 +428,8 @@ int LaneDetectionComponent::InitSensorInfo() {
   // assume all camera have same image size
   base::BaseCameraModelPtr camera_model_ptr =
       sensor_manager->GetUndistortCameraModel(camera_names_[0]);
+  ACHECK(camera_model_ptr) << "Can't find " << camera_names_[0]
+                           << " in data/conf/sensor_meta.pb.txt";
   image_width_ = static_cast<int>(camera_model_ptr->get_width());
   image_height_ = static_cast<int>(camera_model_ptr->get_height());
 
@@ -495,12 +498,15 @@ int LaneDetectionComponent::InitCameraFrames() {
     base::BaseCameraModelPtr model;
     model = algorithm::SensorManager::Instance()->GetUndistortCameraModel(
         camera_name);
+    ACHECK(model) << "Can't find " << camera_name
+                  << " in data/conf/sensor_meta.pb.txt";
     auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
     Eigen::Matrix3f intrinsic = pinhole->get_intrinsic_params();
     intrinsic_map_[camera_name] = intrinsic;
     AINFO << "#intrinsics of " << camera_name << ": "
           << intrinsic_map_[camera_name];
     Eigen::Matrix4d extrinsic;
+    // Todo(zero): need fix! use tf
     LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" + camera_name +
                        "_extrinsics.yaml",
                    &extrinsic);
@@ -510,6 +516,7 @@ int LaneDetectionComponent::InitCameraFrames() {
   // Init camera height
   for (const auto &camera_name : camera_names_) {
     float height = 0.0f;
+    // Todo(zero): need fix! use SensorManager
     SetCameraHeight(camera_name, FLAGS_obs_sensor_intrinsic_path,
                     FLAGS_lidar_sensor_name, default_camera_height_, &height);
     camera_height_map_[camera_name] = height;

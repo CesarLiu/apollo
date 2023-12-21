@@ -31,8 +31,8 @@
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/planning_base/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/planning_base/task_base/common/trajectory_optimizer.h"
-#include "modules/planning/planning_base/task_base/task.h"
+#include "modules/planning/planning_interface_base/task_base/common/trajectory_optimizer.h"
+#include "modules/planning/planning_interface_base/task_base/task.h"
 #include "modules/planning/tasks/open_space_trajectory_provider/open_space_trajectory_optimizer.h"
 
 namespace apollo {
@@ -84,6 +84,7 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
   void ReuseLastFrameDebug(const Frame* last_frame);
 
  private:
+  double straight_trajectory_length_ = 0.0;
   bool thread_init_flag_ = false;
 
   std::unique_ptr<OpenSpaceTrajectoryOptimizer>

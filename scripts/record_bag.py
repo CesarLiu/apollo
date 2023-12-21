@@ -40,6 +40,7 @@ import datetime
 import os
 import subprocess
 import sys
+import shutil
 
 import psutil
 
@@ -79,6 +80,7 @@ LARGE_TOPICS = [
     '/apollo/sensor/velodyne64/compensator/PointCloud2',
 ]
 
+
 def shell_cmd(cmd, alert_on_failure=True):
     """Execute shell command and return (ret-code, stdout, stderr)."""
     print('SHELL > {}'.format(cmd))
@@ -114,6 +116,14 @@ class ArgManager(object):
         self.parser.add_argument('--split_duration', default="1m",
                                  help='Duration to split bags, will be applied '
                                  'as parameter to "rosbag record --duration".')
+        self.parser.add_argument('--default_name', default="",
+                                 help='Change the default name of the record')
+        self.parser.add_argument('--rename', default="",
+                                 help='Change the new name of the record')
+        self.parser.add_argument('--dreamview', default=False, action="store_true",
+                                 help='Path for dreamview fixed recording file.')
+        self.parser.add_argument('--delete', default=False, action="store_true",
+                                 help='Delete record.')
         self._args = None
 
     def args(self):
@@ -161,6 +171,10 @@ class Recorder(object):
     def __init__(self, args):
         self.args = args
         self.disk_manager = DiskManager()
+        self.record_path_file = os.path.join(
+            APOLLO_ENV_ROOT, 'data/bag', 'record_path_file')
+        self.dreamview_record_path = os.path.join(
+            os.path.expanduser("~"), '.apollo/resources/records')
 
     def start(self):
         """Start recording."""
@@ -175,7 +189,12 @@ class Recorder(object):
         record_all = self.args.all or (
             len(disks) > 0 and disks[0]['is_nvme'] and not self.args.small)
         # Use the best disk, or fallback '/apollo' if none available.
-        disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else APOLLO_ENV_ROOT
+        disk_to_use = disks[0]['mountpoint'] if len(
+            disks) > 0 else APOLLO_ENV_ROOT
+
+        # If the start command comes from dreamview, save to the default path.
+        if self.args.dreamview:
+            disk_to_use = self.dreamview_record_path
 
         # Record small topics to quickly copy and process
         if record_all:
@@ -191,9 +210,17 @@ class Recorder(object):
     def record_task(self, disk, record_all):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
         task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        # If a default name is set.
+        if self.args.default_name != "":
+            task_id = self.args.default_name
         if not record_all:
             task_id += "_s"
-        task_dir = os.path.join(disk, 'data/bag', task_id)
+
+        task_dir = ''
+        if self.args.dreamview:
+            task_dir = os.path.join(disk, task_id)
+        else:
+            task_dir = os.path.join(disk, 'data/bag', task_id)
         print('Recording bag to {}'.format(task_dir))
 
         topics_str = "--all"
@@ -208,16 +235,66 @@ class Recorder(object):
         cmd = '''
             cd "{task_dir}"
             source {apollo_runtime_path}/scripts/apollo_base.sh
-            source {apollo_runtime_path}/cyber/setup.bash
             nohup cyber_recorder record {topics_str} >{log_file} 2>&1 &
         '''.format(task_dir=task_dir, apollo_runtime_path=APOLLO_RUNTIME_PATH,
                    topics_str=topics_str, log_file=log_file)
         shell_cmd(cmd)
 
+    def file_exist_check(self, task_dir, old_paths, new_paths, task_dir_flag=False):
+        """Check if the file exists"""
+        for filename in os.listdir(task_dir):
+            if "record" in filename:
+                # Extract the part of the filename before ".record".
+                name_parts = filename.split(".record")
+                if len(name_parts) > 1:
+                    extension = name_parts[1] + ".record"
+
+                    # Construct the new filename.
+                    new_filename = ''
+                    if task_dir_flag:
+                        new_filename = f"{self.args.rename}_s{extension}"
+                    else:
+                        new_filename = f"{self.args.rename}{extension}"
+                    old_path = os.path.join(task_dir, filename)
+                    new_path = os.path.join(
+                        os.path.dirname(task_dir), new_filename)
+                    if os.path.exists(new_path):
+                        print(f"The file '{new_path}' already exist.")
+                        exit(-1)
+                    old_paths.append(old_path)
+                    new_paths.append(new_path)
+
+    def rename_files_in_directory(self, old_paths, new_paths):
+        """rename files"""
+        for i in range(len(old_paths)):
+            shutil.move(old_paths[i], new_paths[i])
+            print(f"Move '{old_paths[i]}' to '{new_paths[i]}'")
+        self.delete()
+
+    def rename(self):
+        """Saving is actually modifying the name of the record just recorded."""
+        task_dir = os.path.join(
+            self.dreamview_record_path, self.args.default_name)
+        task_s_dir = task_dir + '_s'
+        old_paths, new_paths = [], []
+        self.file_exist_check(task_dir, old_paths, new_paths)
+        self.file_exist_check(task_s_dir, old_paths, new_paths, True)
+        self.rename_files_in_directory(old_paths, new_paths)
+
+        # print('save')
+    def delete(self):
+        """Delete the file just recorded."""
+        task_dir = os.path.join(
+            self.dreamview_record_path, self.args.default_name)
+        task_s_dir = task_dir + '_s'
+        shutil.rmtree(task_dir)
+        shutil.rmtree(task_s_dir)
+
     @staticmethod
     def is_running():
         """Test if the given process running."""
-        _, stdout, _ = shell_cmd('pgrep -f "cyber_recorder record" | grep -cv \'^1$\'', False)
+        _, stdout, _ = shell_cmd(
+            'pgrep -f "cyber_recorder record" | grep -cv \'^1$\'', False)
         # If stdout is the pgrep command itself, no such process is running.
         return stdout.strip() != '1' if stdout else False
 
@@ -229,8 +306,12 @@ def main():
     recorder = Recorder(args)
     if args.stop:
         recorder.stop()
-    else:
+    elif args.start:
         recorder.start()
+    elif args.delete:
+        recorder.delete()
+    else:
+        recorder.rename()
 
 
 if __name__ == '__main__':

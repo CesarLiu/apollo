@@ -26,8 +26,36 @@ list_only = False
 
 deprecated_package_prefix = "packages"
 
+src_install_dirs_dict = {}
 
-def shell_cmd(cmd, alert_on_failure=True):
+def is_relative_link(filepath):
+    """Find if a file is a relative link.
+
+    Bazel paths are assumed to always be absolute. If path is not absolute,
+    the file is a link we want to keep.
+
+    If the given `filepath` is not a link, the function returns `None`. If the
+    given `filepath` is a link, the result will depend if the link is absolute
+    or relative. The function is called recursively. If the result is not a
+    link, `None` is returned. If the link is relative, the relative link is
+    returned.
+    """
+    if os.path.islink(filepath):
+        link = os.readlink(filepath)
+        if not os.path.isabs(link):
+            return link
+        else:
+            return is_relative_link(link)
+    else:
+        return filepath
+
+def process_cmd(cmd, queue):
+    """Execute shell command in concurrency"""
+    pwd = check_output("echo $PWD", shell=True).decode("utf-8")
+    output = check_output(cmd, shell=True).decode("utf-8")
+    return queue.put(output)
+
+def shell_cmd(cmd, alert_on_failure=False):
     """Execute shell command and return (ret-code, stdout, stderr)."""
     print("SHELL > {}".format(cmd))
     proc = Popen(cmd, shell=True, close_fds=True, stdout=PIPE, stderr=PIPE)
@@ -61,45 +89,6 @@ def rename_package_name(dest):
 
     return dest.replace(curr_pkg_name, pkg_name_with_ver, 1)
 
-
-# def setup_cyberfile(cyberfile_path, replace=True, dev=False, dbg=False, gpu=False):
-#     """Setup final cyberfile by install parameters. """
-#     cyberfile = ET.parse(cyberfile_path)
-#     root = cyberfile.getroot()
-
-#     name = root.find("name")
-#     old_name = name.text
-#     name.text = get_pkg_real_name(name.text, dev, dbg, gpu)
-    
-#     for dep in root.findall("depend"):
-#         if dep.get("condition"):
-#             if not eval(dep.get("condition")):
-#                 root.remove(dep)
-#             else:
-#                 del dep.attrib["condition"]
-
-#     if replace:
-#         cyberfile.write(cyberfile_path)
-
-#     return old_name, name.text, ET.tostring(root)
-
-
-# def setup_cyberfiles(pkg_name=None):
-#     """Setup final cyberfiles by install parameters. """
-#     for d in os.listdir(prefix):
-#         if pkg_name is not None and d != pkg_name:
-#             # only handle target package
-#             return
-#         cyberfile_path = os.path.join(prefix, d, "local/cyberfile.xml")
-#         if os.path.exists(cyberfile_path):
-#             old_name, new_name, _ = setup_cyberfile(cyberfile_path, True, dev, dbg, gpu)
-            
-#             if os.path.exists(os.path.join(prefix, d, old_name + ".BUILD")):
-#                 os.rename(
-#                     os.path.join(prefix, d, old_name + ".BUILD"), 
-#                     os.path.join(prefix, d, new_name + ".BUILD")
-#                 )
-
 def get_module_name_from_cyberfile(cyberfile_path):
     if not os.path.exists(cyberfile_path):
         return None
@@ -126,9 +115,9 @@ def replace_config(pkg_module_dict, prefix, config_file):
     for pkg_name, module_name in pkg_module_dict.items():
         shell_cmd(
             "sed -i 's/\/apollo\/bazel-bin\/{}\//{}{}\/latest\/lib\//g' {}".format(
-                module_name, 
-                prefix.replace("/", "\/") if prefix.endswith("/") else prefix.replace("/", "\/") + "\/", 
-                pkg_name, 
+                module_name,
+                prefix.replace("/", "\/") if prefix.endswith("/") else prefix.replace("/", "\/") + "\/",
+                pkg_name,
                 config_file
             )
         )
@@ -164,10 +153,10 @@ def fix_configs_in_pkg():
         for c_d in conf_dirs:
             full_c_d = os.path.join(prefix, d, c_d)
             replace_config_dir(full_c_d, prefix, pkg_module_dict)
-            
 
 
-def install_src(src, dst, filter, action_type=None):
+
+def install_src(src, dst, file_filter, action_type=None):
     if list_only:
         return
     deprecated_flag = False
@@ -182,12 +171,38 @@ def install_src(src, dst, filter, action_type=None):
 
     if deprecated_flag:
         dst_full = os.path.join(prefix, deprecated_package_prefix, dst)
+        if not os.path.exists(dst_full):
+            os.makedirs(dst_full)
+        shell_cmd("cd {} && find . -name '{}'|xargs -i -I@@ cp -rvfPL --parents @@ {}/ > /dev/null"
+            .format(src, file_filter, dst_full))
     else:
+        global src_install_dirs_dict
         dst_full = os.path.join(prefix, dst)
-    if not os.path.exists(dst_full):
-        os.makedirs(dst_full)
-    shell_cmd("cd {} && find . -name '{}'|xargs -i -I@@ cp -rvfP --parents @@ {}/ > /dev/null"
-        .format(src, filter, dst_full))
+        if file_filter not in src_install_dirs_dict:
+            src_install_dirs_dict[file_filter] = {}
+        src_install_dirs_dict[file_filter][src] = {"dst": dst_full, "pwd": os.getcwd()}
+
+def install_src_file():
+    global src_install_dirs_dict
+
+    for file_filter in src_install_dirs_dict:
+        common_prefix = os.path.commonprefix([src_dir for src_dir in src_install_dirs_dict[file_filter]])
+        if not os.path.exists(common_prefix) or common_prefix not in src_install_dirs_dict[file_filter]:
+            print("\033[31m[INFO]\033[0m can not calculate common prefix: {}, install all".format(common_prefix), file=sys.stderr)
+            for i in src_install_dirs_dict[file_filter]:
+                dst_full = src_install_dirs_dict[file_filter][i]["dst"]
+                if not os.path.exists(dst_full):
+                    os.makedirs(dst_full)
+                shell_cmd("rsync -aLr --delete --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
+                    .format(file_filter, is_relative_link(os.path.join(pwd, i)), dst_full))   
+        else:  
+
+            pwd = src_install_dirs_dict[file_filter][common_prefix]["pwd"]
+            dst_full = src_install_dirs_dict[file_filter][common_prefix]["dst"]
+            if not os.path.exists(dst_full):
+                os.makedirs(dst_full)
+            shell_cmd("rsync -aLr --delete --whole-file --include='{}' --include='*/' --exclude='*' {}/ {}/"
+                .format(file_filter, is_relative_link(os.path.join(pwd, common_prefix)), dst_full))
 
 
 def main(args):
@@ -240,11 +255,10 @@ def main(args):
     # Execute the install actions.
     <<actions>>
 
-    # Setup cyberfile
-    # setup_cyberfiles(pkg_name)
+    install_src_file()
 
     # Fix config path
-    fix_configs_in_pkg()
+    # fix_configs_in_pkg()
 
 
 if __name__ == "__main__":

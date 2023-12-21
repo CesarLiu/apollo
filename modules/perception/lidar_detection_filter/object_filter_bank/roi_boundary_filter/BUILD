@@ -1,4 +1,4 @@
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_plugin")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_plugin", "apollo_cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,6 +7,12 @@ PERCEPTION_COPTS = ['-DMODULE_NAME=\\"perception\\"']
 
 apollo_plugin(
     name = "libroi_boundary_filter.so",
+    description = ":plugins.xml",
+    deps = [":lib_rbf"],
+)
+
+apollo_cc_library(
+    name = "lib_rbf",
     srcs = ["roi_boundary_filter.cc"],
     hdrs = ["roi_boundary_filter.h"],
     description = ":plugins.xml",
@@ -23,12 +29,12 @@ apollo_plugin(
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "roi_boundary_filter_test",
     size = "small",
     srcs = ["roi_boundary_filter_test.cc"],
     deps = [
-        ":roi_boundary_filter_lib",
+        ":lib_rbf",
         "//modules/perception/common:perception_gflags",
         "@com_google_googletest//:gtest_main",
     ],

@@ -21,7 +21,16 @@
 #include <string>
 #include <vector>
 
+#include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/perception/common/base/blob.h"
+
+#if GPU_PLATFORM == NVIDIA
+  #include <c10/cuda/CUDACachingAllocator.h>
+  using c10::cuda::CUDACachingAllocator::emptyCache;
+#elif GPU_PLATFORM == AMD
+  #include <c10/hip/HIPCachingAllocator.h>
+  using c10::hip::HIPCachingAllocator::emptyCache;
+#endif
 
 namespace apollo {
 namespace perception {
@@ -45,9 +54,16 @@ class Inference {
 
   void set_gpu_id(const int &gpu_id);
 
+  void set_model_info(const std::string &proto_file,
+                      const std::vector<std::string> &net_input_names,
+                      const std::vector<std::string> &net_output_names);
+
  protected:
   int max_batch_size_ = 1;
   int gpu_id_ = 0;
+  std::string proto_file_ = "";
+  std::vector<std::string> net_output_names_;
+  std::vector<std::string> net_input_names_;
 };
 
 }  // namespace inference

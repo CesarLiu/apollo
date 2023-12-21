@@ -48,81 +48,77 @@ sudo apt update && sudo apt install -y libopenblas-base libopenmpi-dev libomp-de
 pip3 install Cython
 
 ##============================================================##
-pushd pytorch
-  export USE_QNNPACK=0 
-  export USE_PYTORCH_QNNPACK=0 
-  export PYTORCH_BUILD_NUMBER=1 
-  export BUILD_CAFFE2=1 
-  export USE_NCCL=0 
-  export PYTORCH_BUILD_VERSION=1.11.0
-  # libtorch_cpu
-  export USE_CUDA=0
-  python3 setup.py install
-  mkdir -p /usr/local/libtorch_cpu
-  cp -r build/lib.linux-x86_64-3.7/torch/lib /usr/local/libtorch_cpu/
-  cp -r build/lib.linux-x86_64-3.7/torch/include /usr/local/libtorch_cpu/
-  ok "Successfully installed libtorch_cpu ${VERSION}"
+# libtorch_cpu
 
-  python3 setup.py clean
-  # libtorch_gpu
-  export USE_CUDA=1
-  export TORCH_CUDA_ARCH_LIST="3.5;5.0;5.2;6.1;6.2"
+if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+  # https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.0%2Bcpu.zip
+  VERSION="1.7.0-2"
+  CHECKSUM="02fd4f30e97ce8911ef933d0516660892392e95e6768b50f591f4727f6224390"
+  PKG_NAME="libtorch_cpu-${VERSION}-linux-${TARGET_ARCH}.tar.gz"
+  DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
+elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
+  VERSION="1.11.0"
+  CHECKSUM="7faae6caad3c7175070263a0767732c0be9a92be25f9fb022aebe14a4cd2d092"
+  PKG_NAME="libtorch_cpu-${VERSION}-linux-${TARGET_ARCH}.tar.gz"
+  DOWNLOAD_LINK="https://apollo-pkg-beta.cdn.bcebos.com/archive/${PKG_NAME}"
+else
+  error "libtorch for ${TARGET_ARCH} not ready. Exiting..."
+  exit 1
+fi
 
-  python3 setup.py install
-  mkdir -p /usr/local/libtorch_gpu
-  cp -r build/lib.linux-x86_64-3.7/torch/lib /usr/local/libtorch_gpu/
-  cp -r build/lib.linux-x86_64-3.7/torch/include /usr/local/libtorch_gpu/
-  ok "Successfully installed libtorch_gpu ${VERSION}"
+download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-popd
-rm -fr pytorch
+tar xzf "${PKG_NAME}"
+mv libtorch_cpu /usr/local/libtorch_cpu
+rm -f "${PKG_NAME}"
+ok "Successfully installed libtorch_cpu ${VERSION}"
 
-# # libtorch_cpu
+##============================================================##
+# libtorch_gpu
+determine_gpu_use_host
+if [[ "${USE_NVIDIA_GPU}" -eq 1 ]]; then
+  # libtorch_gpu nvidia
+  if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+    VERSION="1.7.0-2"
+    CHECKSUM="b64977ca4a13ab41599bac8a846e8782c67ded8d562fdf437f0e606cd5a3b588"
+    PKG_NAME="libtorch_gpu-${VERSION}-cu111-linux-x86_64.tar.gz"
+    DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
+  else # AArch64
+    VERSION="1.11.0"
+    PKG_NAME="libtorch_gpu-${VERSION}-linux-${TARGET_ARCH}.tar.gz"
+    CHECKSUM="661346303cafc832ef2d37b734ee718c85cdcf5ab21b72b13ef453cb40f13f86"
+    DOWNLOAD_LINK="https://apollo-pkg-beta.cdn.bcebos.com/archive/${PKG_NAME}"
+  fi
 
-# if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-#     # https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.0%2Bcpu.zip
-#     VERSION="1.7.0-2"
-#     CHECKSUM="02fd4f30e97ce8911ef933d0516660892392e95e6768b50f591f4727f6224390"
-#     PKG_NAME="libtorch_cpu-${VERSION}-linux-${TARGET_ARCH}.tar.gz"
-#     DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
-# elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
-#     VERSION="1.11.0"
-#     CHECKSUM="7faae6caad3c7175070263a0767732c0be9a92be25f9fb022aebe14a4cd2d092"
-#     PKG_NAME="libtorch_cpu-${VERSION}-linux-${TARGET_ARCH}.tar.gz"
-#     DOWNLOAD_LINK="https://apollo-pkg-beta.cdn.bcebos.com/archive/${PKG_NAME}"
-# else
-#     error "libtorch for ${TARGET_ARCH} not ready. Exiting..."
-#     exit 1
-# fi
+  download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
+  tar xzf "${PKG_NAME}"
+  mv "${PKG_NAME%.tar.gz}" /usr/local/libtorch_gpu/
+elif [[ "${USE_AMD_GPU}" -eq 1 ]]; then
+  if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+    PKG_NAME="libtorch_amd.tar.gz"
+    FILE_ID="1UMzACmxzZD8KVitEnSk-BhXa38Kkl4P-"
+  else # AArch64
+    error "AMD libtorch for ${TARGET_ARCH} not ready. Exiting..."
+    exit 1
+  fi
+  DOWNLOAD_LINK="https://docs.google.com/uc?export=download&id=${FILE_ID}"
+  wget --load-cookies /tmp/cookies.txt \
+    "https://docs.google.com/uc?export=download&confirm=
+            $(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies \
+      --no-check-certificate ${DOWNLOAD_LINK} \
+      -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=${FILE_ID}" \
+    -O "${PKG_NAME}" && rm -rf /tmp/cookies.txt
 
-# download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+  tar xzf "${PKG_NAME}"
+  mv "${PKG_NAME%.tar.gz}/libtorch" /usr/local/libtorch_gpu/
+  mv "${PKG_NAME%.tar.gz}/libtorch_deps/libamdhip64.so.4" /opt/rocm/hip/lib/
+  mv "${PKG_NAME%.tar.gz}/libtorch_deps/libmagma.so" /opt/apollo/sysroot/lib/
+  mv "${PKG_NAME%.tar.gz}/libtorch_deps/"* /usr/local/lib/
+  rm -r "${PKG_NAME%.tar.gz}"
+  ldconfig
+fi
 
-# tar xzf "${PKG_NAME}"
-# mv libtorch_cpu /usr/local/libtorch_cpu
-# rm -f "${PKG_NAME}"
-# ok "Successfully installed libtorch_cpu ${VERSION}"
-
-# ##============================================================##
-# # libtorch_gpu
-# if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-#     VERSION="1.7.0-2"
-#     CHECKSUM="b64977ca4a13ab41599bac8a846e8782c67ded8d562fdf437f0e606cd5a3b588"
-#     PKG_NAME="libtorch_gpu-${VERSION}-cu111-linux-x86_64.tar.gz"
-#     DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
-# else # AArch64
-#     VERSION="1.11.0"
-#     PKG_NAME="libtorch_gpu-${VERSION}-linux-${TARGET_ARCH}.tar.gz"
-#     CHECKSUM="661346303cafc832ef2d37b734ee718c85cdcf5ab21b72b13ef453cb40f13f86"
-#     DOWNLOAD_LINK="https://apollo-pkg-beta.cdn.bcebos.com/archive/${PKG_NAME}"
-# fi
-
-
-# download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-
-# tar xzf "${PKG_NAME}"
-# mv libtorch_gpu /usr/local/libtorch_gpu
-
-# # Cleanup
-# rm -f "${PKG_NAME}"
-# ok "Successfully installed libtorch_gpu ${VERSION}"
+# Cleanup
+rm -f "${PKG_NAME}"
+ok "Successfully installed libtorch_gpu ${VERSION}"

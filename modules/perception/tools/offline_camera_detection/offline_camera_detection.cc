@@ -40,11 +40,11 @@ DEFINE_string(root_dir,
               "/apollo/modules/perception/tools/offline_camera_detection/",
               "image root dir");
 DEFINE_string(image_ext, ".jpg", "extension of image name");
-DEFINE_string(config_path, "perception/camera_detection_2d/data",
+DEFINE_string(config_path, "perception/camera_detection_multi_stage/data",
               "config path");
-DEFINE_string(config_file, "yolo.pb.txt", "config file");
+DEFINE_string(config_file, "yolox3d.pb.txt", "config file");
 DEFINE_string(camera_name, "front_6mm", "camera name");
-DEFINE_string(detector_name, "YoloObstacleDetector", "detector name");
+DEFINE_string(detector_name, "Yolox3DObstacleDetector", "detector name");
 
 namespace apollo {
 namespace perception {
@@ -81,6 +81,8 @@ bool TestDetection() {
   base::BaseCameraModelPtr model =
       algorithm::SensorManager::Instance()->GetUndistortCameraModel(
           camera_name);
+  ACHECK(model) << "Can't find " << camera_name
+                << " in data/conf/sensor_meta.pb.txt";
   auto pinhole = static_cast<base::PinholeCameraModel*>(model.get());
   init_options.intrinsic = pinhole->get_intrinsic_params();
   camera_frame.camera_k_matrix = pinhole->get_intrinsic_params();

@@ -31,7 +31,7 @@
 #include "modules/planning/planning_base/common/reference_line_info.h"
 #include "modules/planning/planning_base/reference_line/reference_line.h"
 #include "modules/planning/planning_base/reference_line/reference_point.h"
-#include "modules/planning/planning_base/scenario_base/stage.h"
+#include "modules/planning/planning_interface_base/scenario_base/stage.h"
 
 namespace apollo {
 namespace planning {
@@ -48,13 +48,6 @@ class LaneFollowStage : public Stage {
   void PlanFallbackTrajectory(
       const common::TrajectoryPoint& planning_start_point, Frame* frame,
       ReferenceLineInfo* reference_line_info);
-
-  void GenerateFallbackPathProfile(const ReferenceLineInfo* reference_line_info,
-                                   PathData* path_data);
-
-  bool RetrieveLastFramePathProfile(
-      const ReferenceLineInfo* reference_line_info, const Frame* frame,
-      PathData* path_data);
 
   common::SLPoint GetStopSL(const ObjectStop& stop_decision,
                             const ReferenceLine& reference_line) const;

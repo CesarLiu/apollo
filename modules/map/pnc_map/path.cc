@@ -47,7 +47,13 @@ const double kSampleDistance = 0.25;
 bool FindLaneSegment(const MapPathPoint& p1, const MapPathPoint& p2,
                      LaneSegment* const lane_segment) {
   for (const auto& wp1 : p1.lane_waypoints()) {
+    if (nullptr == wp1.lane) {
+      continue;
+    }
     for (const auto& wp2 : p2.lane_waypoints()) {
+      if (nullptr == wp2.lane) {
+        continue;
+      }
       if (wp1.lane->id().id() == wp2.lane->id().id() && wp1.s < wp2.s) {
         *lane_segment = LaneSegment(wp1.lane, wp1.s, wp2.s);
         return true;
@@ -735,6 +741,14 @@ bool Path::GetProjection(const common::math::Vec2d& point, double* accumulate_s,
   return GetProjection(point, accumulate_s, lateral, &distance);
 }
 
+bool Path::GetProjection(const double heading,
+                         const common::math::Vec2d& point,
+                         double* accumulate_s,
+                         double* lateral) const {
+  double distance = 0.0;
+  return GetProjection(point, heading, accumulate_s, lateral, &distance);
+}
+
 bool Path::GetProjectionWithWarmStartS(const common::math::Vec2d& point,
                                        double* accumulate_s,
                                        double* lateral) const {
@@ -860,6 +874,58 @@ bool Path::GetProjection(const Vec2d& point, double* accumulate_s,
   *min_distance = std::numeric_limits<double>::infinity();
   int min_index = 0;
   for (int i = 0; i < num_segments_; ++i) {
+    const double distance = segments_[i].DistanceSquareTo(point);
+    if (distance < *min_distance) {
+      min_index = i;
+      *min_distance = distance;
+    }
+  }
+  *min_distance = std::sqrt(*min_distance);
+  const auto& nearest_seg = segments_[min_index];
+  const auto prod = nearest_seg.ProductOntoUnit(point);
+  const auto proj = nearest_seg.ProjectOntoUnit(point);
+  if (min_index == 0) {
+    *accumulate_s = std::min(proj, nearest_seg.length());
+    if (proj < 0) {
+      *lateral = prod;
+    } else {
+      *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
+    }
+  } else if (min_index == num_segments_ - 1) {
+    *accumulate_s = accumulated_s_[min_index] + std::max(0.0, proj);
+    if (proj > 0) {
+      *lateral = prod;
+    } else {
+      *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
+    }
+  } else {
+    *accumulate_s = accumulated_s_[min_index] +
+                    std::max(0.0, std::min(proj, nearest_seg.length()));
+    *lateral = (prod > 0.0 ? 1 : -1) * *min_distance;
+  }
+  return true;
+}
+
+bool Path::GetProjection(const Vec2d& point, const double heading,
+                         double* accumulate_s, double* lateral,
+                         double* min_distance) const {
+  if (segments_.empty()) {
+    return false;
+  }
+  if (accumulate_s == nullptr || lateral == nullptr ||
+      min_distance == nullptr) {
+    return false;
+  }
+  if (use_path_approximation_) {
+    return approximation_.GetProjection(*this, point, accumulate_s, lateral,
+                                        min_distance);
+  }
+  CHECK_GE(num_points_, 2);
+  *min_distance = std::numeric_limits<double>::infinity();
+  int min_index = 0;
+  for (int i = 0; i < num_segments_; ++i) {
+    if (abs(common::math::AngleDiff(segments_[i].heading(), heading)) >= M_PI_2)
+      continue;
     const double distance = segments_[i].DistanceSquareTo(point);
     if (distance < *min_distance) {
       min_index = i;

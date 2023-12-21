@@ -67,6 +67,7 @@ apollo_plugin(
         "st_guide_line.h",
         "st_obstacles_processor.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     description = ":plugins.xml",
     deps = [
         "//modules/common/configs:vehicle_config_helper",
@@ -76,7 +77,7 @@ apollo_plugin(
         "//modules/common_msgs/map_msgs:map_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/map:apollo_map",
-        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
         "//modules/planning/planning_base/proto:planning_config_cc_proto",
         "//modules/planning/tasks/st_bounds_decider/proto:st_bounds_decider_cc_proto",
     ],

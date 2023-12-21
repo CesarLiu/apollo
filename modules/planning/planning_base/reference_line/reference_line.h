@@ -29,6 +29,7 @@
 #include "modules/common_msgs/map_msgs/map_geometry.pb.h"
 #include "modules/common_msgs/planning_msgs/sl_boundary.pb.h"
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
+
 #include "modules/common/math/vec2d.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/planning_base/reference_line/reference_point.h"
@@ -138,6 +139,10 @@ class ReferenceLine {
    * @return True if success.
    */
   bool XYToSL(const common::math::Vec2d& xy_point,
+              common::SLPoint* const sl_point,
+              double warm_start_s = -1.0) const;
+
+  bool XYToSL(const double heading, const common::math::Vec2d& xy_point,
               common::SLPoint* const sl_point,
               double warm_start_s = -1.0) const;
 

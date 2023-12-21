@@ -22,6 +22,7 @@ proto_library(
         "//modules/common_msgs/basic_msgs:header_proto",
         "//modules/common_msgs/basic_msgs:vehicle_id_proto",
         "//modules/common_msgs/basic_msgs:vehicle_signal_proto",
+        "@com_google_protobuf//:any_proto",
     ],
 )
 

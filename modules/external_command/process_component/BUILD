@@ -7,9 +7,10 @@ apollo_component(
     name="libexternal_command_process_component.so",
     srcs=["external_command_process_component.cc"],
     hdrs=["external_command_process_component.h"],
-    copts = ["-DMODULE_NAME=\\\"external_command_process\\\""],
+    copts = ["-DMODULE_NAME=\\\"external_command\\\""],
     deps=[
         "//cyber",
+        "//modules/common/configs:config_gflags",
         "//modules/external_command/process_component/proto:process_component_config_cc_proto",
         "//modules/common_msgs/external_command_msgs:command_status_cc_proto",
         "//modules/external_command/command_processor/command_processor_base:command_processor_base_lib",

@@ -36,7 +36,7 @@
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -219,7 +219,8 @@ ReferenceLine::ToFrenetFrame(const common::TrajectoryPoint& traj_point) const {
   ACHECK(!reference_points_.empty());
 
   common::SLPoint sl_point;
-  XYToSL(traj_point.path_point(), &sl_point);
+  XYToSL(traj_point.path_point().theta(),
+         {traj_point.path_point().x(), traj_point.path_point().y()}, &sl_point);
 
   std::array<double, 3> s_condition;
   std::array<double, 3> l_condition;
@@ -405,6 +406,30 @@ bool ReferenceLine::XYToSL(const common::math::Vec2d& xy_point,
   double l = 0.0;
   if (warm_start_s < 0.0) {
     if (!map_path_.GetProjection(xy_point, &s, &l)) {
+      AERROR << "Cannot get nearest point from path.";
+      return false;
+    }
+  } else {
+    if (!map_path_.GetProjectionWithWarmStartS(xy_point, &s, &l)) {
+      AERROR << "Cannot get nearest point from path with warm_start_s: "
+             << warm_start_s;
+      return false;
+    }
+  }
+
+  sl_point->set_s(s);
+  sl_point->set_l(l);
+  return true;
+}
+
+bool ReferenceLine::XYToSL(const double heading,
+                           const common::math::Vec2d& xy_point,
+                           common::SLPoint* const sl_point,
+                           double warm_start_s) const {
+  double s = warm_start_s;
+  double l = 0.0;
+  if (warm_start_s < 0.0) {
+    if (!map_path_.GetProjection(heading, xy_point, &s, &l)) {
       AERROR << "Cannot get nearest point from path.";
       return false;
     }

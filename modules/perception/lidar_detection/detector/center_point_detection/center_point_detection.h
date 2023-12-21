@@ -108,6 +108,7 @@ class CenterPointDetection : public BaseLidarDetector {
   void GetObjects(const Eigen::Affine3d &pose,
                   const std::vector<float> &detections,
                   const std::vector<int64_t> &labels,
+                  const std::vector<float> &scores,
                   std::vector<std::shared_ptr<base::Object>> *objects);
 
   void FilterScore(
@@ -120,10 +121,16 @@ class CenterPointDetection : public BaseLidarDetector {
 
   base::ObjectSubType GetObjectSubType(int label);
 
+  void FilterObjectsbyPoints(
+    std::vector<std::shared_ptr<base::Object>> *objects);
+
   void FilterForegroundPoints(
     std::vector<std::shared_ptr<base::Object>> *objects);
 
   void SetPointsInROI(
+    std::vector<std::shared_ptr<base::Object>> *objects);
+
+  void FilterObjectsbyClassNMS(
     std::vector<std::shared_ptr<base::Object>> *objects);
 
   // reference pointer of lidar frame
@@ -152,6 +159,14 @@ class CenterPointDetection : public BaseLidarDetector {
   double inference_time_ = 0.0;
   double collect_time_ = 0.0;
   double postprocess_time_ = 0.0;
+  double nms_time_ = 0.0;
+
+  // diff class nms params
+  bool diff_class_nms_ = false;
+  float diff_class_iou_ = 0.0;
+  // true: use nms strategy, false: use nms by object score
+  bool nms_strategy_ = false;
+  std::map<base::ObjectType, std::vector<base::ObjectType>> nms_strategy_table_;
 
   // centerpoint param
   centerpoint::ModelParam model_param_;

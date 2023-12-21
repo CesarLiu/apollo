@@ -14,12 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <poll.h>
-#include <cctype>
-
 #include "modules/external_command/external_command_demo/external_command_wrapper_demo.h"
 
+#include <poll.h>
+
+#include <cctype>
+
 #include "modules/external_command/external_command_demo/proto/sweeper_custom_command.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
 
@@ -71,8 +73,9 @@ bool ExternalCommandWrapperDemo::Proc() {
     case 0:
       return true;
     default:
-      std::string input_command_string = "";
-      std::cin >> input_command_string;
+      char data[50];
+      std::cin.getline(data, 50);
+      std::string input_command_string = data;
       if (input_command_string == "pull_over") {
         // Pull over.
         SendActionCommand(
@@ -102,12 +105,18 @@ bool ExternalCommandWrapperDemo::Proc() {
         SendVehicleSignalCommand();
       } else if (input_command_string == "custom_chassis") {
         SendCustomChassisCommand();
-      } else if (input_command_string == "set_speed_low") {
-        double speed = 1.0;
-        SendSpeedCommand(speed);
-      } else if (input_command_string == "set_speed_high") {
-        double speed = 30.0;
-        SendSpeedCommand(speed);
+      } else if (input_command_string.find("set_speed") != std::string::npos) {
+        auto index = input_command_string.find("set_speed");
+        std::string speed_value_string = input_command_string.substr(
+            index + std::string("set_speed").length(),
+            input_command_string.length());
+        if (!speed_value_string.empty()) {
+          double speed_value = std::atof(speed_value_string.c_str());
+          SendSpeedCommand(speed_value);
+        } else {
+          AWARN << "Input format is invalid, please input format like: "
+                   "set_speed 1.5";
+        }
       } else if (input_command_string == "increase_speed") {
         double speed_factor = 1.2;
         SendSpeedFactorCommand(speed_factor);
@@ -160,22 +169,22 @@ bool ExternalCommandWrapperDemo::Proc() {
         CheckCommandStatus(id);
       } else if (input_command_string == "free1") {
         apollo::external_command::Pose end_pose;
-        end_pose.set_x(437556.02);
-        end_pose.set_y(4432540.34);
-        end_pose.set_heading(1.8);
+        end_pose.set_x(demo_config_.end_pose_x());
+        end_pose.set_y(demo_config_.end_pose_y());
+        end_pose.set_heading(demo_config_.end_pose_heading());
         std::vector<apollo::external_command::Point> way_points;
         apollo::external_command::Point point1;
         apollo::external_command::Point point2;
         apollo::external_command::Point point3;
         apollo::external_command::Point point4;
-        point1.set_x(437536.29);
-        point1.set_y(4432560.69);
-        point2.set_x(437536.29);
-        point2.set_y(4432510.69);
-        point3.set_x(437576.29);
-        point3.set_y(4432510.69);
-        point4.set_x(437576.29);
-        point4.set_y(4432560.69);
+        point1.set_x(demo_config_.point1_x());
+        point1.set_y(demo_config_.point1_y());
+        point2.set_x(demo_config_.point2_x());
+        point2.set_y(demo_config_.point2_y());
+        point3.set_x(demo_config_.point3_x());
+        point3.set_y(demo_config_.point3_y());
+        point4.set_x(demo_config_.point4_x());
+        point4.set_y(demo_config_.point4_y());
         way_points.emplace_back(point1);
         way_points.emplace_back(point2);
         way_points.emplace_back(point3);
@@ -183,7 +192,7 @@ bool ExternalCommandWrapperDemo::Proc() {
 
         SendFreespaceCommand(way_points, end_pose);
       } else {
-        std::cout << "Invalid input!" << std::endl;
+        std::cout << "Invalid input!" << input_command_string << std::endl;
       }
   }
   return true;

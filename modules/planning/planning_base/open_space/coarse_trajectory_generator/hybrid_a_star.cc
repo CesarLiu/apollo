@@ -22,8 +22,12 @@
 
 #include <limits>
 #include <unordered_set>
+
+#include "modules/planning/planning_base/common/path/discretized_path.h"
+#include "modules/planning/planning_base/common/speed/speed_data.h"
 #include "modules/planning/planning_base/common/util/print_debug_info.h"
 #include "modules/planning/planning_base/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
+
 namespace apollo {
 namespace planning {
 
@@ -802,6 +806,14 @@ bool HybridAStar::Plan(
     const double rs_end_time = Clock::NowInSeconds();
     rs_time += rs_end_time - rs_start_time;
     close_set_.insert(current_node->GetIndex());
+
+    if (Clock::NowInSeconds() - astar_start_time >
+            planner_open_space_config_.warm_start_config()
+                .astar_max_search_time() &&
+        available_result_num > 0) {
+      break;
+    }
+
     size_t begin_index = 0;
     size_t end_index = next_node_num_;
     std::unordered_set<std::string> temp_set;
@@ -835,6 +847,16 @@ bool HybridAStar::Plan(
     }
     open_set_.insert(temp_set.begin(), temp_set.end());
   }
+
+  if (final_node_ == nullptr) {
+    AERROR << "Hybird A* cannot find a valid path";
+    print_curves.PrintToLog();
+    return false;
+  }
+
+  AINFO << "open_pq_.empty()" << (open_pq_.empty() ? "true" : "false");
+  AINFO << "open_pq_.size()" << open_pq_.size();
+  AINFO << "desired_explored_num" << desired_explored_num;
   AINFO << "min cost is : " << final_node_->GetTrajCost();
   AINFO << "max_explored_num is " << max_explored_num;
   AINFO << "explored node num is " << explored_node_num
@@ -846,11 +868,7 @@ bool HybridAStar::Plan(
   AINFO << "reed shepp time is " << rs_time;
   AINFO << "hybrid astar total time is "
         << Clock::NowInSeconds() - astar_start_time;
-  if (final_node_ == nullptr) {
-    AERROR << "Hybrid A searching return null ptr(open_set ran out)";
-    print_curves.PrintToLog();
-    return false;
-  }
+
   print_curves.AddPoint("rs_point", final_node_->GetXs().front(),
                         final_node_->GetYs().front());
   if (!GetResult(result)) {
@@ -861,6 +879,11 @@ bool HybridAStar::Plan(
   for (size_t i = 0; i < result->x.size(); i++) {
     print_curves.AddPoint("warm_path", result->x[i], result->y[i]);
   }
+  // PrintBox print_box("warm_path_box");
+  // for (size_t i = 0; i < result->x.size(); i = i + 5) {
+  //   print_box.AddAdcBox(result->x[i], result->y[i], result->phi[i]);
+  // }
+  // print_box.PrintToLog();
   print_curves.PrintToLog();
   return true;
 }
