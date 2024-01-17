@@ -550,6 +550,7 @@ function _determine_drivers_disabled() {
 }
 
 function _determine_perception_disabled() {
+  DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/common/inference/migraphx/..."
   if [ "${USE_GPU}" -eq 0 ]; then
     DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/..."
   elif [ "$GPU_PLATFORM" == "AMD" ]; then
@@ -716,7 +717,7 @@ function run_bazel() {
 
   local sp="    "
   local spaces="    "
-  local count=$(nproc)
+  local count="$(($(nproc) - 2))"
   if [ "$1" == "Coverage" ]; then
     count="$(($(nproc) / 2))"
     spaces="       "
@@ -741,7 +742,7 @@ function run_bazel() {
   info "${TAB}$1 Targets: ${sp}${GREEN}${build_targets}${NO_COLOR}"
   info "${TAB}Disabled:      ${spaces}${YELLOW}${disabled_targets}${NO_COLOR}"
 
-  job_args="--copt=-mavx2 --host_copt=-mavx2 --jobs=${count} --local_ram_resources=HOST_RAM*0.7"
+  job_args="--copt=-march=native --host_copt=-march=native --jobs=${count} --local_ram_resources=HOST_RAM*0.8"
   set -x
   bazel ${1,,} ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
   set +x

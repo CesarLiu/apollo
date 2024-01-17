@@ -19,9 +19,10 @@
 #include <cassert>
 
 #if USE_GPU == 1
+  #include <cublas_v2.h>
+  #include <cuda_runtime.h>
+  #include <cuda_runtime_api.h>
   #if GPU_PLATFORM == NVIDIA
-    #include <cublas_v2.h>
-    #include <cuda_runtime.h>
     #include <cuda_runtime_api.h>
   #elif GPU_PLATFORM == AMD
     #include <hipblas.h>

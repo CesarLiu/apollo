@@ -15,7 +15,6 @@ apollo_cc_library(
     name = "lib_bf",
     srcs = ["background_filter.cc"],
     hdrs = ["background_filter.h"],
-    description = ":plugins.xml",
     deps = [
         "//cyber",
         "//modules/perception/common:perception_common_util",

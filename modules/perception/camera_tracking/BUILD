@@ -94,7 +94,6 @@ apollo_component(
     deps = [
         ":apollo_perception_camera_tracking",
         "//cyber",
-        ":apollo_perception_camera_tracking",
         "//modules/common/util:util_tool",
         "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
         "//modules/perception/camera_tracking/proto:camera_tracking_component_cc_proto",

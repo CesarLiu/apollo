@@ -61,7 +61,6 @@ apollo_cc_test(
         "@com_google_googletest//:gtest_main",
         "@local_config_cuda//cuda:cublas",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_library(
@@ -116,21 +115,6 @@ apollo_cc_library(
         "@local_config_cuda//cuda:cudnn_header",
         "@local_config_tensorrt//:tensorrt",
         "@opencv//:imgcodecs",
-    ],
-    deps = [
-        "//cyber",
-        ":apollo_perception_inference_rt_common",
-        ":apollo_perception_common_inference_tensorrt_plugins",
-        "//modules/perception/common/base:apollo_perception_common_base",
-        "@local_config_cuda//cuda:cudnn_header",
-        "@local_config_tensorrt//:tensorrt",
-        "//modules/perception/common/proto:rt_cc_proto",
-        "//modules/perception/common/inference:inference_lib",
-        "@com_google_protobuf//:protobuf",
-        "@local_config_cuda//cuda:cudart",
-        "@opencv//:imgcodecs",
-        "@com_google_absl//:absl",
-        "@local_config_cuda//cuda:cuda_headers",
     ]
 )
 

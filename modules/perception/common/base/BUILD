@@ -51,7 +51,6 @@ apollo_cc_library(
         "test/test_helper.h",
         "traffic_light.h",
         "vehicle_struct.h",
-        "camera.h",
     ],
     deps = [
         "//cyber",

@@ -889,8 +889,7 @@ apollo_cc_binary(
         "//modules/map:apollo_map",
         "//modules/planning/planning_base/proto:planner_open_space_config_cc_proto",
         "@eigen",
-    ],
-    mandatory = False,
+    ]
 )
 
 apollo_cc_binary(

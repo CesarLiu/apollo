@@ -37,22 +37,6 @@ apollo_cc_library(
     deps = [
         "//modules/common/adapters:adapter_gflags",
         "@com_github_gflags_gflags//:gflags",
-    ],
-    hdrs = [
-        "common/bridge_buffer.h", 
-        "common/bridge_gflags.h",
-        "common/bridge_header.h",
-        "common/bridge_header_item.h",
-        "common/bridge_proto_diser_buf_factory.h",
-        "common/bridge_proto_diserialized_buf.h",
-        "common/bridge_proto_serialized_buf.h",
-        "common/macro.h",
-        "common/udp_listener.h",
-        "common/util.h",
-    ],
-    deps = [
-        "@com_github_gflags_gflags//:gflags",
-        "//modules/common/adapters:adapter_gflags",
     ]
 )
 

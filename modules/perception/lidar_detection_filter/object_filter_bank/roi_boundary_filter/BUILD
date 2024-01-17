@@ -15,7 +15,6 @@ apollo_cc_library(
     name = "lib_rbf",
     srcs = ["roi_boundary_filter.cc"],
     hdrs = ["roi_boundary_filter.h"],
-    description = ":plugins.xml",
     deps = [
         "//cyber",
         "//modules/perception/common:perception_common_util",
