@@ -31,32 +31,32 @@ Steeringrpt0x02::Steeringrpt0x02() {}
 const int32_t Steeringrpt0x02::ID = 0x02;
 
 void Steeringrpt0x02::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis_detail) const {
+                           Fortuna* chassis_detail) const {
                      
     if(steering_wheel_angle_sign(bytes, length)){
-        chassis_detail->mutable_fortuna()->mutable_steering()->set_steering_wheel_angle_sign(Steering_Steering_signType_STEERING_RIGHT);                           
+        chassis_detail->mutable_steering()->set_steering_wheel_angle_sign(Steering_Steering_signType_STEERING_RIGHT);                           
     }
     else{
-        chassis_detail->mutable_fortuna()->mutable_steering()->set_steering_wheel_angle_sign(Steering_Steering_signType_STEERING_LEFT);   
+        chassis_detail->mutable_steering()->set_steering_wheel_angle_sign(Steering_Steering_signType_STEERING_LEFT);   
     }
 
     if(steering_wheel_speed_sign(bytes, length)){
-        chassis_detail->mutable_fortuna()->mutable_steering()->set_steering_wheel_speed_sign(Steering_Steering_signType_STEERING_RIGHT);                           
+        chassis_detail->mutable_steering()->set_steering_wheel_speed_sign(Steering_Steering_signType_STEERING_RIGHT);                           
     }
     else{
-        chassis_detail->mutable_fortuna()->mutable_steering()->set_steering_wheel_speed_sign(Steering_Steering_signType_STEERING_LEFT);   
+        chassis_detail->mutable_steering()->set_steering_wheel_speed_sign(Steering_Steering_signType_STEERING_LEFT);   
     }
 
     if(steering_wheel_torque_sign(bytes, length)){
-        chassis_detail->mutable_fortuna()->mutable_steering()->set_steering_wheel_torque_sign(Steering_Steering_signType_STEERING_RIGHT);                           
+        chassis_detail->mutable_steering()->set_steering_wheel_torque_sign(Steering_Steering_signType_STEERING_RIGHT);                           
     }
     else{
-        chassis_detail->mutable_fortuna()->mutable_steering()->set_steering_wheel_torque_sign(Steering_Steering_signType_STEERING_LEFT);   
+        chassis_detail->mutable_steering()->set_steering_wheel_torque_sign(Steering_Steering_signType_STEERING_LEFT);   
     }
 
-    chassis_detail->mutable_fortuna()->mutable_steering()->set_steering_wheel_torque(steering_wheel_torque(bytes, length));
-    chassis_detail->mutable_fortuna()->mutable_steering()->set_steering_wheel_angle(steering_wheel_angle(bytes, length));
-    chassis_detail->mutable_fortuna()->mutable_steering()->set_steering_wheel_speed(steering_wheel_speed(bytes, length));
+    chassis_detail->mutable_steering()->set_steering_wheel_torque(steering_wheel_torque(bytes, length));
+    chassis_detail->mutable_steering()->set_steering_wheel_angle(steering_wheel_angle(bytes, length));
+    chassis_detail->mutable_steering()->set_steering_wheel_speed(steering_wheel_speed(bytes, length));
 
 }
 

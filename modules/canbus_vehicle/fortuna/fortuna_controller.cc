@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 fortiss GmbH
+ * Copyright 2024 fortiss GmbH. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,15 @@
  *****************************************************************************/
 
 #include "modules/canbus_vehicle/fortuna/fortuna_controller.h"
-
+#include <string>
+#include "modules/canbus_vehicle/fortuna/proto/fortuna.pb.h"
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/canbus_vehicle/fortuna/fortuna_message_manager.h"
-//#include "modules/canbus_vehicle/lincoln/protocol/brake_60.h"
-//#include "modules/canbus_vehicle/lincoln/protocol/gear_66.h"
-//#include "modules/canbus_vehicle/lincoln/protocol/steering_64.h"
-//#include "modules/canbus_vehicle/lincoln/protocol/throttle_62.h"
-//#include "modules/canbus_vehicle/lincoln/protocol/turnsignal_68.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/kv_db/kv_db.h"
-#include "cyber/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -35,9 +31,9 @@ namespace apollo {
 namespace canbus {
 namespace fortuna {
 
+using ::apollo::common::ErrorCode;
+using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
-using common::ErrorCode;
-using control::ControlCommand;
 
 namespace {
 
@@ -48,9 +44,9 @@ const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 }  // namespace
 
 ErrorCode FortunaController::Init(
-    const VehicleParameter &params,
-    CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail> *const message_manager) {
+    const VehicleParameter& params,
+    CanSender<::apollo::canbus::Fortuna>* const can_sender,
+    MessageManager<::apollo::canbus::Fortuna>* const message_manager) {
   if (is_initialized_) {
     AINFO << "FortunaController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
@@ -64,6 +60,7 @@ ErrorCode FortunaController::Init(
   }
 
   if (can_sender == nullptr) {
+    AERROR << "Canbus sender is null.";
     return ErrorCode::CANBUS_ERROR;
   }
   can_sender_ = can_sender;
@@ -117,19 +114,21 @@ ErrorCode FortunaController::Init(
   can_sender_->AddMessage(Turnsignal68::ID, turnsignal_68_, false);
 */
   // Need to sleep to ensure all messages received
-  AINFO << "Controller is initialized.";
+  AINFO << "FortunaController is initialized.";
 
   gear_tmp_ = Chassis::GEAR_INVALID;
   is_initialized_ = true;
   return ErrorCode::OK;
 }
 
+FortunaController::~FortunaController() {}
+
 bool FortunaController::Start() {
   if (!is_initialized_) {
     AERROR << "FortunaController has NOT been initiated.";
     return false;
   }
-  const auto &update_func = [this] { SecurityDogThreadFunc(); };
+  const auto& update_func = [this] { SecurityDogThreadFunc(); };
   thread_.reset(new std::thread(update_func));
 
   // Start in AutoDrive Mode: as we enable/disable from the autobox
@@ -156,7 +155,7 @@ Chassis FortunaController::chassis() {
   chassis_.Clear();
   EnableAutoMode();
 
-  ChassisDetail chassis_detail;
+  Fortuna chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
@@ -169,14 +168,15 @@ Chassis FortunaController::chassis() {
 
   // 3
   // Fortuna: set it via reading the field
-  // chassis_detail.mutable_ems.engine_state
-  if (chassis_detail.has_ems() && chassis_detail.ems().has_engine_state() 
-      && chassis_detail.ems().engine_state() == Ems_Type_RUNNING){
-    chassis_.set_engine_started(true);
-  } else if (chassis_detail.has_ems() && chassis_detail.ems().has_engine_state() 
-      && chassis_detail.ems().engine_state() == Ems_Type_STOP){
-    chassis_.set_engine_started(false);
-  }
+  // // chassis_detail.mutable_ems.engine_state
+  // if (chassis_detail.has_ems() && chassis_detail.ems().has_engine_state() 
+  //     && chassis_detail.ems().engine_state() == Ems_Type_RUNNING){
+  //   chassis_.set_engine_started(true);
+  // } else if (chassis_detail.has_ems() && chassis_detail.ems().has_engine_state() 
+  //     && chassis_detail.ems().engine_state() == Ems_Type_STOP){
+  //   chassis_.set_engine_started(false);
+  // }
+  chassis_.set_engine_started(true);
   // 4
   if (chassis_detail.has_ems() && chassis_detail.ems().has_engine_rpm()) {
     chassis_.set_engine_rpm(
@@ -189,34 +189,6 @@ Chassis FortunaController::chassis() {
       chassis_detail.vehicle_spd().has_vehicle_spd()) {
     chassis_.set_speed_mps(
         static_cast<float>(chassis_detail.vehicle_spd().vehicle_spd()));
-    /*chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(
-        chassis_detail.vehicle_spd().is_wheel_spd_rr_valid());
-    chassis_.mutable_wheel_speed()->set_wheel_direction_rr(
-        chassis_detail.vehicle_spd().wheel_direction_rr());
-    chassis_.mutable_wheel_speed()->set_wheel_spd_rr(
-        chassis_detail.vehicle_spd().wheel_spd_rr());
-
-    chassis_.mutable_wheel_speed()->set_is_wheel_spd_rl_valid(
-        chassis_detail.vehicle_spd().is_wheel_spd_rl_valid());
-    chassis_.mutable_wheel_speed()->set_wheel_direction_rl(
-        chassis_detail.vehicle_spd().wheel_direction_rl());
-    chassis_.mutable_wheel_speed()->set_wheel_spd_rl(
-        chassis_detail.vehicle_spd().wheel_spd_rl());
-
-    chassis_.mutable_wheel_speed()->set_is_wheel_spd_fr_valid(
-        chassis_detail.vehicle_spd().is_wheel_spd_fr_valid());
-    chassis_.mutable_wheel_speed()->set_wheel_direction_fr(
-        chassis_detail.vehicle_spd().wheel_direction_fr());
-    chassis_.mutable_wheel_speed()->set_wheel_spd_fr(
-        chassis_detail.vehicle_spd().wheel_spd_fr());
-
-    chassis_.mutable_wheel_speed()->set_is_wheel_spd_fl_valid(
-        chassis_detail.vehicle_spd().is_wheel_spd_fl_valid());
-    chassis_.mutable_wheel_speed()->set_wheel_direction_fl(
-        chassis_detail.vehicle_spd().wheel_direction_fl());
-    chassis_.mutable_wheel_speed()->set_wheel_spd_fl(
-        chassis_detail.vehicle_spd().wheel_spd_fl());
-        */
 
   } else {
     chassis_.set_speed_mps(0);
@@ -258,16 +230,16 @@ Chassis FortunaController::chassis() {
     chassis_.set_gear_location(Chassis::GEAR_NONE);
   }
   // Fortuna: read from steering can
-  if(chassis_detail.has_fortuna() && chassis_detail.fortuna().has_steering() &&
-    chassis_detail.fortuna().steering().has_steering_wheel_angle() &&
-    chassis_detail.fortuna().steering().has_steering_wheel_angle_sign()) {
+  if(chassis_detail.has_steering() &&
+    chassis_detail.steering().has_steering_wheel_angle() &&
+    chassis_detail.steering().has_steering_wheel_angle_sign()) {
       int sign;
-      if(chassis_detail.fortuna().steering().steering_wheel_angle_sign()) {
+      if(chassis_detail.steering().steering_wheel_angle_sign()) {
         sign = -1;
       } else {
         sign = 1;
       }
-      const double steering_wheel_angle = chassis_detail.fortuna().steering().steering_wheel_angle() * 
+      const double steering_wheel_angle = chassis_detail.steering().steering_wheel_angle() * 
         sign;
       const double steering_angle_range_rad_to_steering_wheel_angle_range_deg_gain = 
         vehicle_params_.steer_ratio() * 180.0 / M_PI; // vaule should be 899 as in the ABX model; // is steer ratio really the correct value here!!!!!????
@@ -416,6 +388,7 @@ Chassis FortunaController::chassis() {
   return chassis_;
 }
 
+bool FortunaController::VerifyID() { return true; }
 void FortunaController::Emergency() {
   set_driving_mode(Chassis::EMERGENCY_MODE);
   ResetProtocol();
@@ -433,7 +406,7 @@ ErrorCode FortunaController::EnableAutoMode() {
 
   
   if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE) {
-    ADEBUG << "Already in COMPLETE_AUTO_DRIVE mode";
+    AINFO << "Already in COMPLETE_AUTO_DRIVE mode";
     return ErrorCode::OK;
   }
   //brake_60_->set_enable();
@@ -451,7 +424,7 @@ ErrorCode FortunaController::EnableAutoMode() {
   // }
 
   set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  ADEBUG << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
+  AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
   return ErrorCode::OK;
 }
 
@@ -459,8 +432,8 @@ ErrorCode FortunaController::DisableAutoMode() {
   //AINFO << "Fortuna currently supports only COMPLETE_MANUAL mode";
   //return ErrorCode::OK;
   
-  //ResetProtocol();
-  //can_sender_->Update();
+  ResetProtocol();
+  can_sender_->Update();
   set_driving_mode(Chassis::COMPLETE_MANUAL);
   set_chassis_error_code(Chassis::NO_ERROR);
   AINFO << "Switch to COMPLETE_MANUAL ok.";
@@ -722,7 +695,7 @@ void FortunaController::ResetProtocol() {
 }
 
 bool FortunaController::CheckChassisError() {
-  ChassisDetail chassis_detail;
+  Fortuna chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
 
   int32_t error_cnt = 0;
@@ -845,7 +818,7 @@ bool FortunaController::CheckChassisError() {
 
 void FortunaController::SecurityDogThreadFunc() {
   if (can_sender_ == nullptr) {
-    AERROR << "Failed to run SecurityDogThreadFunc() because can_sender_ is "
+    AERROR << "Fail to run SecurityDogThreadFunc() because can_sender_ is "
               "nullptr.";
     return;
   }
@@ -854,12 +827,15 @@ void FortunaController::SecurityDogThreadFunc() {
   }
 
   std::chrono::duration<double, std::micro> default_period{50000};
-  int64_t start = absl::ToUnixMicros(common::time::Clock::Now());
+  // int64_t start = absl::ToUnixMicros(common::time::Clock::Now());
+  int64_t start = 0;
+  int64_t end = 0;
 
   int32_t speed_ctrl_fail = 0;
   int32_t steer_ctrl_fail = 0;
 
   while (can_sender_->IsRunning()) {
+    start = ::apollo::cyber::Time::Now().ToMicrosecond();
     const Chassis::DrivingMode mode = driving_mode();
     bool emergency_mode = false;
 
@@ -895,11 +871,11 @@ void FortunaController::SecurityDogThreadFunc() {
     if (emergency_mode && mode != Chassis::EMERGENCY_MODE) {
       Emergency();
     }
-    int64_t end = absl::ToUnixMicros(common::time::Clock::Now());
+    end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
-      start = absl::ToUnixMicros(common::time::Clock::Now());
+      start = ::apollo::cyber::Time::Now().ToMicrosecond();
     } else {
       AERROR_EVERY(100)
           << "Too much time consumption in FortunaController looping process:"
@@ -913,7 +889,7 @@ bool FortunaController::CheckResponse(const int32_t flags, bool need_wait) {
   // for Fortuna, CheckResponse commonly takes ?? ms. We leave a 100ms buffer
   // for it.
   int32_t retry_num = 20;
-  ChassisDetail chassis_detail;
+  Fortuna chassis_detail;
   bool is_eps_online = false;
   bool is_vcu_online = false;
   bool is_esp_online = false;
@@ -978,21 +954,24 @@ void FortunaController::set_chassis_error_code(
   chassis_error_code_ = error_code;
 }
 
+// bool FortunaController::CheckSafetyError(
+//     const ::apollo::canbus::ChassisDetail &chassis_detail) {
+//   bool safety_error =
+//       chassis_detail.safety().is_passenger_door_open() ||
+//       chassis_detail.safety().is_rearleft_door_open() ||
+//       chassis_detail.safety().is_rearright_door_open() ||
+//       chassis_detail.safety().is_hood_open() ||
+//       chassis_detail.safety().is_trunk_open() ||
+//       (chassis_detail.safety().is_passenger_detected() &&
+//        (!chassis_detail.safety().is_passenger_airbag_enabled() ||
+//         !chassis_detail.safety().is_passenger_buckled()));
+//   ADEBUG << "Vehicle safety error status is : " << safety_error;
+//   return safety_error;
+// }
 bool FortunaController::CheckSafetyError(
-    const ::apollo::canbus::ChassisDetail &chassis_detail) {
-  bool safety_error =
-      chassis_detail.safety().is_passenger_door_open() ||
-      chassis_detail.safety().is_rearleft_door_open() ||
-      chassis_detail.safety().is_rearright_door_open() ||
-      chassis_detail.safety().is_hood_open() ||
-      chassis_detail.safety().is_trunk_open() ||
-      (chassis_detail.safety().is_passenger_detected() &&
-       (!chassis_detail.safety().is_passenger_airbag_enabled() ||
-        !chassis_detail.safety().is_passenger_buckled()));
-  ADEBUG << "Vehicle safety error status is : " << safety_error;
-  return safety_error;
+    const ::apollo::canbus::Fortuna& chassis_detail) {
+  return false;
 }
-
 }  // namespace fortuna
 }  // namespace canbus
 }  // namespace apollo

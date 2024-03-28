@@ -31,18 +31,18 @@ RearObject4rpt0x44::RearObject4rpt0x44() {}
 const int32_t RearObject4rpt0x44::ID = 0x44;
 
 void RearObject4rpt0x44::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis_detail) const {
+                           Fortuna* chassis_detail) const {
     if(rear_tracked(bytes, length)){
-        chassis_detail->mutable_fortuna()->mutable_rear_object_4()->set_rear_tracked(Rear_object_4_Rear_trackedType_OBJECT_MEASURED);                             
+        chassis_detail->mutable_rear_object_4()->set_rear_tracked(Rear_object_4_Rear_trackedType_OBJECT_MEASURED);                             
     }
     else{
-        chassis_detail->mutable_fortuna()->mutable_rear_object_4()->set_rear_tracked(Rear_object_4_Rear_trackedType_OBJECT_TRACKED);                             
+        chassis_detail->mutable_rear_object_4()->set_rear_tracked(Rear_object_4_Rear_trackedType_OBJECT_TRACKED);                             
     }
 
-    chassis_detail->mutable_fortuna()->mutable_rear_object_4()->set_rear_id(rear_id(bytes, length));
-    chassis_detail->mutable_fortuna()->mutable_rear_object_4()->set_rear_pos_y(rear_pos_y(bytes, length));
-    chassis_detail->mutable_fortuna()->mutable_rear_object_4()->set_rear_rel_velocity_x(rear_rel_velocity_x(bytes, length));
-    chassis_detail->mutable_fortuna()->mutable_rear_object_4()->set_rear_pos_x(rear_pos_x(bytes, length));
+    chassis_detail->mutable_rear_object_4()->set_rear_id(rear_id(bytes, length));
+    chassis_detail->mutable_rear_object_4()->set_rear_pos_y(rear_pos_y(bytes, length));
+    chassis_detail->mutable_rear_object_4()->set_rear_rel_velocity_x(rear_rel_velocity_x(bytes, length));
+    chassis_detail->mutable_rear_object_4()->set_rear_pos_x(rear_pos_x(bytes, length));
     
 }
 

@@ -38,6 +38,11 @@ cc_proto_library(
 proto_library(
     name = "fortuna_proto",
     srcs = ["fortuna.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:vehicle_id_proto",
+        "//modules/canbus_vehicle/lincoln/proto:lincoln_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_proto",
+    ]
 )
 
 py_proto_library(

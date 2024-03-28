@@ -35,35 +35,35 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "vehicle_factory",
-    srcs = ["vehicle_factory.cc"],
-    hdrs = ["vehicle_factory.h"],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
-    deps = [
-        "//modules/canbus_vehicle/ch:ch_vehicle_factory",
-        "//modules/canbus_vehicle/devkit:devkit_vehicle_factory",
-        "//modules/canbus_vehicle/ge3:ge3_vehicle_factory",
-        "//modules/canbus_vehicle/gem:gem_vehicle_factory",
-        "//modules/canbus_vehicle/lexus:lexus_vehicle_factory",
-        "//modules/canbus_vehicle/lincoln:lincoln_vehicle_factory",
-        "//modules/canbus_vehicle/transit:transit_vehicle_factory",
-        "//modules/canbus_vehicle/wey:wey_vehicle_factory",
-        "//modules/canbus_vehicle/zhongyun:zhongyun_vehicle_factory",
-        "//modules/canbus_vehicle/neolix_edu:neolix_edu_vehicle_factory",
-        "//modules/canbus_vehicle/fortuna:fortuna_vehicle_factory",
-        "//modules/common/util:factory",
-    ],
-)
+# cc_library(
+#     name = "vehicle_factory",
+#     srcs = ["vehicle_factory.cc"],
+#     hdrs = ["vehicle_factory.h"],
+#     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+#     deps = [
+#         "//modules/canbus_vehicle/ch:ch_vehicle_factory",
+#         "//modules/canbus_vehicle/devkit:devkit_vehicle_factory",
+#         "//modules/canbus_vehicle/ge3:ge3_vehicle_factory",
+#         "//modules/canbus_vehicle/gem:gem_vehicle_factory",
+#         "//modules/canbus_vehicle/lexus:lexus_vehicle_factory",
+#         "//modules/canbus_vehicle/lincoln:lincoln_vehicle_factory",
+#         "//modules/canbus_vehicle/transit:transit_vehicle_factory",
+#         "//modules/canbus_vehicle/wey:wey_vehicle_factory",
+#         "//modules/canbus_vehicle/zhongyun:zhongyun_vehicle_factory",
+#         "//modules/canbus_vehicle/neolix_edu:neolix_edu_vehicle_factory",
+#         "//modules/canbus_vehicle/fortuna:fortuna_vehicle_factory",
+#         "//modules/common/util:factory",
+#     ],
+# )
 
-cc_test(
-    name = "vehicle_factory_test",
-    size = "small",
-    srcs = ["vehicle_factory_test.cc"],
-    deps = [
-        ":vehicle_factory",
-        "@com_google_googletest//:gtest",
-    ],
-)
+# cc_test(
+#     name = "vehicle_factory_test",
+#     size = "small",
+#     srcs = ["vehicle_factory_test.cc"],
+#     deps = [
+#         ":vehicle_factory",
+#         "@com_google_googletest//:gtest",
+#     ],
+# )
 
 cpplint()

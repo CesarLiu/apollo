@@ -70,7 +70,8 @@ bool FakeObstacleComponent::Init() {
   CHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
 
   // instantiate reference line provider
-  reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
+  const apollo::common::VehicleStateProvider* vehicle_state_provider = nullptr;
+  reference_line_provider_ = std::make_unique<ReferenceLineProvider>(vehicle_state_provider, hdmap_);
   reference_line_provider_->Start();
 
   AERROR << "Initialized FakeObstacleComponent !";
@@ -148,11 +149,11 @@ bool FakeObstacleComponent::UpdateReferenceLine() {
     AERROR << "chassis not received yet";
     return false;
   }
-
-  Status status = VehicleStateProvider::Instance()->Update(latest_localization_,
+  auto vehicle_state_provider = std::make_shared<VehicleStateProvider>();
+  Status status = vehicle_state_provider->Update(latest_localization_,
                                                            latest_chassis_);
   VehicleState vehicle_state =
-      VehicleStateProvider::Instance()->vehicle_state();
+      vehicle_state_provider->vehicle_state();
 
   reference_line_provider_->UpdateRoutingResponse(latest_routing_);
   reference_line_provider_->UpdateVehicleState(vehicle_state);

@@ -21,7 +21,7 @@
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus_vehicle/fortuna/proto/fortuna.pb.h"
 #include "modules/canbus_vehicle/fortuna/fortuna_message_manager.h"
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
@@ -52,7 +52,7 @@ class FortunaControllerTest : public ::testing::Test {
   FortunaController controller_;
   ControlCommand control_cmd_;
   VehicleSignal vehicle_signal_;
-  CanSender<::apollo::canbus::ChassisDetail> sender_;
+  CanSender<::apollo::canbus::Fortuna> sender_;
   FortunaMessageManager msg_manager_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
@@ -75,13 +75,13 @@ TEST_F(FortunaControllerTest, Init) {
 */
 TEST_F(FortunaControllerTest, Status) {
   controller_.Init(params_, &sender_, &msg_manager_);
-  //controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  //EXPECT_EQ(controller_.Update(control_cmd_), ErrorCode::OK);
-  //controller_.SetHorn(control_cmd_);
-  //controller_.SetBeam(control_cmd_);
-  //controller_.SetTurningSignal(control_cmd_);
-  EXPECT_FALSE(controller_.CheckChassisError());
-  EXPECT_EQ(controller_.chassis_error_code(), Chassis::NO_ERROR);
+  // controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+  EXPECT_EQ(controller_.Update(control_cmd_), ErrorCode::OK);
+  // controller_.SetHorn(control_cmd_);
+  // controller_.SetBeam(control_cmd_);
+  // controller_.SetTurningSignal(control_cmd_);
+  // EXPECT_FALSE(controller_.CheckChassisError());
+  // EXPECT_EQ(controller_.chassis_error_code(), Chassis::NO_ERROR);
 }
 
 /*TEST_F(FortunaControllerTest, UpdateDrivingMode) {

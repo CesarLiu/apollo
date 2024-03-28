@@ -4,7 +4,6 @@ package apollo.canbus;
 
 import "modules/common_msgs/basic_msgs/vehicle_id.proto";
 import "modules/common_msgs/chassis_msgs/chassis.proto";
-import "modules/canbus_vehicle/fortuna/proto/fortuna.proto";
 
 
 message ChassisDetail {
@@ -30,8 +29,6 @@ message ChassisDetail {
   optional License license = 16 [deprecated = true];  // License info
   optional Surround surround = 17;                    // Surround information
   // Reserve fields for other vehicles
-  optional Fortuna fortuna = 99;
-  optional double timestamp = 100;
   optional apollo.common.VehicleID vehicle_id = 101;
 }
 

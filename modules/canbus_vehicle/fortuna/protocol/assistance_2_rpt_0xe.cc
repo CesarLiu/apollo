@@ -31,7 +31,7 @@ Assistance2rpt0xe::Assistance2rpt0xe() {}
 const int32_t Assistance2rpt0xe::ID = 0xe;
 
 void Assistance2rpt0xe::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis_detail) const {
+                           Fortuna* chassis_detail) const {
   // apollo.canbus.chassis.brake_percentage   
   // via apollo.canbus.chassis_detail.gas.throttle_input                        
   chassis_detail->mutable_brake()->set_brake_input(brake_percentage(bytes, length));

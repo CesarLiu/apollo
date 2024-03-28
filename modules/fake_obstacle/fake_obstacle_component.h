@@ -70,7 +70,7 @@ class FakeObstacleComponent : public apollo::cyber::TimerComponent {
   canbus::Chassis latest_chassis_;
   localization::LocalizationEstimate latest_localization_;
 
-  std::unique_ptr<planning::ReferenceLineProvider> reference_line_provider_;
+  std::unique_ptr<apollo::planning::ReferenceLineProvider> reference_line_provider_;
   std::list<planning::ReferenceLine> last_reference_lines_;
 
   const hdmap::HDMap* hdmap_ = nullptr;

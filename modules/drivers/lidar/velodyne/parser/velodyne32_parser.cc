@@ -199,14 +199,14 @@ void Velodyne32Parser::Unpack(const VelodynePacket& pkt,
       raw_distance.bytes[1] = raw->blocks[i].data[k + 1];
 
       // compute time
-      uint64_t timestamp = static_cast<uint64_t>(GetTimestamp(
-          basetime, (*inner_time_)[i][laser_id], static_cast<uint16_t>(i)));
+      // uint64_t timestamp = static_cast<uint64_t>(GetTimestamp(
+      //     basetime, (*inner_time_)[i][laser_id], static_cast<uint16_t>(i)));
 
-      if (laser_id == SCANS_PER_BLOCK - 1) {
-        // set header stamp before organize the point cloud
-        pc->set_measurement_time(static_cast<double>(timestamp) / 1e9);
-      }
-
+      // if (laser_id == SCANS_PER_BLOCK - 1) {
+      //   // set header stamp before organize the point cloud
+      //   pc->set_measurement_time(static_cast<double>(timestamp) / 1e9);
+      // }
+      uint64_t timestamp = static_cast<uint64_t>(cyber::Time::Now().ToNanosecond());
       int rotation = static_cast<int>(raw->blocks[i].rotation);
       float real_distance = raw_distance.raw_distance * DISTANCE_RESOLUTION;
       float distance = real_distance + corrections.dist_correction;

@@ -30,7 +30,7 @@
 #include "modules/perception/onboard/msg_buffer/msg_buffer.h"
 #include "modules/perception/onboard/proto/fortuna_radar_component_config.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus_vehicle/fortuna/proto/fortuna.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -43,10 +43,10 @@ struct RawRadarDetections {
   int id;
 };
 
-using ::apollo::canbus::ChassisDetail;
+using ::apollo::canbus::Fortuna;
 using ::apollo::localization::LocalizationEstimate;
 
-class FortunaRadarDetectionComponent : public cyber::Component<ChassisDetail> {
+class FortunaRadarDetectionComponent : public cyber::Component<Fortuna> {
   
  public:
   FortunaRadarDetectionComponent()
@@ -57,11 +57,11 @@ class FortunaRadarDetectionComponent : public cyber::Component<ChassisDetail> {
   ~FortunaRadarDetectionComponent() = default;
 
   bool Init() override;
-  bool Proc(const std::shared_ptr<ChassisDetail>& message) override;
+  bool Proc(const std::shared_ptr<Fortuna>& message) override;
 
  private:
 
-  bool InternalProc(const std::shared_ptr<ChassisDetail>& in_message,
+  bool InternalProc(const std::shared_ptr<Fortuna>& in_message,
                     std::shared_ptr<SensorFrameMessage> out_message);
   //bool GetCarLocalizationSpeed(double timestamp,
   //                             Eigen::Vector3f* car_linear_speed,
@@ -72,7 +72,7 @@ class FortunaRadarDetectionComponent : public cyber::Component<ChassisDetail> {
 
  private:
 
-  bool GetRawRadarData(const std::shared_ptr<ChassisDetail>& in_message, const double& chassis_detail_time);
+  bool GetRawRadarData(const std::shared_ptr<Fortuna>& in_message, const double& chassis_detail_time);
 
   bool GetLocalizationAndTransform(
     const bool& chassis_detail_has_time,

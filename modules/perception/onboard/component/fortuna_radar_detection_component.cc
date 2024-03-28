@@ -16,10 +16,9 @@
 
 #include "modules/perception/onboard/component/fortuna_radar_detection_component.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
-#include "modules/perception/radar/lib/interface/base_radar_obstacle_perception.h"
 #include "modules/perception/radar/common/radar_util.h"
 
-#include "modules/canbus_vehicle/fortuna/proto/fortuna.pb.h"
+
 
 namespace apollo {
 namespace perception {
@@ -52,7 +51,7 @@ bool FortunaRadarDetectionComponent::Init() {
   return true;
 }
 
-bool FortunaRadarDetectionComponent::Proc(const std::shared_ptr<ChassisDetail>& message) {
+bool FortunaRadarDetectionComponent::Proc(const std::shared_ptr<Fortuna>& message) {
   //!Todo add header to chassis_detail?
   AINFO << "Enter fortuna radar process node at current timestamp " << Clock::NowInSeconds();
   std::shared_ptr<SensorFrameMessage> out_message(new (std::nothrow) SensorFrameMessage);
@@ -65,7 +64,7 @@ bool FortunaRadarDetectionComponent::Proc(const std::shared_ptr<ChassisDetail>& 
 }
 
 bool FortunaRadarDetectionComponent::InternalProc(
-    const std::shared_ptr<ChassisDetail>& in_message,
+    const std::shared_ptr<Fortuna>& in_message,
     std::shared_ptr<SensorFrameMessage> out_message) {
   
   double chassis_detail_time;
@@ -250,42 +249,40 @@ bool FortunaRadarDetectionComponent::GetLocalizationAndTransform(
 
 //! Gather all radar data from Chassis Detail Msg and store it in raw_radar_detections_
 bool FortunaRadarDetectionComponent::GetRawRadarData(
-  const std::shared_ptr<ChassisDetail>& in_message,
+  const std::shared_ptr<Fortuna>& in_message,
   const double& chassis_detail_time) {
       
   raw_radar_detections_.clear();
 
-  if (in_message->has_fortuna()) {
-    if(in_message->mutable_fortuna()->has_front_object_1()) {
-      ProcessFrontObject(in_message->mutable_fortuna()->mutable_front_object_1());
-    }
-    if(in_message->mutable_fortuna()->has_front_object_2()) {
-      ProcessFrontObject(in_message->mutable_fortuna()->mutable_front_object_2());
-    }
-    if(in_message->mutable_fortuna()->has_front_object_3()) {
-      ProcessFrontObject(in_message->mutable_fortuna()->mutable_front_object_3());
-    }
-    if(in_message->mutable_fortuna()->has_front_object_4()) {
-      ProcessFrontObject(in_message->mutable_fortuna()->mutable_front_object_4());
-    }
-    if(in_message->mutable_fortuna()->has_rear_object_1()) {
-      ProcessRearObject(in_message->mutable_fortuna()->mutable_rear_object_1());
-    }
-    if(in_message->mutable_fortuna()->has_rear_object_2()) {
-      ProcessRearObject(in_message->mutable_fortuna()->mutable_rear_object_2());
-    }
-    if(in_message->mutable_fortuna()->has_rear_object_3()) {
-      ProcessRearObject(in_message->mutable_fortuna()->mutable_rear_object_3());
-    }
-    if(in_message->mutable_fortuna()->has_rear_object_4()) {
-      ProcessRearObject(in_message->mutable_fortuna()->mutable_rear_object_4());
-    }
-    if(in_message->mutable_fortuna()->has_rear_object_5()) {
-      ProcessRearObject(in_message->mutable_fortuna()->mutable_rear_object_5());
-    }
-    if(in_message->mutable_fortuna()->has_rear_object_6()) {
-      ProcessRearObject(in_message->mutable_fortuna()->mutable_rear_object_6());
-    }
+  if(in_message->has_front_object_1()) {
+    ProcessFrontObject(in_message->mutable_front_object_1());
+  }
+  if(in_message->has_front_object_2()) {
+    ProcessFrontObject(in_message->mutable_front_object_2());
+  }
+  if(in_message->has_front_object_3()) {
+    ProcessFrontObject(in_message->mutable_front_object_3());
+  }
+  if(in_message->has_front_object_4()) {
+    ProcessFrontObject(in_message->mutable_front_object_4());
+  }
+  if(in_message->has_rear_object_1()) {
+    ProcessRearObject(in_message->mutable_rear_object_1());
+  }
+  if(in_message->has_rear_object_2()) {
+    ProcessRearObject(in_message->mutable_rear_object_2());
+  }
+  if(in_message->has_rear_object_3()) {
+    ProcessRearObject(in_message->mutable_rear_object_3());
+  }
+  if(in_message->has_rear_object_4()) {
+    ProcessRearObject(in_message->mutable_rear_object_4());
+  }
+  if(in_message->has_rear_object_5()) {
+    ProcessRearObject(in_message->mutable_rear_object_5());
+  }
+  if(in_message->has_rear_object_6()) {
+    ProcessRearObject(in_message->mutable_rear_object_6());
   }
   
   // Debug outputs

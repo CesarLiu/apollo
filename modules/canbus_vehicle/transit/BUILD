@@ -56,6 +56,7 @@ cc_library(
         "//modules/common_msgs/basic_msgs:vehicle_signal_cc_proto",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/common:canbus_common",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
     ],
 )
 

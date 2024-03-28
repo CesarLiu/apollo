@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus_vehicle/fortuna/proto/fortuna.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -24,12 +24,12 @@ namespace canbus {
 namespace fortuna {
 
 class FrontObject1rpt0x31 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+                           ::apollo::canbus::Fortuna> {
  public:
   static const int32_t ID;
   FrontObject1rpt0x31();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+             Fortuna* chassis) const override;
 
  private:
   // config detail: {'description': 'checksum', 'offset': 0.0,

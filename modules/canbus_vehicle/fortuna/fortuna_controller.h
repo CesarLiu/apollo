@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 fortiss GmbH
+ * Copyright 2024 fortiss GmbH. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,17 +30,11 @@
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus_vehicle/fortuna/proto/fortuna.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-
-//#include "modules/canbus_vehicle/lincoln/protocol/brake_60.h"
-//#include "modules/canbus_vehicle/lincoln/protocol/gear_66.h"
-//#include "modules/canbus_vehicle/lincoln/protocol/steering_64.h"
-//#include "modules/canbus_vehicle/lincoln/protocol/throttle_62.h"
-//#include "modules/canbus_vehicle/lincoln/protocol/turnsignal_68.h"
-#include "modules/canbus/vehicle/vehicle_controller.h"
 
 /**
  * @namespace apollo::canbus::fortuna
@@ -55,16 +49,19 @@ namespace fortuna {
  *
  * @brief this class implements the vehicle controller for fortuna vehicle.
  */
-class FortunaController final : public VehicleController {
+class FortunaController final : public VehicleController<::apollo::canbus::Fortuna> {
  public:
+  FortunaController() {}
+
+  virtual ~FortunaController();
   /**
    * @brief initialize the fortuna vehicle controller.
    * @return init error_code
    */
-  common::ErrorCode Init(
-      const VehicleParameter &params,
-      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail> *const message_manager)
+  ::apollo::common::ErrorCode Init(
+      const VehicleParameter& params,
+      CanSender<::apollo::canbus::Fortuna>* const can_sender,
+      MessageManager<::apollo::canbus::Fortuna>* const message_manager)
       override;
 
   /**
@@ -91,10 +88,10 @@ class FortunaController final : public VehicleController {
  private:
   // main logical function for operation the car enter or exit the auto driving
   void Emergency() override;
-  common::ErrorCode EnableAutoMode() override;
-  common::ErrorCode DisableAutoMode() override;
-  common::ErrorCode EnableSteeringOnlyMode() override;
-  common::ErrorCode EnableSpeedOnlyMode() override;
+  ::apollo::common::ErrorCode EnableAutoMode() override;
+  ::apollo::common::ErrorCode DisableAutoMode() override;
+  ::apollo::common::ErrorCode EnableSteeringOnlyMode() override;
+  ::apollo::common::ErrorCode EnableSpeedOnlyMode() override;
 
   // NEUTRAL, REVERSE, DRIVE
   void Gear(Chassis::GearPosition state) override;
@@ -122,14 +119,19 @@ class FortunaController final : public VehicleController {
   void Steer(double angle, double angle_spd) override;
 
   // set Electrical Park Brake
-  void SetEpbBreak(const control::ControlCommand &command) override;
-  void SetBeam(const control::ControlCommand &command) override;
-  void SetHorn(const control::ControlCommand &command) override;
-  void SetTurningSignal(const control::ControlCommand &command) override;
+  void SetEpbBreak(const ::apollo::control::ControlCommand& command) override;
+  void SetBeam(const ::apollo::control::ControlCommand& command) override;
+  void SetHorn(const ::apollo::control::ControlCommand& command) override;
+  void SetTurningSignal(const ::apollo::control::ControlCommand& command) override;
   
+  // response vid
+  bool VerifyID() override;
   void ResetProtocol();
   bool CheckChassisError();
-  bool CheckSafetyError(const canbus::ChassisDetail &chassis);
+  bool CheckSafetyError(const canbus::Fortuna& chassis);
+  bool CheckVin();
+  void GetVin();
+  void ResetVin();
 
  private:
   void SecurityDogThreadFunc();
@@ -137,7 +139,7 @@ class FortunaController final : public VehicleController {
   void set_chassis_error_mask(const int32_t mask);
   int32_t chassis_error_mask();
   Chassis::ErrorCode chassis_error_code();
-  void set_chassis_error_code(const Chassis::ErrorCode &error_code);
+  void set_chassis_error_code(const Chassis::ErrorCode& error_code);
 
  private:
   // control protocol
@@ -160,18 +162,6 @@ class FortunaController final : public VehicleController {
   bool received_vin_ = false;
 
   canbus::Chassis::GearPosition gear_tmp_;
-/*
-  virtual void Gear(Chassis::GearPosition state) {}
-  virtual void Brake(double acceleration) {}
-  virtual void Throttle(double throttle) {}
-  virtual void Acceleration(double acc) {}
-  virtual void Steer(double angle)  {}
-  virtual void Steer(double angle, double angle_spd)  {}
-  virtual void SetEpbBreak(const control::ControlCommand &command) {}
-  virtual void SetBeam(const control::ControlCommand &command) {}
-  virtual void SetHorn(const control::ControlCommand &command) {}
-  virtual void SetTurningSignal(const control::ControlCommand &command) {}
-*/
 };
 
 }  // namespace fortuna

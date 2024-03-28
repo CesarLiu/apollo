@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -40,6 +41,7 @@ cc_library(
         "//modules/canbus/proto:canbus_conf_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "//modules/canbus_vehicle/fortuna/proto:fortuna_cc_proto",
     ],
 )
 

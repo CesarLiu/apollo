@@ -69,8 +69,8 @@ cc_library(
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus_vehicle/fortuna/protocol:canbus_fortuna_protocol",
         "//modules/common_msgs/basic_msgs:error_code_cc_proto",
-        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
         "//modules/common/kv_db",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
     ],
 )
 
@@ -82,7 +82,7 @@ cc_test(
    ],
    data = ["//modules/canbus:test_data"],
    deps = [
-       "fortuna_controller",
+       ":fortuna_controller",
        "@com_google_googletest//:gtest_main",
    ],
 )

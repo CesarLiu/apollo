@@ -293,7 +293,7 @@ ErrorCode VehicleController<SensorType>::Update(
   // }
   // currently, we do not have pad msgs or any other msg to activate the full autonomy.
   // set to complete autonomy with the control msg present
-  mode = Chassis::COMPLETE_AUTO_DRIVE;
+  Chassis::DrivingMode mode = Chassis::COMPLETE_AUTO_DRIVE;
   auto error_code = SetDrivingMode(mode);
   if (error_code != ErrorCode::OK) {
     AERROR << "Failed to set driving mode.";

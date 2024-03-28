@@ -31,7 +31,7 @@ Motionrpt0x01::Motionrpt0x01() {}
 const int32_t Motionrpt0x01::ID = 0x01;
 
 void Motionrpt0x01::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis_detail) const {
+                           Fortuna* chassis_detail) const {
   // apollo.canbus.chassis.speed_mps will be set via
   // apollo.canbus.chasssis_detail.vehicle_spd
   // fortuna canbus has vehicle speed in km/h so

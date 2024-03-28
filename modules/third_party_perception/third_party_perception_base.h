@@ -73,12 +73,6 @@ class ThirdPartyPerception {
       localization_reader_ = nullptr;
   std::shared_ptr<apollo::cyber::Reader<apollo::canbus::Chassis>>
       chassis_reader_ = nullptr;
-  std::shared_ptr<apollo::cyber::Node> node_ = nullptr;
-  std::shared_ptr<
-      apollo::cyber::Reader<apollo::localization::LocalizationEstimate>>
-      localization_reader_ = nullptr;
-  std::shared_ptr<apollo::cyber::Reader<apollo::canbus::Chassis>>
-      chassis_reader_ = nullptr;
 };
 
 }  // namespace third_party_perception

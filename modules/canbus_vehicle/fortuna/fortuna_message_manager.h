@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 fortiss GmbH
+ * Copyright 2024 fortiss GmbH. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus_vehicle/fortuna/proto/fortuna.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 /**
@@ -40,7 +40,7 @@ using ::apollo::drivers::canbus::MessageManager;
  * @brief implementation of MessageManager for fortuna vehicle
  */
 class FortunaMessageManager
-    : public MessageManager<::apollo::canbus::ChassisDetail> {
+    : public MessageManager<::apollo::canbus::Fortuna> {
  public:
   /**
    * @brief construct a fortuna message manager. protocol data for send and

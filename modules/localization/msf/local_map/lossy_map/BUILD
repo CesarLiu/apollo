@@ -12,11 +12,6 @@ cc_library(
         "lossy_map_pool_2d.cc",
     ],
     hdrs = glob(["*.h"]),
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
     deps = [
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/common/util:compression",

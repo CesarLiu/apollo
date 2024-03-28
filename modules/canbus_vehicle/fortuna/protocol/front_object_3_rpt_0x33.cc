@@ -31,16 +31,16 @@ FrontObject3rpt0x33::FrontObject3rpt0x33() {}
 const int32_t FrontObject3rpt0x33::ID = 0x33;
 
 void FrontObject3rpt0x33::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis_detail) const {
-    chassis_detail->mutable_fortuna()->mutable_front_object_3()->set_rel_velocity_x(rel_velocity_x(bytes, length));                           
-    chassis_detail->mutable_fortuna()->mutable_front_object_3()->set_rel_pos_y(rel_pos_y(bytes, length));                           
-    chassis_detail->mutable_fortuna()->mutable_front_object_3()->set_rel_pos_x(rel_pos_x(bytes, length));                           
-    chassis_detail->mutable_fortuna()->mutable_front_object_3()->set_id(id(bytes, length));                           
+                           Fortuna* chassis_detail) const {
+    chassis_detail->mutable_front_object_3()->set_rel_velocity_x(rel_velocity_x(bytes, length));                           
+    chassis_detail->mutable_front_object_3()->set_rel_pos_y(rel_pos_y(bytes, length));                           
+    chassis_detail->mutable_front_object_3()->set_rel_pos_x(rel_pos_x(bytes, length));                           
+    chassis_detail->mutable_front_object_3()->set_id(id(bytes, length));                           
     if(fused_state(bytes, length)){
-        chassis_detail->mutable_fortuna()->mutable_front_object_3()->set_fused_state(Front_object_3_Fused_stateType_OBJECT_FUSED);                           
+        chassis_detail->mutable_front_object_3()->set_fused_state(Front_object_3_Fused_stateType_OBJECT_FUSED);                           
     }
     else{
-        chassis_detail->mutable_fortuna()->mutable_front_object_3()->set_fused_state(Front_object_3_Fused_stateType_NOT_FUSED);
+        chassis_detail->mutable_front_object_3()->set_fused_state(Front_object_3_Fused_stateType_NOT_FUSED);
     }
     
 }

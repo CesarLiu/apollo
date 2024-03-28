@@ -31,7 +31,7 @@ Powertrain1rpt0x04::Powertrain1rpt0x04() {}
 const int32_t Powertrain1rpt0x04::ID = 0x04;
 
 void Powertrain1rpt0x04::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis_detail) const {
+                           Fortuna* chassis_detail) const {
 
   // use this to set apollo.canbus.chassis.gear_location 
   // via apollo.canbus.chassis_detail.gear.gear_state                          

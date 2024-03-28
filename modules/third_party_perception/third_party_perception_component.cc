@@ -58,7 +58,6 @@ bool ThirdPartyPerceptionComponent::Init() {
 bool ThirdPartyPerceptionComponent::Proc() {
   auto response = std::make_shared<apollo::perception::PerceptionObstacles>();
   if (!perception_->Process(response.get())) {
-  if (!perception_->Process(response.get())) {
     return false;
   }
   writer_->Write(response);

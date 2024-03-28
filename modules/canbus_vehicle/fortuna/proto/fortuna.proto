@@ -2,6 +2,47 @@ syntax = "proto2";
 
 package apollo.canbus;
 
+import "modules/common_msgs/basic_msgs/vehicle_id.proto";
+import "modules/common_msgs/chassis_msgs/chassis.proto";
+import "modules/canbus_vehicle/lincoln/proto/lincoln.proto";
+
+
+message Fortuna {
+  enum Type {
+    QIRUI_EQ_15 = 0;
+    CHANGAN_RUICHENG = 1;
+  }
+  optional Type car_type = 1;                          // car type
+  optional BasicInfo basic = 2;                        // basic info
+  optional Safety safety = 3;                          // safety
+  optional Gear gear = 4;                              // gear
+  optional Ems ems = 5;                                // engine manager system
+  optional Esp esp = 6;                                // Electronic Stability Program
+  optional Gas gas = 7;                                // gas pedal
+  optional Epb epb = 8;                                // Electronic parking brake
+  optional Brake brake = 9;                            // brake pedal
+  optional Deceleration deceleration = 10;             // deceleration
+  optional VehicleSpd vehicle_spd = 11;                // vehicle speed
+  optional Eps eps = 12;                               // Electronic Power Steering
+  optional Light light = 13;                           // Light
+  optional Battery battery = 14;                       // Battery info
+  optional CheckResponseSignal check_response = 15;
+  optional Surround surround = 17;                     // Surround information
+  // Reserve fields for other vehicles
+   optional double timestamp = 89;                      // timestamp
+  optional Front_object_1 front_object_1 = 90; // report message
+  optional Front_object_2 front_object_2 = 91; // report message
+  optional Front_object_3 front_object_3 = 92; // report message
+  optional Front_object_4 front_object_4 = 93; // report message
+  optional Rear_object_1 rear_object_1 = 94; //report message
+  optional Rear_object_2 rear_object_2 = 95; //report message
+  optional Rear_object_3 rear_object_3 = 96; //report message
+  optional Rear_object_4 rear_object_4 = 97; //report message
+  optional Rear_object_5 rear_object_5 = 98; //report message
+  optional Rear_object_6 rear_object_6 = 99; //report message
+  optional Steering steering = 100; // report message
+  optional apollo.common.VehicleID vehicle_id = 101;
+}
 
 //Sensor data messages
 
@@ -172,16 +213,3 @@ message Steering {
 }
 
 
-message Fortuna{
-    optional Front_object_1 front_object_1 = 1; // report message
-    optional Front_object_2 front_object_2 = 2; // report message
-    optional Front_object_3 front_object_3 = 3; // report message
-    optional Front_object_4 front_object_4 = 4; // report message
-    optional Rear_object_1 rear_object_1 = 5; //report message
-    optional Rear_object_2 rear_object_2 = 6; //report message
-    optional Rear_object_3 rear_object_3 = 7; //report message
-    optional Rear_object_4 rear_object_4 = 8; //report message
-    optional Rear_object_5 rear_object_5 = 9; //report message
-    optional Rear_object_6 rear_object_6 = 10; //report message
-    optional Steering steering = 11; // report message
-}
