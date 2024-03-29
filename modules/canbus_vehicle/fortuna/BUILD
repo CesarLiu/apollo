@@ -1,144 +1,97 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
 
-cc_library(
-    name = "fortuna_vehicle_factory",
-    srcs = [
-        "fortuna_vehicle_factory.cc",
-    ],
-    hdrs = [
-        "fortuna_vehicle_factory.h",
-    ],
-    alwayslink = True,
-    copts = CANBUS_COPTS,
-    deps = [
-        ":fortuna_controller",
-        ":fortuna_message_manager",
-        "//modules/canbus/common:canbus_gflags",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/common/status",
-        "//modules/canbus/vehicle:abstract_vehicle_factory",
-        "//modules/drivers/canbus:sensor_canbus_lib",
-    ],
-)
-
-cc_binary(
-    name = "libfortuna_vehicle_factory_lib.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":fortuna_vehicle_factory"],
-)
-
-cc_library(
-    name = "fortuna_message_manager",
-    srcs = [
-        "fortuna_message_manager.cc",
-    ],
-    hdrs = [
-        "fortuna_message_manager.h",
-    ],
-    copts = CANBUS_COPTS,
-    deps = [
-        "//modules/canbus/proto:canbus_conf_cc_proto",
-        "//modules/canbus_vehicle/fortuna/proto:fortiss_hardware_status_cc_proto",
-        "//modules/canbus_vehicle/fortuna/protocol:canbus_fortuna_protocol",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",
-    ],
-)
-
-cc_library(
-    name = "fortuna_controller",
+apollo_cc_library(
+    name = "apollo_canbus_vehicle_fortuna",
     srcs = [
         "fortuna_controller.cc",
+        "fortuna_message_manager.cc",
+        "fortuna_vehicle_factory.cc",
+        "protocol/assistance_2_rpt_0xe.cc",
+        "protocol/motion_rpt_0x01.cc",
+        "protocol/powertrain_1_rpt_0x04.cc",
+        "protocol/front_object_1_rpt_0x31.cc",
+        "protocol/front_object_2_rpt_0x32.cc",
+        "protocol/front_object_3_rpt_0x33.cc",
+        "protocol/front_object_4_rpt_0x34.cc",
+        "protocol/rear_object_1_rpt_0x41.cc",
+        "protocol/rear_object_2_rpt_0x42.cc",
+        "protocol/rear_object_3_rpt_0x43.cc",
+        "protocol/rear_object_4_rpt_0x44.cc",
+        "protocol/rear_object_5_rpt_0x45.cc",
+        "protocol/rear_object_6_rpt_0x46.cc",
+        "protocol/steering_rpt_0x02.cc",
     ],
     hdrs = [
         "fortuna_controller.h",
+        "fortuna_message_manager.h",
+        "fortuna_vehicle_factory.h",
+        "protocol/assistance_2_rpt_0xe.h",
+        "protocol/motion_rpt_0x01.h",
+        "protocol/powertrain_1_rpt_0x04.h",
+        "protocol/front_object_1_rpt_0x31.h",
+        "protocol/front_object_2_rpt_0x32.h",
+        "protocol/front_object_3_rpt_0x33.h",
+        "protocol/front_object_4_rpt_0x34.h",
+        "protocol/rear_object_1_rpt_0x41.h",
+        "protocol/rear_object_2_rpt_0x42.h",
+        "protocol/rear_object_3_rpt_0x43.h",
+        "protocol/rear_object_4_rpt_0x44.h",
+        "protocol/rear_object_5_rpt_0x45.h",
+        "protocol/rear_object_6_rpt_0x46.h",
+        "protocol/steering_rpt_0x02.h",
     ],
-    copts = CANBUS_COPTS,
     deps = [
-        ":fortuna_message_manager",
-        "//modules/canbus/proto:canbus_conf_cc_proto",
-        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
-        "//modules/canbus/proto:vehicle_parameter_cc_proto",
-        "//modules/canbus/vehicle:vehicle_controller_base",
-        "//modules/canbus_vehicle/fortuna/protocol:canbus_fortuna_protocol",
-        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/canbus:apollo_canbus",
+        "//modules/canbus_vehicle/fortuna/proto:fortuna_cc_proto",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/kv_db",
-        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
+        "//modules/common/status",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
+        "//modules/drivers/canbus:apollo_drivers_canbus",
+        "@com_google_googletest//:gtest",
     ],
 )
 
-cc_test(
-   name = "fortuna_controller_test",
-   size = "small",
-   srcs = [
-       "fortuna_controller_test.cc",
-   ],
-   data = ["//modules/canbus:test_data"],
-   deps = [
-       ":fortuna_controller",
-       "@com_google_googletest//:gtest_main",
-   ],
+apollo_component(
+    name = "libfortuna_vehicle_factory_lib.so",
+    deps = [":apollo_canbus_vehicle_fortuna"],
 )
 
-# cc_test(
+apollo_cc_test(
+    name = "fortuna_controller_test",
+    size = "small",
+    srcs = ["fortuna_controller_test.cc"],
+    data = ["//modules/canbus:test_data"],
+    deps = [
+        ":apollo_canbus_vehicle_fortuna",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+# apollo_cc_test(
 #     name = "fortuna_message_manager_test",
 #     size = "small",
-#     srcs = [
-#         "fortuna_message_manager_test.cc",
-#     ],
+#     srcs = ["fortuna_message_manager_test.cc"],
 #     deps = [
-#         "//modules/canbus_vehicle/fortuna:fortuna_message_manager",
-#         "@gtest//:main",
+#         ":apollo_canbus_vehicle_fortuna",
+#         "@com_google_googletest//:gtest_main",
 #     ],
 # )
 
-cc_test(
-   name = "fortuna_vehicle_factory_test",
-   size = "small",
-   srcs = ["fortuna_vehicle_factory_test.cc"],
-   deps = [
-       ":fortuna_vehicle_factory",
-       "@com_google_googletest//:gtest_main",
-   ],
-)
-install(
-    name = "install",
-    library_dest = "canbus-vehicle-fortuna/lib",
-    data_dest = "canbus-vehicle-fortuna",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":canbus-vehicle-fortuna.BUILD",
-    ],
-    targets = [
-        ":libfortuna_vehicle_factory_lib.so",
-    ],
+apollo_cc_test(
+    name = "fortuna_vehicle_factory_test",
+    size = "small",
+    srcs = ["fortuna_vehicle_factory_test.cc"],
+    data = ["//modules/canbus:test_data"],
+    linkstatic = True,
     deps = [
-        ":pb_fortuna",
-        ":pb_hdrs",
-    ],
-)
-
-install(
-    name = "pb_hdrs",
-    data_dest = "canbus-vehicle-fortuna/include",
-    data = [
-        "//modules/canbus_vehicle/fortuna/proto:fortiss_hardware_status_cc_proto",
-    ],
-)
-
-install_files(
-    name = "pb_fortuna",
-    dest = "canbus-vehicle-fortuna",
-    files = [
-        "//modules/canbus_vehicle/fortuna/proto:fortiss_hardware_status_py_pb2",
+        ":apollo_canbus_vehicle_fortuna",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -149,25 +102,7 @@ filegroup(
     ]),
 )
 
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_fortuna_src",
-        ":install_fortuna_hdrs"
-    ],
-)
 
-install_src_files(
-    name = "install_fortuna_src",
-    src_dir = ["."],
-    dest = "canbus-vehicle-fortuna/src",
-    filter = "*",
-)
+apollo_package()
 
-install_src_files(
-    name = "install_fortuna_hdrs",
-    src_dir = ["."],
-    dest = "canbus-vehicle-fortuna/include",
-    filter = "*.h",
-)
 cpplint()

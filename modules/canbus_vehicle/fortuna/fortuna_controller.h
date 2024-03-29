@@ -120,9 +120,11 @@ class FortunaController final : public VehicleController<::apollo::canbus::Fortu
 
   // set Electrical Park Brake
   void SetEpbBreak(const ::apollo::control::ControlCommand& command) override;
-  void SetBeam(const ::apollo::control::ControlCommand& command) override;
-  void SetHorn(const ::apollo::control::ControlCommand& command) override;
-  void SetTurningSignal(const ::apollo::control::ControlCommand& command) override;
+  common::ErrorCode HandleCustomOperation(
+      const external_command::ChassisCommand &command) override;
+  void SetBeam(const common::VehicleSignal& command) override;
+  void SetHorn(const common::VehicleSignal& command) override;
+  void SetTurningSignal(const common::VehicleSignal& command) override;
   
   // response vid
   bool VerifyID() override;

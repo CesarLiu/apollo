@@ -101,30 +101,4 @@ grpc_deps()
 load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 
 grpc_extra_deps()
-
-################# Start Bark Integration ########################
-
-## bark 
-#new_local_repository(
-#    name = "bark",
-#    build_file = "third_party/bark.BUILD",
-#    path = "/apollo/bark/include",
-#)
-
-new_local_repository(
-    name = "miqp_planner",
-    build_file = "miqp/miqp.BUILD",
-    path = "/apollo/miqp",
-)
-
-new_local_repository(
-    name = "cplex",
-    path = "/apollo/cplex/opl",
-    build_file = "cplex/cplex.BUILD",
-    )
-
-new_local_repository(
-    name = "nlopt",
-    path = "/usr/local",
-    build_file = "third_party/nlopt.BUILD",
-)
+#######################################APOLLO#######################################

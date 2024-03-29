@@ -405,6 +405,8 @@ DEFINE_double(replan_lateral_distance_threshold, 0.5,
 DEFINE_double(replan_longitudinal_distance_threshold, 2.5,
               "The longitudinal distance threshold of replan");
 DEFINE_double(replan_time_threshold, 7.0, "The time threshold of replan");
+DEFINE_double(replan_standstill_velocity_threshold, 0.3,
+              "The velocity threshold (standstill) of replan");
 DEFINE_double(trajectory_check_collision_time_step, 1.0,
               "checks collision time step for trajectory");
 
@@ -436,3 +438,8 @@ DEFINE_double(
 DEFINE_double(
     referfece_line_max_backward_heading_diff, 3.1415926536 / 6,
     "max angle difference between the backward reference line and ego heading");
+
+DEFINE_double(trajectory_stitching_advance_time, 0.0,
+              "Zero starts the trajectory to be planned exactly at the next "
+              "(expected) position of the car, a value greater than zero "
+              "starts x seconds in advance on the old trajectory");

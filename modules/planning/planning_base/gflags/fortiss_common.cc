@@ -15,10 +15,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/common/fortiss_common.h"
+#include "modules/planning/planning_base/gflags/fortiss_common.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/planning/common/smoothers/trajectory_smoother_nlopt.h"
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/planning_base/common/smoothers/trajectory_smoother_nlopt.h"
+#include "modules/planning/planning_base/common/trajectory/discretized_trajectory.h"
 
 namespace apollo {
 namespace planning {

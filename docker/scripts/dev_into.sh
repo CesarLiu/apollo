@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 DOCKER_USER="${USER}"
-DEV_CONTAINER_PREFIX='apollo_latest_'
+DEV_CONTAINER_PREFIX='apollo_dev9_'
 DEV_CONTAINER="${DEV_CONTAINER_PREFIX}${USER}"
 
 function parse_arguments {

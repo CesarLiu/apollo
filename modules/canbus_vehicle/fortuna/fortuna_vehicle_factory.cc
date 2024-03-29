@@ -136,6 +136,15 @@ void FortunaVehicleFactory::UpdateCommand(
   can_sender_.Update();
 }
 
+void FortunaVehicleFactory::UpdateCommand(
+    const apollo::external_command::ChassisCommand *chassis_command) {
+  if (vehicle_controller_->Update(*chassis_command) != ErrorCode::OK) {
+    AERROR << "Failed to process callback function OnControlCommand because "
+              "vehicle_controller_->Update error.";
+    return;
+  }
+  can_sender_.Update();
+}
 Chassis FortunaVehicleFactory::publish_chassis() {
   Chassis chassis = vehicle_controller_->chassis();
   ADEBUG << chassis.ShortDebugString();

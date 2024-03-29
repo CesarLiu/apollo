@@ -66,7 +66,7 @@ class OnLanePlanning : public PlanningBase {
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
       ADCTrajectory* const trajectory) override;
 
-  bool PublishTrajectory() override { return publish_trajectory_; }
+//   bool PublishTrajectory() override { return publish_trajectory_; }
 
  private:
   common::Status InitFrame(const uint32_t sequence_num,

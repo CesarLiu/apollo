@@ -40,22 +40,6 @@ DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
 DECLARE_string(smoother_config_filename);
 DECLARE_bool(enable_smooth_reference_line);
-<<<<<<< HEAD:modules/planning/common/planning_gflags.h
-
-DECLARE_bool(prioritize_change_lane);
-DECLARE_double(change_lane_min_length);
-
-DECLARE_bool(publish_estop);
-DECLARE_bool(enable_trajectory_stitcher);
-
-// parameters for trajectory stitching and reinit planning starting point.
-DECLARE_double(replan_lateral_distance_threshold);
-DECLARE_double(replan_longitudinal_distance_threshold);
-DECLARE_double(replan_standstill_velocity_threshold);
-
-// parameter for reference line
-=======
->>>>>>> master:modules/planning/planning_base/gflags/planning_gflags.h
 DECLARE_bool(enable_reference_line_provider_thread);
 DECLARE_double(default_reference_line_width);
 DECLARE_double(smoothed_reference_line_max_diff);
@@ -208,7 +192,6 @@ DECLARE_bool(use_st_drivable_boundary);
 
 DECLARE_bool(use_front_axe_center_in_path_planning);
 
-<<<<<<< HEAD:modules/planning/common/planning_gflags.h
 DECLARE_double(trajectory_stitching_advance_time);
 
 DECLARE_bool(always_update_trajectory);
@@ -221,8 +204,6 @@ DECLARE_double(buffer_in_routing);
 
 DECLARE_double(buffer_out_routing);
 
-=======
->>>>>>> master:modules/planning/planning_base/gflags/planning_gflags.h
 // learning related
 DECLARE_bool(planning_offline_learning);
 DECLARE_string(planning_data_dir);
@@ -244,6 +225,7 @@ DECLARE_double(obstacle_lon_ignore_buffer);
 // parameters for trajectory stitching and reinit planning starting point.
 DECLARE_double(replan_lateral_distance_threshold);
 DECLARE_double(replan_longitudinal_distance_threshold);
+DECLARE_double(replan_standstill_velocity_threshold);
 
 DECLARE_double(replan_time_threshold);
 
@@ -261,3 +243,5 @@ DECLARE_double(near_stop_deceleration);
 
 DECLARE_double(referfece_line_max_forward_heading_diff);
 DECLARE_double(referfece_line_max_backward_heading_diff);
+
+DECLARE_double(trajectory_stitching_advance_time);

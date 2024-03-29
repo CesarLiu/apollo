@@ -79,7 +79,9 @@ class FortunaVehicleFactory : public AbstractVehicleFactory {
    */
   void UpdateCommand(
       const apollo::control::ControlCommand *control_command) override;
-
+      
+  void UpdateCommand(
+      const apollo::external_command::ChassisCommand *chassis_command) override;
   /**
    * @brief publish chassis messages
    */

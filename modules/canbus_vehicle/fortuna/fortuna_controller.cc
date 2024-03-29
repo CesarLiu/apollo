@@ -34,6 +34,7 @@ namespace fortuna {
 using ::apollo::common::ErrorCode;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
+using ::apollo::common::VehicleSignal;
 
 namespace {
 
@@ -656,30 +657,30 @@ void FortunaController::SetEpbBreak(const ControlCommand &command) {
   }
 }
 
-void FortunaController::SetBeam(const ControlCommand &command) {
-  if (command.signal().high_beam()) {
+void FortunaController::SetBeam(const VehicleSignal &command) {
+  if (command.high_beam()) {
     // None
-  } else if (command.signal().low_beam()) {
-    // None
-  } else {
-    // None
-  }
-}
-
-void FortunaController::SetHorn(const ControlCommand &command) {
-  if (command.signal().horn()) {
+  } else if (command.low_beam()) {
     // None
   } else {
     // None
   }
 }
 
-void FortunaController::SetTurningSignal(const ControlCommand &command) {
+void FortunaController::SetHorn(const VehicleSignal &command) {
+  if (command.horn()) {
+    // None
+  } else {
+    // None
+  }
+}
+
+void FortunaController::SetTurningSignal(const VehicleSignal &command) {
   // Set Turn Signal
   //A simple message in case Fortuna is used with not Manual mode
   AINFO << "Fortuna currently does not support setting turn signal";
   
-  /*auto signal = command.signal().turn_signal();
+  /*auto signal = command.turn_signal();
   if (signal == common::VehicleSignal::TURN_LEFT) {
     turnsignal_68_->set_turn_left();
   } else if (signal == common::VehicleSignal::TURN_RIGHT) {
@@ -720,7 +721,7 @@ bool FortunaController::CheckChassisError() {
       ((chassis_detail.eps().connector_fault()) << (++error_cnt));
 
   if (!chassis_detail.has_brake()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO brake."
+    AERROR_EVERY(100) << "Fortuna has NO brake."
                       << chassis_detail.DebugString();
     return false;
   }
@@ -742,7 +743,7 @@ bool FortunaController::CheckChassisError() {
       ((chassis_detail.brake().connector_fault()) << (++error_cnt));
 
   if (!chassis_detail.has_gas()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO gas."
+    AERROR_EVERY(100) << "Fortuna has NO gas."
                       << chassis_detail.DebugString();
     return false;
   }
@@ -762,7 +763,7 @@ bool FortunaController::CheckChassisError() {
       ((chassis_detail.gas().connector_fault()) << (++error_cnt));
 
   if (!chassis_detail.has_gear()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO gear."
+    AERROR_EVERY(100) << "Fortuna has NO gear."
                       << chassis_detail.DebugString();
     return false;
   }
@@ -972,6 +973,12 @@ bool FortunaController::CheckSafetyError(
     const ::apollo::canbus::Fortuna& chassis_detail) {
   return false;
 }
+
+ErrorCode FortunaController::HandleCustomOperation(
+    const external_command::ChassisCommand &command) {
+  return ErrorCode::OK;
+}
+
 }  // namespace fortuna
 }  // namespace canbus
 }  // namespace apollo
