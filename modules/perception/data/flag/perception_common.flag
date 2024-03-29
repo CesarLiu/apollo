@@ -58,6 +58,11 @@
 # default:
 --obs_sensor2novatel_tf2_frame_id=novatel
 
+# sensor to novatel child frame id.
+# type: string
+# default:
+--obs_sensor2novatel_tf2_child_frame_id=velodyne64
+
 # novatel to world frame id.
 # type: string
 # default:

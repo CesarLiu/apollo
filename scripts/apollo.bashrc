@@ -36,7 +36,7 @@ export APOLLO_DAG_PATH="${APOLLO_ROOT_DIR}"
 export APOLLO_LIB_PATH="${APOLLO_ROOT_DIR}/bazel-bin"
 export APOLLO_CONF_PATH="${APOLLO_ROOT_DIR}"
 export APOLLO_FLAG_PATH="${APOLLO_ROOT_DIR}"
-export APOLLO_MODEL_PATH="${APOLLO_ROOT_DIR}/modules/perception/data/models"
+export APOLLO_MODEL_PATH="${APOLLO_ROOT_DIR}/modules/perception/data/model"
 
 export APOLLO_DISTRIBUTION_HOME="${APOLLO_DISTRIBUTION_HOME:=/opt/apollo/neo}"
 export APOLLO_PLUGIN_INDEX_PATH="${APOLLO_DISTRIBUTION_HOME}/share/cyber_plugin_index"

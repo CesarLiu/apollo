@@ -213,3 +213,18 @@ Initial release of Apollo implements autonomous GPS waypoint following.
 
 ## Autonomous Driving Capabilities
 Vehicles with this version do **NOT** perceive obstacles in close promixity. Neither can they drive on public roads or areas without GPS signals.
+
+## Coordinate
+
+ camera_front_6mm
+ camera_front_12mm
+ velodyne64
+ novatel
+ velodyne64
+ world->novatel/localization
+
+## BUGS
+1. Failed to start Dreamview. Please check /apollo/nohup.out or /apollo/data/core for more information
+```
+curl http://localhost:8888
+```

@@ -1,7 +1,7 @@
 # cnnseg params
 
 info {
-  name: "cnnseg64"
+  name: "cnnseg64_caffe"
   version: ""
   dataset: "apollo"
   task_type: Detection3D

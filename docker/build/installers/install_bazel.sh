@@ -59,6 +59,7 @@ if [[ "$TARGET_ARCH" == "x86_64" ]]; then
 
 elif [[ "$TARGET_ARCH" == "aarch64" ]]; then
   BAZEL_VERSION="5.1.0"
+  BUILDTOOLS_VERSION="4.2.0"
   ARM64_BINARY="bazel-${BAZEL_VERSION}-linux-arm64"
   CHECKSUM="af2b09fc30123af7aee992eba285c61758c343480116ba76d880268e40d081a5"
   DOWNLOAD_LINK="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${ARM64_BINARY}"

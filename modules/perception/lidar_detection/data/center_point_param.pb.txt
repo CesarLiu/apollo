@@ -1,7 +1,7 @@
 # center point params
 
 info {
-  name: "center_point"
+  name: "center_point_paddle"
   version: ""
   dataset: "apollo"
   task_type: Detection3D
@@ -51,7 +51,7 @@ postprocess {
 }
 
 paddle_settings {
-  use_trt: false
+  use_trt: true
   trt_precision: 1
   trt_use_static: true
   use_calibration: true

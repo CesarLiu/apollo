@@ -17,8 +17,7 @@ def repo():
 
     http_archive(
         name = "centerpoint_infer_op-aarch64",
-        sha256 = "e7c933db4237399980c5217fa6a81dff622b00e3a23f0a1deb859743f7977fc1",
         strip_prefix = "centerpoint_infer_op",
-        urls = ["https://apollo-pkg-beta.bj.bcebos.com/archive/centerpoint_infer_op-linux-aarch64-1.0.0.tar.gz"],
+        url = "file:///opt/apollo/centerpoint_infer_op-aarch64.tar.gz",
     )
 

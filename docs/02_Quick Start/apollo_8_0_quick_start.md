@@ -429,7 +429,7 @@ mainboard -d /apollo/modules/perception/production/dag/dag_streaming_perception_
 1. Play the record: you need to mask out the perception channel data contained in the record with -k parameter.
 
 ```shell
-cyber_recorder play -f ./data/bag/sensor_rgb.record -k /perception/vehicle/obstacles /apollo/perception/obstacles /apollo/perception/traffic_light /apollo/perception
+cyber_recorder play -f ./data/bag/sensor_rgb.record -k /perception/vehicle/obstacles /apollo/perception/obstacles /apollo/perception/traffic_light /apollo/perception /tf_static
 ```
 
 2. Verify the detection result: click the LayerMenu in the left toolbar of DreamView and turn on Point Cloud in Perception.

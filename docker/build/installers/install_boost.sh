@@ -24,19 +24,19 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 if ldconfig -p | grep -q "libboost_system.so" ; then
     info "Found existing Boost installation. Reinstallation skipped."
-    exit 0
+    # exit 0
 fi
 
 # PreReq for Unicode support for Boost.Regex
 #    icu-devtools \
 #    libicu-dev
-apt_get_update_and_install \
-    liblzma-dev \
-    libbz2-dev \
-    libzstd-dev
+# apt_get_update_and_install \
+#     liblzma-dev \
+#     libbz2-dev \
+#     libzstd-dev
 
 # Ref: https://www.boost.org/
-VERSION="1_74_0"
+VERSION="1_65_1"
 
 PKG_NAME="boost_${VERSION}.tar.bz2"
 DOWNLOAD_LINK="https://boostorg.jfrog.io/artifactory/main/release/${VERSION//_/.}/source/boost_${VERSION}.tar.bz2"
