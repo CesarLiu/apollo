@@ -24,12 +24,15 @@
 
 #include "absl/strings/str_cat.h"
 
+#include "modules/drivers/canbus/sensor_gflags.h"
+
 namespace apollo {
 namespace drivers {
 namespace canbus {
 namespace can {
 
 #define CAN_ID_MASK 0x1FFFF800U  // can_filter mask
+#define CAN_STANDARD_MAX_ID 0x7FFU
 
 using apollo::common::ErrorCode;
 
@@ -81,14 +84,15 @@ ErrorCode SocketCanClientRaw::Start() {
 
   // // 1. for non virtual busses, set receive message_id filter, ie white list
   // if (interface_ != CANCardParameter::VIRTUAL) {
-  //   struct can_filter filter[2048];
-  //   for (int i = 0; i < 2048; ++i) {
-  //     filter[i].can_id = 0x000 + i;
-  //     filter[i].can_mask = CAN_SFF_MASK;
-  //   }
+  //   // set a scope for each EID instead of a single filter rule for each EID
+  //   struct can_filter filter[1];
+  //   // filter[0].can_mask = CAN_ID_MASK;
+  //   // all EID without filter
+  //   filter[0].can_id = 0x000;
+  //   filter[0].can_mask = 0x000;
 
   //   ret = setsockopt(dev_handler_, SOL_CAN_RAW, CAN_RAW_FILTER, &filter,
-  //                        sizeof(filter));
+  //                    sizeof(filter));
   //   if (ret < 0) {
   //     AERROR << "add receive msg id filter error code: " << ret;
   //     return ErrorCode::CAN_CLIENT_ERROR_BASE;
@@ -166,7 +170,12 @@ ErrorCode SocketCanClientRaw::Send(const std::vector<CanFrame> &frames,
              << CANBUS_MESSAGE_LENGTH << ").";
       return ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED;
     }
-    send_frames_[i].can_id = frames[i].id;
+    if (frames[i].id > CAN_STANDARD_MAX_ID) {
+      send_frames_[i].can_id = (frames[i].id & CAN_EFF_MASK) | CAN_EFF_FLAG;
+    } else {
+      send_frames_[i].can_id = (frames[i].id & CAN_SFF_MASK);
+    }
+    ADEBUG << "send can id is " << send_frames_[i].can_id;
     send_frames_[i].can_dlc = frames[i].len;
     std::memcpy(send_frames_[i].data, frames[i].data, frames[i].len);
 
@@ -205,15 +214,14 @@ ErrorCode SocketCanClientRaw::Receive(std::vector<CanFrame> *const frames,
       AERROR << "receive message failed, error code: " << ret;
       return ErrorCode::CAN_CLIENT_ERROR_BASE;
     }
-    //if (recv_frames_[i].can_dlc > CANBUS_MESSAGE_LENGTH ||
-    //    recv_frames_[i].can_dlc < 0) {
-    //  AERROR << "recv_frames_[" << i
-    //         << "].can_dlc = " << recv_frames_[i].can_dlc
-    //         << ", which is not equal to can message data length ("
-    //         << CANBUS_MESSAGE_LENGTH << ").";
-    //  return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
-    //}
-    cf.id = recv_frames_[i].can_id;
+    // if (recv_frames_[i].can_id > CAN_STANDARD_MAX_ID) {
+    //   cf.id = FLAGS_enable_can_err_check
+    //               ? recv_frames_[i].can_id & CAN_EFF_MASK | CAN_ERR_FLAG
+    //               : recv_frames_[i].can_id & CAN_EFF_MASK;
+    // } else {
+    //   cf.id = (recv_frames_[i].can_id & CAN_SFF_MASK);
+    // }
+    // ADEBUG << "Socket can receive can id is " << recv_frames_[i].can_id;
     cf.len = recv_frames_[i].can_dlc;
     std::memcpy(cf.data, recv_frames_[i].data, recv_frames_[i].can_dlc);
     frames->push_back(cf);
