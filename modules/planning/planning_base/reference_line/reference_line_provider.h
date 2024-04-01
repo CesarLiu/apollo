@@ -67,10 +67,17 @@ class ReferenceLineProvider {
       const ReferenceLineConfig* reference_line_config,
       const std::shared_ptr<relative_map::MapMsg>& relative_map = nullptr);
 
+  ReferenceLineProvider(
+      const common::VehicleStateProvider* vehicle_state_provider,
+      const hdmap::HDMap* base_map,
+      const std::shared_ptr<relative_map::MapMsg>& relative_map = nullptr);
+
   /**
    * @brief Default destructor.
    */
   ~ReferenceLineProvider();
+
+  bool UpdateRoutingResponse(const routing::RoutingResponse& routing);
 
   /**
    * @brief Update when new PlanningCommand is received.
@@ -193,6 +200,8 @@ class ReferenceLineProvider {
   planning::PlanningCommand planning_command_;
   bool has_planning_command_ = false;
   bool is_new_command_ = false;
+  routing::RoutingResponse routing_;
+  bool has_routing_ = false;
 
   std::mutex reference_lines_mutex_;
   std::list<ReferenceLine> reference_lines_;
