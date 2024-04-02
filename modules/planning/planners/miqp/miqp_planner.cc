@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright 2021 fortiss GmbH
- * Authors: Tobias Kessler, Klemens Esterle
+ * Copyright 2024 fortiss GmbH
+ * Authors: Tobias Kessler, Klemens Esterle, Xiangzhong Liu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  * @file
  **/
 
-#include "modules/planning/planner/miqp/miqp_planner.h"
+#include "modules/planning/planners/miqp/miqp_planner.h"
 
 #include <limits>
 #include <memory>
@@ -31,10 +31,10 @@
 #include "cyber/logger/logger_util.h"
 #include "modules/common/math/path_matcher.h"
 #include "cyber/time/time.h"
-#include "modules/planning/common/fortiss_common.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/constraint_checker/collision_checker.h"
-#include "modules/planning/constraint_checker/constraint_checker.h"
+#include "modules/planning/planning_base/gflags/fortiss_common.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
+#include "modules/planning/planners/lattice/behavior/collision_checker.h"
+#include "modules/planning/planning_base/math/constraint_checker/constraint_checker.h"
 
 namespace apollo {
 namespace planning {
@@ -67,7 +67,11 @@ using apollo::planning::fortiss::MapOffset;
 //   // logdir_ += time_pid_string;
 // }
 
-common::Status MiqpPlanner::Init(const PlanningConfig& config) {
+common::Status MiqpPlanner::Init(const std::shared_ptr<DependencyInjector>& injector,
+                         const std::string& config_path) {
+  Planner::Init(injector, config_path);
+  AINFO << "In MiqpPlanner::Init()";
+  LoadConfig<MiqpPlannerConfiguration>(config_path, &config_);
   MiqpPlannerSettings settings = DefaultSettings();
   planner_ = NewCMiqpPlannerSettings(settings);
   firstrun_ = true;                      // add car only in first run
@@ -84,16 +88,8 @@ common::Status MiqpPlanner::Init(const PlanningConfig& config) {
   strcpy(name_prefix_cstr, "miqp_planner_");
   ActivateDebugFileWriteCMiqpPlanner(planner_, logdir_cstr, name_prefix_cstr);
 
-  config_ = config;
-  if (!config_.has_miqp_planner_config()) {
-    AERROR << "Please provide miqp planner parameter file! " +
-                  config_.DebugString();
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "miqp planner parameters missing!");
-  } else {
-    AINFO << "MIQP Planner Configuration: "
-          << config_.miqp_planner_config().DebugString();
-  }
+  AINFO << "MIQP Planner Configuration: "
+          << config_.DebugString();
 
   return common::Status::OK();
 }
@@ -108,13 +104,13 @@ Status MiqpPlanner::PlanOnReferenceLine(
         << "############## MIQP Planner called at t = " << timestep;
   double current_time = timestep;
   const double start_time = timestep;
-  const MapOffset map_offset(config_.miqp_planner_config().pts_offset_x(),
-                             config_.miqp_planner_config().pts_offset_y());
+  const MapOffset map_offset(config_.pts_offset_x(),
+                             config_.pts_offset_y());
 
   double stop_dist;
   fortiss::PlannerState planner_status = fortiss::DeterminePlannerState(
       planning_init_point.v(), reference_line_info, stop_dist,
-      config_.miqp_planner_config().destination_distance_stop_threshold(),
+      config_.destination_distance_stop_threshold(),
       standstill_velocity_threshold_, minimum_valid_speed_planning_);
 
   if (planner_status == fortiss::PlannerState::STANDSTILL_TRAJECTORY) {
@@ -133,7 +129,7 @@ Status MiqpPlanner::PlanOnReferenceLine(
   std::vector<PathPoint> discrete_reference_line =
       fortiss::ToDiscretizedReferenceLine(
           reference_line_info, stop_dist,
-          config_.miqp_planner_config().cutoff_distance_reference_after_stop());
+          config_.cutoff_distance_reference_after_stop());
 
   // Reference line to raw c format
   const int ref_size =
@@ -142,9 +138,9 @@ Status MiqpPlanner::PlanOnReferenceLine(
   double ref[ref_size * 2];
   for (int i = 0; i < ref_size; ++i) {
     PathPoint refPoint = discrete_reference_line.at(i);
-    ref[2 * i] = refPoint.x() - config_.miqp_planner_config().pts_offset_x();
+    ref[2 * i] = refPoint.x() - config_.pts_offset_x();
     ref[2 * i + 1] =
-        refPoint.y() - config_.miqp_planner_config().pts_offset_y();
+        refPoint.y() - config_.pts_offset_y();
   }
   AINFO << "ReferenceLine Time [s] = "
         << (Clock::NowInSeconds() - current_time);
@@ -152,7 +148,7 @@ Status MiqpPlanner::PlanOnReferenceLine(
 
   // Map
   fortiss::RoadBoundaries road_bounds;
-  if (config_.miqp_planner_config().use_environment_polygon()) {
+  if (config_.use_environment_polygon()) {
     current_time = Clock::NowInSeconds();
     road_bounds = fortiss::ToLeftAndRightBoundary(reference_line_info);
     const int poly_size = road_bounds.left.size() + road_bounds.right.size();
@@ -172,9 +168,9 @@ Status MiqpPlanner::PlanOnReferenceLine(
   double vDes;
   double deltaSDes;
   const double dist_start_slowdown =
-      config_.miqp_planner_config().distance_start_slowdown();
+      config_.distance_start_slowdown();
   const double dist_stop_before =
-      config_.miqp_planner_config().distance_stop_before();
+      config_.distance_stop_before();
   if ((stop_dist - dist_stop_before < dist_start_slowdown) &&
       (planner_status != fortiss::PlannerState::START_TRAJECTORY)) {
     track_ref_pos = false;  // only relevant for miqp
@@ -188,7 +184,7 @@ Status MiqpPlanner::PlanOnReferenceLine(
   } else {
     track_ref_pos = true;
     vDes = FLAGS_default_cruise_speed;
-    deltaSDes = config_.miqp_planner_config().delta_s_desired();
+    deltaSDes = config_.delta_s_desired();
   }
 
   // Add/update ego car
@@ -212,7 +208,7 @@ Status MiqpPlanner::PlanOnReferenceLine(
   }
 
   // Obstacles as obstacles
-  if (config_.miqp_planner_config().consider_obstacles()) {
+  if (config_.consider_obstacles()) {
     RemoveAllObstaclesCMiqpPlanner(planner_);
     bool success1 = ProcessStaticObstacles(frame->obstacles());
     bool success2 = ProcessDynamicObstacles(
@@ -254,15 +250,15 @@ Status MiqpPlanner::PlanOnReferenceLine(
     apollo_traj = RawCTrajectoryToApolloTrajectory(traj, size, true);
   }
 
-  if (config_.miqp_planner_config().minimum_percentage_valid_miqp_points() *
-          config_.miqp_planner_config().nr_steps() >
+  if (config_.minimum_percentage_valid_miqp_points() *
+          config_.nr_steps() >
       apollo_traj.size()) {
     AERROR << "Trajectory has too many invalid points, setting error state";
     return Status(ErrorCode::PLANNING_ERROR, "invalid points!");
   }
 
   // Check resulting trajectory for collision with obstacles
-  if (config_.miqp_planner_config().consider_obstacles()) {
+  if (config_.consider_obstacles()) {
     const auto& vehicle_config =
         common::VehicleConfigHelper::Instance()->GetConfig();
     const double ego_length = vehicle_config.vehicle_param().length();
@@ -279,7 +275,7 @@ Status MiqpPlanner::PlanOnReferenceLine(
   }
 
   // Check resulting trajectory for collision with environment
-  if (config_.miqp_planner_config().use_environment_polygon()) {
+  if (config_.use_environment_polygon()) {
     if (fortiss::EnvironmentCollision(road_bounds, apollo_traj)) {
       AERROR << "Planning success but collision with environment!";
     }
@@ -288,7 +284,7 @@ Status MiqpPlanner::PlanOnReferenceLine(
   // Planning success -> publish trajectory
   Status return_status;
   int subsampling = 3;
-  if (config_.miqp_planner_config().use_smoothing()) {
+  if (config_.use_smoothing()) {
     auto smoothed_apollo_trajectory = fortiss::SmoothTrajectory(
         apollo_traj, planning_init_point, logdir_.c_str(), map_offset, subsampling);
     if (smoothed_apollo_trajectory.first) {
@@ -318,17 +314,17 @@ DiscretizedTrajectory MiqpPlanner::RawCTrajectoryToApolloTrajectory(
     double traj[], int size, bool low_speed_check) {
   double s = 0.0f;
   double lastx =
-      traj[0 + TRAJECTORY_X_IDX] + config_.miqp_planner_config().pts_offset_x();
+      traj[0 + TRAJECTORY_X_IDX] + config_.pts_offset_x();
   double lasty =
-      traj[0 + TRAJECTORY_Y_IDX] + config_.miqp_planner_config().pts_offset_y();
+      traj[0 + TRAJECTORY_Y_IDX] + config_.pts_offset_y();
 
   DiscretizedTrajectory apollo_trajectory;
   for (int trajidx = 0; trajidx < size; ++trajidx) {
     const double time = traj[trajidx * TRAJECTORY_SIZE + TRAJECTORY_TIME_IDX];
     const double x = traj[trajidx * TRAJECTORY_SIZE + TRAJECTORY_X_IDX] +
-                     config_.miqp_planner_config().pts_offset_x();
+                     config_.pts_offset_x();
     const double y = traj[trajidx * TRAJECTORY_SIZE + TRAJECTORY_Y_IDX] +
-                     config_.miqp_planner_config().pts_offset_y();
+                     config_.pts_offset_y();
     const double vx = traj[trajidx * TRAJECTORY_SIZE + TRAJECTORY_VX_IDX];
     const double vy = traj[trajidx * TRAJECTORY_SIZE + TRAJECTORY_VY_IDX];
     const double ax = traj[trajidx * TRAJECTORY_SIZE + TRAJECTORY_AX_IDX];
@@ -398,12 +394,12 @@ void MiqpPlanner::ConvertToInitialStateSecondOrder(
   double kappa = planning_init_point.path_point().kappa();
   // cplex throws an exception if vel=0
   initial_state[0] = planning_init_point.path_point().x() -
-                     config_.miqp_planner_config().pts_offset_x();
+                     config_.pts_offset_x();
   initial_state[1] = vel * cos(theta);
   initial_state[2] =
       planning_init_point.a() * cos(theta) - pow(vel, 2) * kappa * sin(theta);
   initial_state[3] = planning_init_point.path_point().y() -
-                     config_.miqp_planner_config().pts_offset_y();
+                     config_.pts_offset_y();
   initial_state[4] = vel * sin(theta);
   initial_state[5] =
       planning_init_point.a() * sin(theta) + pow(vel, 2) * kappa * cos(theta);
@@ -416,7 +412,7 @@ void MiqpPlanner::ConvertToInitialStateSecondOrder(
 
 MiqpPlannerSettings MiqpPlanner::DefaultSettings() {
   MiqpPlannerSettings s = MiqpPlannerSettings();
-  auto& conf = config_.miqp_planner_config();
+  auto& conf = config_;
 
   if (conf.has_nr_regions()) {
     s.nr_regions = conf.nr_regions();
@@ -602,8 +598,8 @@ MiqpPlannerSettings MiqpPlanner::DefaultSettings() {
 
 bool MiqpPlanner::ProcessStaticObstacles(
     const std::vector<const Obstacle*>& obstacles) {
-  double ext_l = config_.miqp_planner_config().extension_length_static();
-  double ext_w = config_.miqp_planner_config().extension_width_static();
+  double ext_l = config_.extension_length_static();
+  double ext_w = config_.extension_width_static();
   bool is_soft = (ext_w > 0 || ext_l > 0) ? true : false;
 
   std::vector<Polygon2d> static_polygons;
@@ -615,11 +611,11 @@ bool MiqpPlanner::ProcessStaticObstacles(
       obst_box.LateralExtend(ext_w);
       const common::math::Polygon2d obst_poly = Polygon2d(obst_box);
 
-      if (config_.miqp_planner_config().merge_static_obstacles()) {
+      if (config_.merge_static_obstacles()) {
         for (auto it = static_polygons.begin(); it != static_polygons.end();
              it++) {
           double d = obst_poly.DistanceTo(*it);
-          if (d < config_.miqp_planner_config()
+          if (d < config_
                       .static_obstacle_distance_criteria()) {
             // merge polygons!
             std::vector<Vec2d> vertices = obst_poly.GetAllVertices();
@@ -680,7 +676,7 @@ bool MiqpPlanner::ProcessDynamicObstacles(
         common::math::Box2d box_i = obstacle->GetBoundingBox(point);
         AINFO << "idx: " << i << ", box: " << box_i.DebugString();
         box_i.LongitudinalExtend(
-            config_.miqp_planner_config().extension_length_dynamic());
+            config_.extension_length_dynamic());
         AINFO << "idx: " << i << ", extended box: " << box_i.DebugString();
         common::math::Polygon2d poly2d_i = Polygon2d(box_i);
         FillInflatedPtsFromPolygon(poly2d_i, p1_x[i], p1_y[i], p2_x[i], p2_y[i],
@@ -715,14 +711,14 @@ bool MiqpPlanner::FillInflatedPtsFromPolygon(const common::math::Polygon2d poly,
   }
 
   // TODO: could use MapOffset struct
-  p1_x = pts.at(0).x() - config_.miqp_planner_config().pts_offset_x();
-  p1_y = pts.at(0).y() - config_.miqp_planner_config().pts_offset_y();
-  p2_x = pts.at(1).x() - config_.miqp_planner_config().pts_offset_x();
-  p2_y = pts.at(1).y() - config_.miqp_planner_config().pts_offset_y();
-  p3_x = pts.at(2).x() - config_.miqp_planner_config().pts_offset_x();
-  p3_y = pts.at(2).y() - config_.miqp_planner_config().pts_offset_y();
-  p4_x = pts.at(3).x() - config_.miqp_planner_config().pts_offset_x();
-  p4_y = pts.at(3).y() - config_.miqp_planner_config().pts_offset_y();
+  p1_x = pts.at(0).x() - config_.pts_offset_x();
+  p1_y = pts.at(0).y() - config_.pts_offset_y();
+  p2_x = pts.at(1).x() - config_.pts_offset_x();
+  p2_y = pts.at(1).y() - config_.pts_offset_y();
+  p3_x = pts.at(2).x() - config_.pts_offset_x();
+  p3_y = pts.at(2).y() - config_.pts_offset_y();
+  p4_x = pts.at(3).x() - config_.pts_offset_x();
+  p4_y = pts.at(3).y() - config_.pts_offset_y();
 
   return true;
 }

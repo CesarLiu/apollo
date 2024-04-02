@@ -1,0 +1,3 @@
+<library path="modules/planning/planners/bark_rl_wrapper/libbark_rl_planner.so">
+    <class type="apollo::planning::BarkRlPlanner" base_class="apollo::planning::Planner"></class>
+</library>

@@ -37,6 +37,9 @@ load("//third_party/tinyxml2:workspace.bzl", tinyxml2 = "repo")
 load("//third_party/uuid:workspace.bzl", uuid = "repo")
 load("//third_party/yaml_cpp:workspace.bzl", yaml_cpp = "repo")
 load("//third_party/localization_msf:workspace.bzl", localization_msf = "repo")
+load("//third_party/nlopt:workspace.bzl", nlopt = "repo")
+load("//miqp:workspace.bzl", miqp_planner = "repo")
+load("//cplex:workspace.bzl", cplex = "repo")
 
 # load("//third_party/glew:workspace.bzl", glew = "repo")
 
@@ -88,6 +91,9 @@ def initialize_third_party():
     uuid()
     yaml_cpp()
     localization_msf()
+    nlopt()
+    miqp_planner()
+    cplex()
 
 # Define all external repositories required by
 def apollo_repositories():

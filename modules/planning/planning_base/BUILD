@@ -34,6 +34,7 @@ apollo_cc_library(
         "common/planning_context.cc",
         "common/reference_line_info.cc",
         "common/smoothers/smoother.cc",
+        "common/smoothers/trajectory_smoother_nlopt.cc",
         "common/speed/speed_data.cc",
         "common/speed/st_boundary.cc",
         "common/speed/st_point.cc",
@@ -57,6 +58,7 @@ apollo_cc_library(
         "math/constraint_checker/constraint_checker.cc",
         "math/constraint_checker/constraint_checker1d.cc",
         "gflags/planning_gflags.cc",
+        "gflags/fortiss_common.cc",
         "learning_based/img_feature_renderer/birdview_img_feature_renderer.cc",
         "learning_based/model_inference/trajectory_imitation_libtorch_inference.cc",
         "learning_based/tuning/autotuning_mlp_net_model.cc",
@@ -143,6 +145,7 @@ apollo_cc_library(
         "common/planning_context.h",
         "common/reference_line_info.h",
         "common/smoothers/smoother.h",
+        "common/smoothers/trajectory_smoother_nlopt.h",
         "common/speed/speed_data.h",
         "common/speed/st_boundary.h",
         "common/speed/st_point.h",
@@ -167,6 +170,7 @@ apollo_cc_library(
         "math/constraint_checker/constraint_checker.h",
         "math/constraint_checker/constraint_checker1d.h",
         "gflags/planning_gflags.h",
+        "gflags/fortiss_common.h",
         "learning_based/img_feature_renderer/birdview_img_feature_renderer.h",
         "learning_based/model_inference/model_inference.h",
         "learning_based/model_inference/trajectory_imitation_libtorch_inference.h",
@@ -311,6 +315,7 @@ apollo_cc_library(
         "@opencv//:core",
         "@opencv//:imgcodecs",
         "@osqp",
+        "@nlopt",
     ] + if_gpu([":planning_block"]),
 )
 
@@ -332,6 +337,13 @@ filegroup(
     name = "planning_testdata",
     srcs = glob([
         "testdata/**",
+    ]),
+)
+
+filegroup(
+    name = "miqp_testdata",
+    srcs = glob([
+        "common/smoothers/miqp_testdata/**",
     ]),
 )
 
@@ -850,6 +862,20 @@ apollo_cc_test(
         ":apollo_planning_planning_base",
         "//modules/common/util:common_util",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "trajectory_smoother_nlopt_test",
+    size = "small",
+    srcs = ["common/smoothers/trajectory_smoother_nlopt_test.cc"],
+    data = [
+        "//modules/planning/planning_base:miqp_testdata",
+    ],
+    deps = [
+        ":apollo_planning_planning_base",
+        "@com_google_googletest//:gtest_main",
+        "//modules/common/math",
     ],
 )
 

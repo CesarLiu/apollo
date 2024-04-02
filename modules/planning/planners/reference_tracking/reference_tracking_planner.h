@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright 2021 fortiss GmbH
- * Authors: Tobias Kessler, Klemens Esterle
+ * Copyright 2024 fortiss GmbH
+ * Authors: Tobias Kessler, Klemens Esterle, Xiangzhong Liu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,13 @@
 #pragma once
 
 #include <string>
-
+#include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/planning_base/common/frame.h"
 #include "modules/planning/planning_base/common/reference_line_info.h"
-#include "modules/planning/planner/lattice/lattice_planner.h"
 #include "modules/planning/planning_interface_base/planner_base/planner.h"
-#include "modules/planning/proto/bark_interface.pb.h"
-#include "modules/planning/planning_base/proto/planning_config.pb.h"
+#include "modules/planning/planners/lattice/lattice_planner.h"
+#include "modules/planning/planners/bark_rl_wrapper/proto/planner_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -40,15 +39,12 @@ namespace planning {
  **/
 class ReferenceTrackingPlanner : public LatticePlanner {
  public:
-  ReferenceTrackingPlanner() = delete;
-  explicit ReferenceTrackingPlanner(const std::shared_ptr<DependencyInjector>& injector)
-      : LatticePlanner(injector) {}
-
   virtual ~ReferenceTrackingPlanner() = default;
 
   std::string Name() override { return "REFERENCE_TRACKING"; }
 
-  common::Status Init(const PlanningConfig& config) override;
+  common::Status Init(const std::shared_ptr<DependencyInjector>& injector,
+                      const std::string& config_path = "") override;
 
   void Stop() override;
 
@@ -67,7 +63,9 @@ class ReferenceTrackingPlanner : public LatticePlanner {
   double minimum_valid_speed_planning_;
   double standstill_velocity_threshold_;
   std::string logdir_;
+  BarkRlPlannerConfiguration config_;
 };
+CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::ReferenceTrackingPlanner, Planner)
 
 }  // namespace planning
 }  // namespace apollo

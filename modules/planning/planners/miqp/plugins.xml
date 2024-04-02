@@ -1,0 +1,3 @@
+<library path="modules/planning/planners/miqp/libmiqp_planner.so">
+    <class type="apollo::planning::MiqpPlanner" base_class="apollo::planning::Planner"></class>
+</library>

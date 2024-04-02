@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright 2021 fortiss GmbH
- * Authors: Tobias Kessler, Klemens Esterle
+ * Copyright 2024 fortiss GmbH
+ * Authors: Tobias Kessler, Klemens Esterle, Xiangzhong Liu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  * @file
  **/
 
-#include "modules/planning/planner/reference_tracking/reference_tracking_planner.h"
+#include "modules/planning/planners/reference_tracking/reference_tracking_planner.h"
 
 #include <limits>
 #include <memory>
@@ -32,10 +32,11 @@
 #include "cyber/time/rate.h"
 #include "modules/common/math/path_matcher.h"
 #include "cyber/time/time.h"
-#include "modules/planning/common/fortiss_common.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/constraint_checker/collision_checker.h"
-#include "modules/planning/constraint_checker/constraint_checker.h"
+#include "cyber/time/clock.h"
+#include "modules/planning/planning_base/gflags/fortiss_common.h"
+#include "modules/planning/planning_base/gflags/planning_gflags.h"
+#include "modules/planning/planners/lattice/behavior/collision_checker.h"
+#include "modules/planning/planning_base/math/constraint_checker/constraint_checker.h"
 
 namespace apollo {
 namespace planning {
@@ -57,21 +58,17 @@ using apollo::planning::fortiss::MapOffset;
 //   logdir_ += "/apollo/data/log/";
 // }
 
-common::Status ReferenceTrackingPlanner::Init(const PlanningConfig& config) {
+common::Status ReferenceTrackingPlanner::Init(const std::shared_ptr<DependencyInjector>& injector,
+                         const std::string& config_path) {
+  Planner::Init(injector, config_path);
+  AINFO << "In ReferenceTrackingPlanner::Init()";
+  LoadConfig<BarkRlPlannerConfiguration>(config_path, &config_);
   minimum_valid_speed_planning_ = 1.0;   // below our model is invalid
   standstill_velocity_threshold_ = 0.1;  // set velocity hard to zero below this
 
   LOG(INFO) << "Writing ReferenceTrackingPlanner Logs to " << logdir_.c_str();
-  config_ = config;
-  if (!config_.has_bark_rl_planner_config()) {
-    AERROR << "Please provide ReferenceTrackingPlanner parameter file! " +
-                  config_.DebugString();
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "ReferenceTrackingPlanner parameters missing!");
-  } else {
-    AINFO << "ReferenceTrackingPlanner Configuration: "
-          << config_.bark_rl_planner_config().DebugString();
-  }
+  AINFO << "ReferenceTrackingPlanner Configuration: "
+          << config_.DebugString();
 
   return common::Status::OK();
 }
@@ -85,14 +82,14 @@ Status ReferenceTrackingPlanner::PlanOnReferenceLine(
   AINFO << std::setprecision(15)
         << "############## Smoother-only planning called at t = " << timestep;
   const double start_time = timestep;
-  const MapOffset map_offset(config_.bark_rl_planner_config().pts_offset_x(),
-                             config_.bark_rl_planner_config().pts_offset_y());
+  const MapOffset map_offset(config_.pts_offset_x(),
+                             config_.pts_offset_y());
 
   double stop_dist;
   bool brake_for_inline_while_driving = true;
   fortiss::PlannerState planner_status = fortiss::DeterminePlannerState(
       planning_init_point.v(), reference_line_info, stop_dist,
-      config_.bark_rl_planner_config().destination_distance_stop_threshold(),
+      config_.destination_distance_stop_threshold(),
       standstill_velocity_threshold_, minimum_valid_speed_planning_,
       brake_for_inline_while_driving);
 
@@ -107,7 +104,7 @@ Status ReferenceTrackingPlanner::PlanOnReferenceLine(
   std::vector<PathPoint> discrete_reference_line =
       fortiss::ToDiscretizedReferenceLine(
           reference_line_info, stop_dist,
-          config_.bark_rl_planner_config()
+          config_
               .cutoff_distance_reference_after_stop());
 
   // Map
@@ -117,9 +114,9 @@ Status ReferenceTrackingPlanner::PlanOnReferenceLine(
   // Target velocity
   double vDes;
   const double dist_start_slowdown =
-      config_.bark_rl_planner_config().distance_start_slowdown();
+      config_.distance_start_slowdown();
   const double dist_stop_before =
-      config_.bark_rl_planner_config().distance_stop_before();
+      config_.distance_stop_before();
   if ((stop_dist - dist_stop_before < dist_start_slowdown) &&
       (planner_status != fortiss::PlannerState::START_TRAJECTORY)) {
     vDes = 0;
@@ -131,7 +128,7 @@ Status ReferenceTrackingPlanner::PlanOnReferenceLine(
   double acc_max = 3;    // TODO parameter!!
   double acc_decel = 3;  // TODO parameter!!
   DiscretizedTrajectory reference_traj;
-  reference_traj.reserve(config_.bark_rl_planner_config().nr_steps());
+  reference_traj.reserve(config_.nr_steps());
   reference_traj.push_back(planning_init_point);
 
   // GetNearestPointAndS
@@ -139,12 +136,12 @@ Status ReferenceTrackingPlanner::PlanOnReferenceLine(
       discrete_reference_line, planning_init_point.path_point().x(),
       planning_init_point.path_point().y());
   double s = point_on_line.s();
-  const double dt = config_.bark_rl_planner_config().ts();
+  const double dt = config_.ts();
   double t =
       planning_init_point.relative_time();  // TODO should be zero, is it zero??
 
   // start from 1 as planning_init_point is already first point of the traj
-  for (int i = 1; i < config_.bark_rl_planner_config().nr_steps(); ++i) {
+  for (int i = 1; i < config_.nr_steps(); ++i) {
     t += dt;
 
     const double v0 = reference_traj.at(i - 1).v();
@@ -184,7 +181,7 @@ Status ReferenceTrackingPlanner::PlanOnReferenceLine(
   }
 
   // Check resulting trajectory for collision with obstacles
-  if (config_.bark_rl_planner_config().consider_obstacles()) {
+  if (config_.consider_obstacles()) {
     const auto& vehicle_config =
         common::VehicleConfigHelper::Instance()->GetConfig();
     const double ego_length = vehicle_config.vehicle_param().length();
@@ -202,7 +199,7 @@ Status ReferenceTrackingPlanner::PlanOnReferenceLine(
   }
 
   // Check resulting trajectory for collision with environment
-  if (config_.bark_rl_planner_config().use_environment_polygon()) {
+  if (config_.use_environment_polygon()) {
     if (fortiss::EnvironmentCollision(road_bounds,
                                       smoothed_apollo_trajectory.second)) {
       AERROR << "Planning success but collision with environment!";

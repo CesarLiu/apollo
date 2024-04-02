@@ -22,13 +22,13 @@
 #pragma once
 
 #include <string>
-
+#include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/planning_base/common/frame.h"
 #include "modules/planning/planning_base/common/reference_line_info.h"
-#include "modules/planning/planner/lattice/lattice_planner.h"
+#include "modules/planning/planners/lattice/lattice_planner.h"
 #include "modules/planning/planning_interface_base/planner_base/planner.h"
-#include "modules/planning/planning_base/proto/planning_config.pb.h"
+#include "modules/planning/planners/miqp/proto/planner_config.pb.h"
 #include "src/miqp_planner_c_api.h"
 
 namespace apollo {
@@ -40,15 +40,12 @@ namespace planning {
  **/
 class MiqpPlanner : public LatticePlanner {
  public:
-  MiqpPlanner() = delete;
-  explicit MiqpPlanner(const std::shared_ptr<DependencyInjector>& injector)
-      : LatticePlanner(injector) {}
-
   virtual ~MiqpPlanner() = default;
 
   std::string Name() override { return "MIQP"; }
 
-  common::Status Init(const PlanningConfig& config) override;
+  common::Status Init(const std::shared_ptr<DependencyInjector>& injector,
+                      const std::string& config_path = "") override;
 
   void Stop() override;
 
@@ -93,7 +90,9 @@ class MiqpPlanner : public LatticePlanner {
   double minimum_valid_speed_vx_vy_;
   double standstill_velocity_threshold_;
   std::string logdir_;
+  MiqpPlannerConfiguration config_;
 };
 
+CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::MiqpPlanner, Planner)
 }  // namespace planning
 }  // namespace apollo

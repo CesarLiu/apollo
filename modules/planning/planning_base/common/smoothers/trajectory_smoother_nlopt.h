@@ -21,7 +21,7 @@
 
 #include "Eigen/Dense"
 #include "Eigen/SparseCore"
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/planning_base/common/trajectory/discretized_trajectory.h"
 
 namespace apollo {
 namespace planning {

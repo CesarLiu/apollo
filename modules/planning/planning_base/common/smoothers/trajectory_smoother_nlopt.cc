@@ -15,7 +15,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/common/smoothers/trajectory_smoother_nlopt.h"
+#include "modules/planning/planning_base/common/smoothers/trajectory_smoother_nlopt.h"
 
 #include <nlopt.h>
 
@@ -27,7 +27,7 @@
 #include "cyber/logger/logger_util.h"
 #include "modules/common/math/math_utils.h"
 #include "cyber/time/clock.h"
-#include "modules/planning/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/planning_base/common/trajectory/publishable_trajectory.h"
 
 // Create function pointers for nlopt outside the namespace
 double nlopt_objective_wrapper(unsigned n, const double* x, double* grad,

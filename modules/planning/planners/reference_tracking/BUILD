@@ -1,27 +1,32 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_plugin", "apollo_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "reference_tracking_planner",
+filegroup(
+    name = "runtime_files",
+    srcs = glob([
+        "conf/**",
+    ])
+)
+
+apollo_plugin(
+    name = "libreference_tracking_planner.so",
     srcs = ["reference_tracking_planner.cc"],
     hdrs = ["reference_tracking_planner.h"],
+    description = ":plugins.xml",
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/math",
         "//modules/common/vehicle_state:vehicle_state_provider",
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/constraint_checker",
-        "//modules/planning/constraint_checker:collision_checker",
-        "//modules/planning/planner",
-        "//modules/planning/planner/lattice:lattice_planner",
+        "//modules/planning/planning_interface_base:apollo_planning_planning_interface_base",
+        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/planners/lattice:liblattice_planner.so",
+        "//modules/planning/planners/bark_rl_wrapper/proto:planner_config_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/proto:planning_config_cc_proto",
-        "//modules/planning/proto:bark_interface_cc_proto",
-        "//modules/planning/common:fortiss_common",
     ],
 )
 
+apollo_package()
 cpplint()

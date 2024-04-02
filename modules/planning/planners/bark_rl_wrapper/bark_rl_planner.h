@@ -28,8 +28,8 @@
 #include "modules/planning/planning_base/common/reference_line_info.h"
 #include "modules/planning/planning_interface_base/planner_base/planner.h"
 #include "modules/planning/planners/lattice/lattice_planner.h"
-#include "modules/planning/planning_base/proto/bark_interface.pb.h"
-#include "modules/planning/planning_base/proto/planning_config.pb.h"
+#include "modules/planning/planners/bark_rl_wrapper/proto/bark_interface.pb.h"
+#include "modules/planning/planners/bark_rl_wrapper/proto/planner_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -62,10 +62,9 @@ class BarkRlPlanner : public LatticePlanner {
 
   void SetBarkInterfacePointers(
       const std::shared_ptr<cyber::Writer<ApolloToBarkMsg>>& request_writer,
-      BarkResponse* response, std::mutex* mutex) override;
+      BarkResponse* response, std::mutex* mutex);
 
  private:
-  void RegisterTasks();
   std::vector<BarkObstacle> ConvertToBarkObstacles(
       const std::vector<const Obstacle*>& obstacles, double timestep) const;
 
@@ -82,7 +81,10 @@ class BarkRlPlanner : public LatticePlanner {
   double minimum_valid_speed_planning_;
   double standstill_velocity_threshold_;
   std::string logdir_;
+  BarkRlPlannerConfiguration config_;
 };
+
+CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::BarkRlPlanner, Planner)
 
 }  // namespace planning
 }  // namespace apollo

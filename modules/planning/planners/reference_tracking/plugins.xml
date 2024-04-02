@@ -1,0 +1,3 @@
+<library path="modules/planning/planners/reference_tracking/libreference_tracking_planner.so">
+    <class type="apollo::planning::ReferenceTrackingPlanner" base_class="apollo::planning::Planner"></class>
+</library>

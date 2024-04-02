@@ -19,7 +19,7 @@
  * @file
  **/
 
-#include "modules/planning/planner/bark_rl_wrapper/bark_rl_planner.h"
+#include "modules/planning/planners/bark_rl_wrapper/bark_rl_planner.h"
 
 #include <limits>
 #include <memory>
@@ -35,7 +35,7 @@
 #include "cyber/time/clock.h"
 #include "modules/planning/planning_base/gflags/fortiss_common.h"
 #include "modules/planning/planning_base/gflags/planning_gflags.h"
-#include "modules/planning/constraint_checker/collision_checker.h"
+#include "modules/planning/planners/lattice/behavior/collision_checker.h"
 #include "modules/planning/planning_base/math/constraint_checker/constraint_checker.h"
 
 namespace apollo {
@@ -59,23 +59,13 @@ common::Status BarkRlPlanner::Init(const std::shared_ptr<DependencyInjector>& in
                          const std::string& config_path) {
   Planner::Init(injector, config_path);
   AINFO << "In BarkRlPlanner::Init()";
-  RegisterTasks();
-  PlannerNaviConfig planner_conf;
-  LoadConfig<PlannerNaviConfig>(config_path, &planner_conf);
+  LoadConfig<BarkRlPlannerConfiguration>(config_path, &config_);
   minimum_valid_speed_planning_ = 1.0;   // below our model is invalid
   standstill_velocity_threshold_ = 0.1;  // set velocity hard to zero below this
 
   LOG(INFO) << "Writing BarkRlPlanner Logs to " << logdir_.c_str();
-  config_ = config;
-  if (!config_.has_bark_rl_planner_config()) {
-    AERROR << "Please provide BarkRlPlanner parameter file! " +
-                  config_.DebugString();
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "BarkRlPlanner parameters missing!");
-  } else {
-    AINFO << "BarkRlPlanner Configuration: "
-          << config_.bark_rl_planner_config().DebugString();
-  }
+  AINFO << "BarkRlPlanner Configuration: "
+          << config_.DebugString();
 
   return common::Status::OK();
 }
@@ -89,13 +79,13 @@ Status BarkRlPlanner::PlanOnReferenceLine(
   AINFO << std::setprecision(15)
         << "############## BARK-RL Planner called at t = " << timestep;
   const double start_time = timestep;
-  const MapOffset map_offset(config_.bark_rl_planner_config().pts_offset_x(),
-                             config_.bark_rl_planner_config().pts_offset_y());
+  const MapOffset map_offset(config_.pts_offset_x(),
+                             config_.pts_offset_y());
 
   double stop_dist;
   fortiss::PlannerState planner_status = fortiss::DeterminePlannerState(
       planning_init_point.v(), reference_line_info, stop_dist,
-      config_.bark_rl_planner_config().destination_distance_stop_threshold(),
+      config_.destination_distance_stop_threshold(),
       standstill_velocity_threshold_, minimum_valid_speed_planning_);
 
   if (planner_status == fortiss::PlannerState::STANDSTILL_TRAJECTORY) {
@@ -109,7 +99,7 @@ Status BarkRlPlanner::PlanOnReferenceLine(
   std::vector<PathPoint> discrete_reference_line =
       fortiss::ToDiscretizedReferenceLine(
           reference_line_info, stop_dist,
-          config_.bark_rl_planner_config()
+          config_
               .cutoff_distance_reference_after_stop());
 
   // Map
@@ -119,9 +109,9 @@ Status BarkRlPlanner::PlanOnReferenceLine(
   // Target velocity
   double vDes;
   const double dist_start_slowdown =
-      config_.bark_rl_planner_config().distance_start_slowdown();
+      config_.distance_start_slowdown();
   const double dist_stop_before =
-      config_.bark_rl_planner_config().distance_stop_before();
+      config_.distance_stop_before();
   if ((stop_dist - dist_stop_before < dist_start_slowdown) &&
       (planner_status != fortiss::PlannerState::START_TRAJECTORY)) {
     vDes = 0;
@@ -131,7 +121,7 @@ Status BarkRlPlanner::PlanOnReferenceLine(
 
   // Obstacles as obstacles
   std::vector<BarkObstacle> bark_obstacles;
-  if (config_.bark_rl_planner_config().consider_obstacles()) {
+  if (config_.consider_obstacles()) {
     bark_obstacles = ConvertToBarkObstacles(
         frame->obstacles(), planning_init_point.relative_time());
   }
@@ -178,7 +168,7 @@ Status BarkRlPlanner::PlanOnReferenceLine(
   }
 
   // Check resulting trajectory for collision with obstacles
-  if (config_.bark_rl_planner_config().consider_obstacles()) {
+  if (config_.consider_obstacles()) {
     const auto& vehicle_config =
         common::VehicleConfigHelper::Instance()->GetConfig();
     const double ego_length = vehicle_config.vehicle_param().length();
@@ -196,7 +186,7 @@ Status BarkRlPlanner::PlanOnReferenceLine(
   }
 
   // Check resulting trajectory for collision with environment
-  if (config_.bark_rl_planner_config().use_environment_polygon()) {
+  if (config_.use_environment_polygon()) {
     if (fortiss::EnvironmentCollision(road_bounds, apollo_traj)) {
       AERROR << "Planning success but collision with environment!";
     }
@@ -205,7 +195,7 @@ Status BarkRlPlanner::PlanOnReferenceLine(
   // Planning success -> publish trajectory
   Status return_status;
   int subsampling = 0;
-  if (config_.bark_rl_planner_config().use_smoothing()) {
+  if (config_.use_smoothing()) {
     auto smoothed_apollo_trajectory = fortiss::SmoothTrajectory(
         apollo_traj, planning_init_point, logdir_.c_str(), map_offset, subsampling);
     if (smoothed_apollo_trajectory.first) {
@@ -217,7 +207,7 @@ Status BarkRlPlanner::PlanOnReferenceLine(
       return_status = Status(ErrorCode::PLANNING_ERROR, "Smoothing failed!");
     }
     // Log full trajectories
-    if (config_.bark_rl_planner_config().log_trajectories()) {
+    if (config_.log_trajectories()) {
       if(smoothed_apollo_trajectory.first) {
         const std::string& time_pid_string = fortiss::GetTimeString();
         const std::string& file_name = "smoothed_traj_" + time_pid_string + ".pb.txt";
@@ -232,7 +222,7 @@ Status BarkRlPlanner::PlanOnReferenceLine(
   }
 
   // Log full trajectories
-  if (config_.bark_rl_planner_config().log_trajectories()) {
+  if (config_.log_trajectories()) {
     const std::string& time_pid_string = fortiss::GetTimeString();
     const std::string& file_name = "bark_ml_traj_" + time_pid_string + ".pb.txt";
     SaveDiscretizedTrajectoryToFile(apollo_traj, logdir_.c_str(), file_name);
@@ -255,8 +245,8 @@ void BarkRlPlanner::SetBarkInterfacePointers(
 std::vector<BarkObstacle> BarkRlPlanner::ConvertToBarkObstacles(
     const std::vector<const Obstacle*>& obstacles, double timestep) const {
   std::vector<BarkObstacle> bark_obstacles;
-  const int N = config_.bark_rl_planner_config().nr_steps();
-  const float ts = config_.bark_rl_planner_config().ts();
+  const int N = config_.nr_steps();
+  const float ts = config_.ts();
   for (const Obstacle* obstacle : obstacles) {
     if (!obstacle->IsVirtual()) {
       BarkObstacle bark_obstacle;
