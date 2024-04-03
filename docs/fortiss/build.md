@@ -35,14 +35,20 @@ Then go back to the top directory (change the setting in  https://github.com/for
 
 `bash docker/scripts/dev_into.sh`
 
-Now, inside the docker container, build Apollo using:
+Now, inside the docker container, build Apollo with gpu support using:
 
- `bash apollo.sh build`
+ `bash apollo.sh build_gpu`
 
-**Note: ** calling `bash apollo.sh build_cpu` instead of `bash apollo.sh build`causes some erros, as opencv cannot be found. Don't do it and stick to the plan build call.
+ without gpu support,
+ `bash apollo.sh build_cpu`
+
+**Note: ** calling `bash apollo.sh build_cpu` instead of `bash apollo.sh build`causes some erros, as opencv cannot be found(not sure on 04.2024). Don't do it and stick to the plan build call.
 **Note: ** If you experience experience some weird stuff when building, clean all bazel directories using `bazel clean --expunge`
+cleaning can be done via apollo.sh
+`bash apollo.sh clean -a`
 
 ## Fortiss MIQP Planner
+(TODO)
 In order to use the MIQP Planner (described in the publications [1](https://ieeexplore.ieee.org/document/9304743) and [2](https://ieeexplore.ieee.org/document/9304495), see [source code](https://github.com/bark-simulator/planner_miqp)), you need to build Apollo at the first time using 
 
 `bash apollo.sh build_use_planner_miqp`.
@@ -58,12 +64,12 @@ https://github.com/fortiss/apollo/blob/fc62d694f5b44e1a9a72cb47487ab85b51b5a6b7/
 
  Actually, when you create the Apollo maps with the map generation tools (like apollo/modules/tools/map_gen/map_gen_single_lane.py), you should rewrite    the speed limit as your need: https://github.com/fortiss/apollo/blob/fc62d694f5b44e1a9a72cb47487ab85b51b5a6b7/modules/tools/map_gen/map_gen_single_lane.py#L74
 
-2. Then, you can reset the following parameters in the "planning.conf" file under direction "apollo/modules/planning/conf/planning.conf" as your need:
+2. Then, you can reset the following parameters in the "planning.conf" file under direction "apollo/modules/planning/planning_component/conf/planning.conf" as your need:
 https://github.com/fortiss/apollo/blob/1e58c6d68832fe1dbd01cf949d74326f4f007062/modules/planning/conf/planning.conf#L4
 https://github.com/fortiss/apollo/blob/1e58c6d68832fe1dbd01cf949d74326f4f007062/modules/planning/conf/planning.conf#L11
 If you use other planers, reset the above parameters in the corresponding .conf file.
 
-3. Next, reset the parameters in apollo/modules/planning/common/planning_gflags.cc as your need:
+3. Next, reset the parameters in apollo/modules/planning/planning_base/gflags/planning_gflags.cc as your need:
 https://github.com/fortiss/apollo/blob/1e58c6d68832fe1dbd01cf949d74326f4f007062/modules/planning/common/planning_gflags.cc#L171
 https://github.com/fortiss/apollo/blob/1e58c6d68832fe1dbd01cf949d74326f4f007062/modules/planning/common/planning_gflags.cc#L325
 

@@ -1,4 +1,4 @@
-FROM apolloauto/apollo:dev-18.04-x86_64-20200602_0644
+FROM apolloauto/apollo:dev-x86_64-18.04-20230831_1143
 
 RUN curl https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
   && curl https://bazel.build/bazel-release.pub.gpg |apt-key add - \
