@@ -1,5 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -13,43 +12,8 @@ filegroup(
     ]),
 )
 
-install(
-    name = "install",
-    library_dest = "autobox_bridge/lib",
-    data_dest = "autobaox_bridge",
-    data = [
-      ":runtime_data",
-      "cyberfile.xml",
-      "autobox_bridge.BUILD"
-    ],
-    targets = [
-        ":libautobox_bridge_component_chassis.so",
-        ":libautobox_bridge_component_control.so",
-        ":libautobox_bridge_component_localization.so",
-        ":libautobox_bridge_component_trajectory.so",
-    ],
-)
-install(
-    name = "pb_hdrs",
-    data_dest = "autobox_bridge/include",
-    data = [
-        "//modules/autobox_bridge/proto:autobox_bridge_conf_cc_proto",
-        "//modules/autobox_bridge/proto:autobox_chassis_cc_proto",
-        "//modules/autobox_bridge/proto:autobox_control_cc_proto",
-        "//modules/autobox_bridge/proto:autobox_localization_cc_proto",
-        "//modules/autobox_bridge/proto:autobox_trajectory_cc_proto",
-    ],
-)
-
-cc_binary(
+apollo_component(
     name = "libautobox_bridge_component_chassis.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":autobox_bridge_component_lib_chassis"],
-)
-
-cc_library(
-    name = "autobox_bridge_component_lib_chassis",
     srcs = ["autobox_bridge_component_chassis.cc"],
     hdrs = ["autobox_bridge_component_chassis.h"],
     copts = ['-DMODULE_NAME=\\"autobox_bridge\\"'],
@@ -62,15 +26,8 @@ cc_library(
     ],
 )
 
-cc_binary(
+apollo_component(
     name = "libautobox_bridge_component_control.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":autobox_bridge_component_lib_control"],
-)
-
-cc_library(
-    name = "autobox_bridge_component_lib_control",
     srcs = ["autobox_bridge_component_control.cc"],
     hdrs = ["autobox_bridge_component_control.h"],
     copts = ['-DMODULE_NAME=\\"autobox_bridge\\"'],
@@ -83,15 +40,8 @@ cc_library(
     ],
 )
 
-cc_binary(
+apollo_component(
     name = "libautobox_bridge_component_localization.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":autobox_bridge_component_lib_localization"],
-)
-
-cc_library(
-    name = "autobox_bridge_component_lib_localization",
     srcs = ["autobox_bridge_component_localization.cc"],
     hdrs = ["autobox_bridge_component_localization.h"],
     copts = ['-DMODULE_NAME=\\"autobox_bridge\\"'],
@@ -104,15 +54,8 @@ cc_library(
     ],
 )
 
-cc_binary(
+apollo_component(
     name = "libautobox_bridge_component_trajectory.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":autobox_bridge_component_lib_trajectory"],
-)
-
-cc_library(
-    name = "autobox_bridge_component_lib_trajectory",
     srcs = ["autobox_bridge_component_trajectory.cc"],
     hdrs = ["autobox_bridge_component_trajectory.h"],
     copts = ['-DMODULE_NAME=\\"autobox_bridge\\"'],
@@ -127,26 +70,6 @@ cc_library(
     ],
 )
 
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_autobox_bridge_src",
-        ":install_autobox_bridge_hdrs"
-    ],
-)
-
-install_src_files(
-    name = "install_autobox_bridge_src",
-    src_dir = ["."],
-    dest = "bridge/src",
-    filter = "*",
-)
-
-install_src_files(
-    name = "install_autobox_bridge_hdrs",
-    src_dir = ["."],
-    dest = "bridge/include",
-    filter = "*.h",
-)
+apollo_package()
 
 cpplint()

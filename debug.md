@@ -21,4 +21,7 @@ this rule is missing dependency declarations for the following files included by
 
 Solution:
 add `"//modules/common_msgs/control_msgs:control_cmd_cc_proto",` to `/apollo/modules/canbus_vehicle/gem/BUILD:68:11`
+03.04.2024
+4. E0403 16:39:47.159559 825464 class_loader_utility.cc:218] [mainboard]LibraryLoadException: libnlopt.so.0: cannot open shared object file: No such file or directory [fake_obstacle] E0403 16:39:47.159619 825464 class_loader_utility.cc:234] [mainboard]shared library failed: /apollo/bazel-bin/modules/fake_obstacle/libfake_obstacle_component.so:
+```ldconfig -p | grep libnlopt.so.0``` returns nothing, so need to install it ```sudo apt-get install libnlopt0```
 
