@@ -22,7 +22,7 @@ ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 
 ENV CUDNN_VERSION 8.2.1
 
-ENV TENSORRT_VERSION 8.2.1
+ENV TENSORRT_VERSION 7.1.3
  
 COPY rcfiles /opt/apollo/rcfiles
 COPY installers /opt/apollo/installers

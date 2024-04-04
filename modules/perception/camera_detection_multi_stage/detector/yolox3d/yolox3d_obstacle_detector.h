@@ -119,8 +119,6 @@ class Yolox3DObstacleDetector : public BaseObstacleDetector {
   std::shared_ptr<inference::Inference> net_3D_;
   FILE *file_;
 
-  std::shared_ptr<inference::Inference> net_3D_;
-
   int gpu_id_ = 0;
   cudaStream_t stream_ = nullptr;
 

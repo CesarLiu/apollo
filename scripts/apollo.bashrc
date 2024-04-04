@@ -106,11 +106,11 @@ function fail() {
 
 function determine_gpu_use_target() {
   local arch="$(uname -m)"
-  local gpu_platform="UNKNOWN"
+  local gpu_platform="NVIDIA"
   local use_gpu=0
   local nv=0
   local amd=0
-  local need_cuda=0
+  local need_cuda=1
   local need_rocm=0
   if [[ -f "/.cross-platform" ]]; then
     # cross platform building, force to use gpu mode
@@ -122,6 +122,8 @@ function determine_gpu_use_target() {
           use_gpu=1
         fi
       fi
+      need_cuda=1
+      gpu_platform="NVIDIA"
     else ## x86_64 mode
       # Check the existence of nvidia-smi and rocm-smi
       if [[ ! -x "$(command -v nvidia-smi)" ]]; then
@@ -161,7 +163,7 @@ function determine_gpu_use_target() {
   fi
   export TF_NEED_CUDA="${need_cuda}"
   export TF_NEED_ROCM="${need_rocm}"
-  export USE_GPU_TARGET="${use_gpu}"
+  export USE_GPU_TARGET="${1}"
   export GPU_PLATFORM="${gpu_platform}"
 }
 

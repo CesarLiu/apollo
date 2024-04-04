@@ -81,13 +81,7 @@ class MotionCommandProcessorBase : public CommandProcessorBase {
   virtual bool Convert(const std::shared_ptr<T>& command,
                        std::shared_ptr<apollo::routing::RoutingRequest>&
                            routing_request) const = 0;
-  /**
-   * @brief Set the start pose of lane_way_points with current vehicle pose.
-   * @param lane_way_points start pose to be updated.
-   * @return Return true if there is error occurs.
-   */
-  bool SetStartPose(
-      std::vector<apollo::routing::LaneWaypoint>* lane_way_points) const;
+                           
   /**
    * @brief Set the start pose of RoutingRequest with current vehicle pose.
    * @param routing_request RoutingRequest to be updated.
