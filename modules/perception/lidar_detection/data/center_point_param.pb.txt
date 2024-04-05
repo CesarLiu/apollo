@@ -57,7 +57,7 @@ paddle_settings {
   use_calibration: true
   collect_shape_info: false
   use_dynamicshape: true
-  dynamic_shape_file: "modules/perception/lidar_detection/data/center_point_paddle/collect_shape_info_3lidar_20.pbtxt"
+  dynamic_shape_file: "modules/perception/lidar_detection/data/center_point_paddle/collect_shape_info_3lidar_20.pb.txt"
 }
 
 point2box_max_num: 5

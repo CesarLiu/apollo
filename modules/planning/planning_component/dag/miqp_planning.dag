@@ -1,11 +1,12 @@
 # Define all coms in DAG streaming.
 module_config {
-  module_library : "/apollo/bazel-bin/modules/planning/libplanning_component.so"
+  module_library : "/apollo/bazel-bin/modules/planning/planning_component/libplanning_component.so"
   components {
     class_name : "PlanningComponent"
     config {
       name: "planning"
-      flag_file_path:  "/apollo/modules/planning/conf/miqp_planning.conf"
+      config_file_path:  "/apollo/modules/planning/planning_component/conf/miqp_planning_config.pb.txt"
+      flag_file_path:  "/apollo/modules/planning/planning_component/conf/miqp_planning.conf"
       
       readers: [
         {

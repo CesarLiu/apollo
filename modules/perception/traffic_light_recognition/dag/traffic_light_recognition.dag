@@ -6,7 +6,7 @@ module_config {
     config {
       name: "TrafficLightRecognComponent"
       config_file_path: "/apollo/modules/perception/traffic_light_recognition/conf/traffic_light_recognition_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common_fortiss.flag"
       readers {
       channel: "/perception/inner/Retection"
       }

@@ -5,7 +5,7 @@ module_config {
     config {
       name : "PointCloudPreprocess"
       config_file_path : "/apollo/modules/perception/pointcloud_preprocess/conf/pointcloud_preprocess_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common_fortiss.flag"
       readers {
         channel: "/apollo/sensor/lidar16/compensator/PointCloud2"
       }
@@ -20,7 +20,7 @@ module_config {
     config {
       name : "PointCloudMapROI"
       config_file_path : "/apollo/modules/perception/pointcloud_map_based_roi/conf/pointcloud_map_based_roi_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common_fortiss.flag"
       readers {
         channel: "/perception/lidar/pointcloud_preprocess"
       }
@@ -35,7 +35,7 @@ module_config {
     config {
       name : "PointCloudGroundDetect"
       config_file_path : "/apollo/modules/perception/pointcloud_ground_detection/conf/pointcloud_ground_detection_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common_fortiss.flag"
       readers {
         channel: "/perception/lidar/pointcloud_map_based_roi"
       }
@@ -50,7 +50,7 @@ module_config {
     config {
       name : "LidarDetection"
       config_file_path : "/apollo/modules/perception/lidar_detection/conf/lidar_detection_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common_fortiss.flag"
       readers {
         channel: "/perception/lidar/pointcloud_ground_detection"
       }
@@ -65,7 +65,7 @@ module_config {
     config {
       name : "LidarDetectionFilter"
       config_file_path : "/apollo/modules/perception/lidar_detection_filter/conf/lidar_detection_filter_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common_fortiss.flag"
       readers {
         channel: "/perception/lidar/detection"
       }
@@ -80,7 +80,7 @@ module_config {
     config {
       name : "LidarTracking"
       config_file_path : "/apollo/modules/perception/lidar_tracking/conf/lidar_tracking_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common_fortiss.flag"
       readers {
         channel: "/perception/lidar/detection_filter"
       }
@@ -95,7 +95,7 @@ module_config {
     config {
       name : "LidarOutput"
       config_file_path : "/apollo/modules/perception/lidar_output/conf/lidar_output_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common_fortiss.flag"
       readers {
         channel: "/perception/inner/PrefusedObjects"
       }

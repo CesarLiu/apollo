@@ -5,7 +5,7 @@ module_config {
     config {
       name : "LidarDetection"
       config_file_path : "/apollo/modules/perception/lidar_detection/conf/lidar_detection_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common_fortiss.flag"
       readers {
         channel: "/perception/lidar/pointcloud_ground_detection"
       }

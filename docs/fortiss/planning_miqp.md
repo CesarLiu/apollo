@@ -8,7 +8,7 @@ You then start Dreamview, activate Simcontrol, and launch the following modules:
 
 - Routing: `cyber_launch start modules/routing/launch/routing.launch`
 - Prediction: `cyber_launch start modules/tools/prediction/fake_prediction/fake_prediction.launch`
-- Planning: `cyber_launch start modules/planning/launch/miqp_planning.launch`
+- Planning: `cyber_launch start modules/planning/planning_component/launch/miqp_planning.launch`
 
 Finally, you need to perform a routing. The planner should now start planning, and the car should drive.
 

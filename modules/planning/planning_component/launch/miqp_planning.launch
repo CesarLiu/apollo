@@ -1,7 +1,7 @@
 <cyber>
     <module>
         <name>planning</name>
-        <dag_conf>/apollo/modules/planning/dag/miqp_planning.dag</dag_conf>
+        <dag_conf>/apollo/modules/planning/planning_component/dag/miqp_planning.dag</dag_conf>
         <process_name>planning</process_name>
     </module>
 </cyber>

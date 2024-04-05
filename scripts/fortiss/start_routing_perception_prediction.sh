@@ -9,7 +9,7 @@ tmux send-keys 'bash scripts/bootstrap.sh start' C-m
 tmux send-keys 'cyber_monitor' C-m
 tmux split-window -h
 tmux send-keys 'source cyber/setup.bash' C-m
-tmux send-keys 'cyber_launch start modules/perception/production/launch/perception_fortiss.launch' C-m
+tmux send-keys 'cyber_launch start modules/perception/launch/perception_all_fortiss.launch' C-m
 tmux split-window -v -p 66
 tmux send-keys 'source cyber/setup.bash' C-m
 #tmux send-keys 'cyber_launch start modules/tools/prediction/fake_prediction/fake_prediction.launch' C-m

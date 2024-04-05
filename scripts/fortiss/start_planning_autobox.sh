@@ -5,7 +5,7 @@ python scripts/fortiss/set_cyber_ip.py
 
 tmux new -d
 tmux send-keys 'source cyber/setup.bash' C-m
-tmux send-keys 'cyber_launch start modules/planning/launch/miqp_planning.launch' C-m 
+tmux send-keys 'cyber_launch start modules/planning/planning_component/launch/miqp_planning.launch' C-m 
 tmux split-window -h
 tmux send-keys 'source cyber/setup.bash' C-m
 tmux send-keys 'cyber_launch start modules/autobox_bridge/launch/autobox_bridge_localization.launch' C-m 

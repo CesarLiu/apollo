@@ -5,7 +5,7 @@ module_config {
     config {
       name: "FrontRadarDetection"
       config_file_path: "/apollo/modules/perception/radar_detection/conf/front_radar_detection_config.pb.txt"
-      flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      flag_file_path: "/apollo/modules/perception/data/flag/perception_common_fortiss.flag"
       readers {
         channel: "/apollo/sensor/radar/front"
       }

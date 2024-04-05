@@ -12,17 +12,17 @@ Could also be in one launch file, order is not relevant
 after entering the docker container:
 
 1. ```$ cyber_launch start modules/transform/launch/static_transform_fortiss.launch```
-2. ```$ cyber_launch start modules/drivers/velodyne/launch/velodyne32_fortuna.launch```
-3. ```$ cyber_launch start modules/perception/production/launch/perception_fortiss.launch```
+2. ```$ cyber_launch start modules/drivers/lidar/velodyne/launch/velodyne32_fortuna.launch```
+3. ```$ cyber_launch start modules/perception/launch/perception_lidar_fortiss.launch```
 
 ### Explanations
 Some explanations what these launch files do:
 
 1. [Static transform](../../modules/transform/launch/static_transform_fortiss.launch) launches transformation 
 information: __imar2localization__ and __imar2velodyne32__.
-2. [Velodyne driver](../../modules/drivers/velodyne/launch/velodyne32_fortuna.launch) publishes the point cloud from the 
+2. [Velodyne driver](../../modules/drivers/lidar/velodyne/launch/velodyne32_fortuna.launch) publishes the point cloud from the 
 top Velodyne-VLC32 and compensates the point cloud with pose information.
-3. The [perception module](../../modules/drivers/velodyne/launch/velodyne32_fortuna.launch) segments the incoming point cloud, 
+3. The [perception module](../../modules/drivers/lidar/velodyne/launch/velodyne32_fortuna.launch) segments the incoming point cloud, 
 clusters the point cloud, classifies it and tracks the classified objects.
 
 ### Input/output topics
@@ -75,10 +75,10 @@ Note: Dreamview only shows compensated point clouds
 
 - Transform is looking into the future
 1. The velodyne driver needs GPS time which is currently not provided by our valodyne(s) (gps is not wired the the valodyne fusion box)
-2. Hotfix by setting the GPS time to current cyber time in line 76 and line 105 of [velodyne32_parser.cc](../../modules/drivers/velodyne/parser/velodyne32_parser.cc)
+2. Hotfix by setting the GPS time to current cyber time in line 76 and line 105 of [velodyne32_parser.cc](../../modules/drivers/lidar/velodyne/parser/velodyne32_parser.cc)
 3. Changes were made in commits 6cac88f4ad70ca2e2046edd1d1c4a5ba754eea18 and 853d00fdc34b8f3f4581822d5ad3067af106f98a
 
-- Cannot start dreamview and concurrently run the [perception module](../../modules/drivers/velodyne/launch/velodyne32_fortuna.launch)
+- Cannot start dreamview and concurrently run the [perception module](../../modules/drivers/lidar/velodyne/launch/velodyne32_fortuna.launch)
 1. Our fortiss Lenovo Thinkpads with a GeForce 940MX does not have enough GPU memory available for running dreamview and the pipeline
 2. If you have a better GPU it should work
 3. TODO does it work in the car?

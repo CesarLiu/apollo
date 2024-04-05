@@ -10,7 +10,7 @@ tmux send-keys 'source cyber/setup.bash' C-m
 tmux send-keys 'cyber_launch start modules/drivers/imar/launch/imar.launch' C-m
 tmux split-window -h
 tmux send-keys 'source cyber/setup.bash' C-m
-tmux send-keys 'cyber_launch start modules/drivers/velodyne/launch/velodyne32_fortuna.launch' C-m
+tmux send-keys 'cyber_launch start modules/drivers/lidar/velodyne/launch/velodyne32_fortuna.launch' C-m
 tmux split-window -v
 tmux send-keys 'source cyber/setup.bash' C-m
 tmux send-keys 'cyber_launch start modules/localization/launch/rtk_localization.launch' C-m

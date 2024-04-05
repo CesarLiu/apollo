@@ -8,7 +8,7 @@ extrinsic_file {
 extrinsic_file {
     frame_id: "imar"
     child_frame_id: "velodyne32"
-    file_path: "/apollo/modules/drivers/velodyne/params/velodyne32_imar_extrinsics.yaml"
+    file_path: "/apollo/modules/drivers/lidar/velodyne/params/velodyne32_imar_extrinsics.yaml"
     enable: true
 }
 

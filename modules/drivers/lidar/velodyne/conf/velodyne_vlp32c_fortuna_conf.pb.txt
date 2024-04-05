@@ -10,7 +10,7 @@ max_range: 200
 min_range: 0.4 
 use_gps_time: false
 calibration_online: false
-calibration_file: "/apollo/modules/drivers/velodyne/params/vlp32c_fortuna.yaml"
+calibration_file: "/apollo/modules/drivers/lidar/velodyne/params/vlp32c_fortuna.yaml"
 organized: false
 convert_channel_name: "/apollo/sensor/velodyne32/PointCloud2"
 use_poll_sync: true
