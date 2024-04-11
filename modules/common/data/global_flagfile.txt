@@ -42,5 +42,30 @@
 
 --map_dir=/apollo/modules/map/data/sunnyvale
 
+
+
+--map_dir=/apollo/modules/map/data/guerickestrasse_assymetric_47
+
+--map_dir=/apollo/modules/map/data/sunnyvale_with_two_offices
+
 --map_dir=/apollo/modules/map/data/sunnyvale_big_loop
 
+--map_dir=/apollo/modules/map/data/apollo_virutal_map
+
+--map_dir=/apollo/modules/map/data/demo
+
+--pointcloud_topic=/apollo/sensor/velodyne64/compensator/PointCloud2
+
+--map_dir=/apollo/modules/map/data/guerickestrasse_assymetric_47
+
+--map_dir=/apollo/modules/map/data/guerickestrasse_assymetric_48
+
+--map_dir=/apollo/modules/map/data/guerickestrasse_assymetric_7
+
+--map_dir=/apollo/modules/map/data/guerickestrasse_assymetric_47
+
+--map_dir=/apollo/modules/map/data/guerickestrasse_assymetric_48
+
+--map_dir=/apollo/modules/map/data/sunnyvale_loop
+
+--map_dir=/apollo/modules/map/data/guerickestrasse_assymetric_48

@@ -5,7 +5,7 @@
     "length": 4,
     "width": 2,
     "height": 1,
-    "speed": 8.0,
+    "speed": 4.0,
     "tracking_time": 1.0,
     "type": "VEHICLE",
     "trace": [

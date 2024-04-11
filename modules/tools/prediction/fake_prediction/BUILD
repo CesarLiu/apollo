@@ -1,9 +1,9 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_component","apollo_cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
-apollo_cc_library(
+apollo_component(
     name = "libfake_prediction_component.so",
     srcs = ["fake_prediction.cc"],
     deps = [

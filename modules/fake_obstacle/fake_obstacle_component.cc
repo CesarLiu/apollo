@@ -71,7 +71,7 @@ bool FakeObstacleComponent::Init() {
   CHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
 
   // instantiate reference line provider
-  const apollo::common::VehicleStateProvider* vehicle_state_provider = nullptr;
+  const apollo::common::VehicleStateProvider* vehicle_state_provider;
   // const apollo::planning::ReferenceLineConfig* reference_line_config = nullptr;
   reference_line_provider_ = std::make_unique<ReferenceLineProvider>(vehicle_state_provider, hdmap_);
   reference_line_provider_->Start();
@@ -83,7 +83,7 @@ bool FakeObstacleComponent::Init() {
 
 bool FakeObstacleComponent::InitReaders() {
   routing_reader_ = node_->CreateReader<RoutingResponse>(
-      FLAGS_routing_response_topic,
+      "/apollo/routing_response",
       [this](const std::shared_ptr<RoutingResponse>& routing) {
         AINFO << "Received routing data: run routing callback."
               << routing->header().DebugString();
@@ -134,11 +134,6 @@ bool FakeObstacleComponent::Proc() {
 }
 
 bool FakeObstacleComponent::UpdateReferenceLine() {
-  AINFO << "Get routing:" << latest_routing_.DebugString();
-  if (!latest_routing_.has_header()) {
-    AERROR << "routing not received yet";
-    return false;
-  }
 
   AINFO << "Get localization:" << latest_localization_.DebugString();
   if (!latest_localization_.has_header()) {
@@ -149,6 +144,12 @@ bool FakeObstacleComponent::UpdateReferenceLine() {
   AINFO << "Get chassis:" << latest_chassis_.DebugString();
   if (!latest_chassis_.has_header()) {
     AERROR << "chassis not received yet";
+    return false;
+  }
+
+  AERROR << "Get routing:" << latest_routing_.DebugString();
+  if (!latest_routing_.has_status()) {
+    AERROR << "routing not received yet";
     return false;
   }
   auto vehicle_state_provider = std::make_shared<VehicleStateProvider>();
@@ -189,7 +190,7 @@ PerceptionObstacles FakeObstacleComponent::FillPerceptionObstacles() {
           common::math::Vec2d(latest_localization_.pose().position().x(),
                               latest_localization_.pose().position().y());
       common::SLPoint ego_sl;
-      last_reference_lines_.front().XYToSL(ego_vec2d, &ego_sl);
+      last_reference_lines_.front().XYToSL(ego_vec2d, &ego_sl, 0.0);
 
       ObstacleInitState obstacle_init_state;
       obstacle_init_state.s = ego_sl.s() + fake_obst_config.delta_s_in_front();

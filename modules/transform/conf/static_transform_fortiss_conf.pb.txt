@@ -15,7 +15,7 @@ extrinsic_file {
 extrinsic_file {
     frame_id: "velodyne32"
     child_frame_id: "front_6mm"
-    file_path: "/apollo/modules/perception/data/params/front_6mm_extrinsics.yaml"
+    file_path: "/apollo/modules/perception/data/params/front_6mm_extrinsics_fortiss.yaml"
     enable: true
 }
 
