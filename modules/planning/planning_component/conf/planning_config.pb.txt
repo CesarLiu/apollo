@@ -18,3 +18,4 @@ learning_mode: NO_LEARNING
 reference_line_config {
   pnc_map_class: "apollo::planning::LaneFollowMap"
 }
+planner: "apollo::planning::PublicRoadPlanner"

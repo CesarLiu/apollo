@@ -40,6 +40,7 @@ namespace planning {
  **/
 class BarkRlPlanner : public LatticePlanner {
  public:
+  BarkRlPlanner();
   virtual ~BarkRlPlanner() = default;
 
   std::string Name() override { return "BARK_RL"; }

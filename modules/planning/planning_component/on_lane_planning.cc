@@ -109,10 +109,10 @@ std::string OnLanePlanning::Name() const { return "on_lane_planning"; }
 Status OnLanePlanning::Init(const PlanningConfig& config) {
   if (!CheckPlanningConfig(config)) {
     return Status(ErrorCode::PLANNING_ERROR,
-                  "planning config error: " + config_.DebugString());
+                  "planning config error: " + config.DebugString());
   }
 
-  PlanningBase::Init(config_);
+  PlanningBase::Init(config);
 
   // clear planning history
   injector_->history()->Clear();

@@ -53,7 +53,7 @@ using apollo::cyber::Rate;
 using apollo::planning::DiscretizedTrajectory;
 using apollo::planning::fortiss::MapOffset;
 
-// BarkRlPlanner::BarkRlPlanner() { logdir_ += "/apollo/data/log/"; }
+BarkRlPlanner::BarkRlPlanner() { logdir_ += "/apollo/data/log/"; }
 
 common::Status BarkRlPlanner::Init(const std::shared_ptr<DependencyInjector>& injector,
                          const std::string& config_path) {

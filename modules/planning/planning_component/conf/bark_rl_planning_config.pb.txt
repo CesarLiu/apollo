@@ -1,14 +1,21 @@
-use_environment_polygon: true
-consider_obstacles: true
-nr_steps: 10
-ts: 0.2
-distance_stop_before: 1
-distance_start_slowdown: 15
-destination_distance_stop_threshold: 5.0
-cutoff_distance_reference_after_stop: 10.0
-pts_offset_x: 692000
-pts_offset_y: 5.339e+06
-use_smoothing: true
-log_trajectories: true
-
-
+topic_config {
+  chassis_topic: "/apollo/canbus/chassis"
+  hmi_status_topic: "/apollo/hmi/status"
+  localization_topic: "/apollo/localization/pose"
+  planning_pad_topic: "/apollo/planning/pad"
+  planning_trajectory_topic: "/apollo/planning"
+  prediction_topic: "/apollo/prediction"
+  relative_map_topic: "/apollo/relative_map"
+  routing_request_topic: "/apollo/external_command/lane_follow"
+  routing_response_topic: "/apollo/routing_response"
+  planning_command_topic: "/apollo/planning/command"
+  story_telling_topic: "/apollo/storytelling"
+  traffic_light_detection_topic: "/apollo/perception/traffic_light"
+  planning_learning_data_topic: "/apollo/planning/learning_data"
+}
+# NO_LEARNING / E2E / HYBRID / RL_TEST / E2E_TEST / HYBRID_TEST
+learning_mode: NO_LEARNING
+reference_line_config {
+  pnc_map_class: "apollo::planning::LaneFollowMap"
+}
+planner: "apollo::planning::BarkRlPlanner"

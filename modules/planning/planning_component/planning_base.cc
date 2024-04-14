@@ -93,11 +93,14 @@ void PlanningBase::FillPlanningPb(const double timestamp,
 
 void PlanningBase::LoadPlanner() {
   // Use PublicRoadPlanner as default Planner
+  AINFO << "In config Planner name is set to be " << config_.planner();
   std::string planner_name = "apollo::planning::PublicRoadPlanner";
   if ("" != config_.planner()) {
+    AINFO << "Planner name is set to be " << config_.planner();
     planner_name = config_.planner();
     planner_name = ConfigUtil::GetFullPlanningClassName(planner_name);
   }
+  AINFO << "Planning planner: " << planner_name;
   planner_ =
       cyber::plugin_manager::PluginManager::Instance()->CreateInstance<Planner>(
           planner_name);

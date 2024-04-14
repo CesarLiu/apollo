@@ -70,7 +70,7 @@ class LatticePlanner : public PlannerWithReferenceLine {
 };
 
 CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::LatticePlanner,
-                                     PlannerWithReferenceLine)
+                                     Planner)
 
 }  // namespace planning
 }  // namespace apollo

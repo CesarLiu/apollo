@@ -57,7 +57,8 @@ bool PlanningComponent::Init() {
       return false;
     }
   }
-
+  // debug config_ content:
+  AINFO << "PlaningComponent: config_ content: " << config_.DebugString();
   planning_base_->Init(config_);
 
   planning_command_reader_ = node_->CreateReader<PlanningCommand>(

@@ -40,6 +40,7 @@ namespace planning {
  **/
 class MiqpPlanner : public LatticePlanner {
  public:
+  MiqpPlanner();
   virtual ~MiqpPlanner() = default;
 
   std::string Name() override { return "MIQP"; }
