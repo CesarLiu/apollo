@@ -37,6 +37,7 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacles;
 using apollo::planning::ReferenceLineProvider;
 using apollo::routing::RoutingResponse;
+using apollo::planning::PlanningCommand;
 
 FakeObstacleComponent::FakeObstacleComponent()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {
@@ -66,34 +67,43 @@ bool FakeObstacleComponent::Init() {
   obstacle_writer_ =
       node_->CreateWriter<PerceptionObstacles>(FLAGS_perception_obstacle_topic);
 
-  // load map
-  hdmap_ = HDMapUtil::BaseMapPtr();
-  CHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
-
   // instantiate reference line provider
-  const apollo::common::VehicleStateProvider* vehicle_state_provider;
-  // const apollo::planning::ReferenceLineConfig* reference_line_config = nullptr;
-  reference_line_provider_ = std::make_unique<ReferenceLineProvider>(vehicle_state_provider, hdmap_);
+  vehicle_state_provider_ = std::make_shared<common::VehicleStateProvider>();
+  const apollo::planning::ReferenceLineConfig* reference_line_config = nullptr;
+  reference_line_provider_ = std::make_unique<ReferenceLineProvider>(
+      vehicle_state_provider_.get(), reference_line_config);
   reference_line_provider_->Start();
 
-  AERROR << "Initialized FakeObstacleComponent !";
+  AINFO << "Initialized FakeObstacleComponent !";
 
   return true;
 }
 
 bool FakeObstacleComponent::InitReaders() {
-  routing_reader_ = node_->CreateReader<RoutingResponse>(
-      "/apollo/routing_response",
-      [this](const std::shared_ptr<RoutingResponse>& routing) {
-        AINFO << "Received routing data: run routing callback."
-              << routing->header().DebugString();
+  planning_command_reader_ = node_->CreateReader<PlanningCommand>(
+      "/apollo/planning/command",
+      [this](const std::shared_ptr<PlanningCommand>& planning_command) {
+        AINFO << "Received planning data: run planning callback."
+              << planning_command->header().DebugString();
         std::lock_guard<std::mutex> lock(mutex_);
-        latest_routing_.CopyFrom(*routing);
+        latest_planning_command_.CopyFrom(*planning_command);
       });
-  if (routing_reader_ == nullptr) {
-    AERROR << "Create routing response reader failed";
+  if (planning_command_reader_ == nullptr) {
+    AERROR << "Create planning command reader failed";
     return false;
   }
+  // routing_reader_ = node_->CreateReader<RoutingResponse>(
+  //     "/apollo/routing_response",
+  //     [this](const std::shared_ptr<RoutingResponse>& routing) {
+  //       AINFO << "Received routing data: run routing callback."
+  //             << routing->header().DebugString();
+  //       std::lock_guard<std::mutex> lock(mutex_);
+  //       latest_routing_.CopyFrom(*routing);
+  //     });
+  // if (routing_reader_ == nullptr) {
+  //   AERROR << "Create routing response reader failed";
+  //   return false;
+  // }
 
   chassis_reader_ = node_->CreateReader<Chassis>(
       FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis>& chassis) {
@@ -147,18 +157,23 @@ bool FakeObstacleComponent::UpdateReferenceLine() {
     return false;
   }
 
-  AERROR << "Get routing:" << latest_routing_.DebugString();
-  if (!latest_routing_.has_status()) {
-    AERROR << "routing not received yet";
+  // AINFO << "Get routing:" << latest_routing_.DebugString();
+  // if (!latest_routing_.has_status()) {
+  //   AERROR << "routing not received yet";
+  //   return false;
+  // }
+  AINFO << "Get planning command:" << latest_planning_command_.DebugString();
+  if (!latest_planning_command_.has_header()) {
+    AERROR << "planning command not received yet";
     return false;
   }
-  auto vehicle_state_provider = std::make_shared<VehicleStateProvider>();
-  Status status = vehicle_state_provider->Update(latest_localization_,
+  Status status = vehicle_state_provider_->Update(latest_localization_,
                                                            latest_chassis_);
   VehicleState vehicle_state =
-      vehicle_state_provider->vehicle_state();
+      vehicle_state_provider_->vehicle_state();
 
-  reference_line_provider_->UpdateRoutingResponse(latest_routing_);
+  // reference_line_provider_->UpdateRoutingResponse(latest_routing_);
+  reference_line_provider_->UpdatePlanningCommand(latest_planning_command_);
   reference_line_provider_->UpdateVehicleState(vehicle_state);
 
   std::list<hdmap::RouteSegments> segments;
@@ -180,7 +195,7 @@ PerceptionObstacles FakeObstacleComponent::FillPerceptionObstacles() {
        fake_obst_list_config_.fake_obstacle_conf()) {
     int id = fake_obst_config.id();
     if (obstacles_init_states_.count(id) == 0) {
-      AERROR << "Initializing fake obstacle with id " << id;
+      AINFO << "Initializing fake obstacle with id " << id;
       if (!UpdateReferenceLine()) {
         AERROR << "Could not update reference";
         break;

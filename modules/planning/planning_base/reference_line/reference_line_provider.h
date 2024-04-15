@@ -67,10 +67,6 @@ class ReferenceLineProvider {
       const ReferenceLineConfig* reference_line_config,
       const std::shared_ptr<relative_map::MapMsg>& relative_map = nullptr);
 
-  ReferenceLineProvider(
-      const common::VehicleStateProvider* vehicle_state_provider,
-      const hdmap::HDMap* base_map,
-      const std::shared_ptr<relative_map::MapMsg>& relative_map = nullptr);
 
   /**
    * @brief Default destructor.

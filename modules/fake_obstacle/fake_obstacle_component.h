@@ -29,6 +29,7 @@
 #include "modules/planning/planning_base/reference_line/reference_line.h"
 #include "modules/planning/planning_base/reference_line/reference_line_provider.h"
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_command.pb.h"
 
 
 namespace apollo {
@@ -55,6 +56,8 @@ class FakeObstacleComponent : public apollo::cyber::TimerComponent {
   apollo::perception::PerceptionObstacles FillPerceptionObstacles();
 
  private:
+  std::shared_ptr<cyber::Reader<apollo::planning::PlanningCommand>> planning_command_reader_ =
+      nullptr;
   std::shared_ptr<cyber::Reader<routing::RoutingResponse>> routing_reader_ =
       nullptr;
   std::shared_ptr<cyber::Reader<localization::LocalizationEstimate>>
@@ -67,14 +70,13 @@ class FakeObstacleComponent : public apollo::cyber::TimerComponent {
   std::mutex mutex_;
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
-  routing::RoutingResponse latest_routing_;
   canbus::Chassis latest_chassis_;
   localization::LocalizationEstimate latest_localization_;
+  planning::PlanningCommand latest_planning_command_;
+  std::shared_ptr<common::VehicleStateProvider> vehicle_state_provider_ = nullptr;
 
   std::unique_ptr<apollo::planning::ReferenceLineProvider> reference_line_provider_;
   std::list<planning::ReferenceLine> last_reference_lines_;
-
-  const hdmap::HDMap* hdmap_ = nullptr;
 
   std::map<int, ObstacleInitState> obstacles_init_states_;
 };

@@ -7,8 +7,8 @@ module_config {
     config {
       name : "fake_obstacle"
       flag_file_path:  "/apollo/modules/fake_obstacle/conf/fake_obstacle.conf"
-      #config_file_path : "/apollo/modules/fake_obstacle/conf/fake_obstacle_dynamic.pb.txt"
-      config_file_path : "/apollo/modules/fake_obstacle/conf/fake_obstacle_static_1.pb.txt"
+      config_file_path : "/apollo/modules/fake_obstacle/conf/fake_obstacle_dynamic.pb.txt"
+      #config_file_path : "/apollo/modules/fake_obstacle/conf/fake_obstacle_static_1.pb.txt"
       interval: 1000
       
     }

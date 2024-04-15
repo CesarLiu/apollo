@@ -25,6 +25,7 @@ apollo_component(
         "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
         "//modules/map:apollo_map",
         "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
     ],
 )
 

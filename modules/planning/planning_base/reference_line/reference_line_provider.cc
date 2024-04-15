@@ -106,36 +106,6 @@ ReferenceLineProvider::ReferenceLineProvider(
   is_initialized_ = true;
 }
 
-ReferenceLineProvider::ReferenceLineProvider(
-    const common::VehicleStateProvider *vehicle_state_provider,
-    const hdmap::HDMap *base_map,
-    const std::shared_ptr<relative_map::MapMsg> &relative_map)
-    : vehicle_state_provider_(vehicle_state_provider) {
-  current_pnc_map_ = nullptr;
-  if (!FLAGS_use_navigation_mode) {
-    relative_map_ = nullptr;
-  } else {
-    current_pnc_map_ = nullptr;
-    relative_map_ = relative_map;
-  }
-
-  ACHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
-                                         &smoother_config_))
-      << "Failed to load smoother config file "
-      << FLAGS_smoother_config_filename;
-  if (smoother_config_.has_qp_spline()) {
-    smoother_.reset(new QpSplineReferenceLineSmoother(smoother_config_));
-  } else if (smoother_config_.has_spiral()) {
-    smoother_.reset(new SpiralReferenceLineSmoother(smoother_config_));
-  } else if (smoother_config_.has_discrete_points()) {
-    smoother_.reset(new DiscretePointsReferenceLineSmoother(smoother_config_));
-  } else {
-    ACHECK(false) << "unknown smoother config "
-                  << smoother_config_.DebugString();
-  }
-  is_initialized_ = true;
-}
-
 bool ReferenceLineProvider::UpdateRoutingResponse(
     const routing::RoutingResponse &routing) {
   std::lock_guard<std::mutex> routing_lock(routing_mutex_);
@@ -341,9 +311,11 @@ bool ReferenceLineProvider::GetReferenceLines(
   CHECK_NOTNULL(reference_lines);
   CHECK_NOTNULL(segments);
   if (!has_planning_command_) {
+    AERROR << "Planning command is not ready.";
     return true;
   }
   if (FLAGS_use_navigation_mode) {
+    AINFO << "Use navigation mode for reference line provider";
     double start_time = Clock::NowInSeconds();
     bool result = GetReferenceLinesFromRelativeMap(reference_lines, segments);
     if (!result) {
@@ -362,6 +334,7 @@ bool ReferenceLineProvider::GetReferenceLines(
       return true;
     }
   } else {
+    AINFO << "Reference line provider thread is disabled";
     double start_time = Clock::NowInSeconds();
     if (CreateReferenceLine(reference_lines, segments)) {
       UpdateReferenceLine(*reference_lines, *segments);
