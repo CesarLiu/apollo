@@ -42,6 +42,7 @@ Inference *CreateInferenceByName(const std::string &frame_work,
                                  const std::vector<std::string> &outputs,
                                  const std::vector<std::string> &inputs,
                                  const std::string &model_root) {
+  AINFO << "Create inference by STRING name: " << frame_work;
   if (frame_work == "RTNet") {
     return new RTNET;
   } else if (frame_work == "RTNetInt8") {
@@ -65,6 +66,7 @@ Inference *CreateInferenceByName(const common::Framework &frame_work,
                                  const std::vector<std::string> &outputs,
                                  const std::vector<std::string> &inputs,
                                  const std::string &model_root) {
+  AINFO << "Create inference by recognized FRAMEWORK name: " << frame_work;
   switch (frame_work) {
     case common::TensorRT:
       if (model_root.empty()) {

@@ -783,6 +783,8 @@ RTNet::RTNet(const std::string &net_file, const std::string &model_file,
   loadWeights(model_file, &weight_map_);
   net_param_.reset(new NetParameter);
   loadNetParams(net_file, net_param_.get());
+  std::string::size_type pos = model_file.find_last_of("/\\");
+  model_root_= model_file.substr(0, pos);
 }
 RTNet::RTNet(const std::string &net_file, const std::string &model_file,
              const std::vector<std::string> &outputs,
@@ -876,7 +878,7 @@ bool RTNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
 
   builder_ = nvinfer1::createInferBuilder(rt_gLogger);
 
-  workspaceSize_ = 1 << 30;
+  workspaceSize_ = 1 << 32;
   cudaDeviceProp prop;
   cudaGetDeviceProperties(&prop, gpu_id_);
   bool int8_mode = checkInt8(prop.name, calibrator_);
@@ -911,7 +913,7 @@ bool RTNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
 
   // serialize trt engine the first time
   nvinfer1::ICudaEngine *engine = nullptr;
-  auto trt_cache_path = model_root_ + "/TRTengine.cache";
+  auto trt_cache_path = model_root_ + ".trt.engine";
   if (!LoadCache(trt_cache_path)) {
     engine = builder_->buildEngineWithConfig(*network_, *builder_config_);
 
